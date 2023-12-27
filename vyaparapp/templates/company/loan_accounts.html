@@ -1,0 +1,2518 @@
+{% extends 'company/src/html/base.html' %}
+{% load static %}
+{% block content %}
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.6"
+    integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+    crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://kit.fontawesome.com/2a2f1ba69e.js" crossorigin="anonymous"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+
+
+
+<style>
+    .calendar-title {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .calendar {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        position: absolute;
+        top: 20% !important;
+        left: 51% !important;
+        z-index: 1;
+        display: none;
+    }
+
+    .header {
+        background-color: #3498db;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    #prevBtn,
+    #nextBtn {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    #monthYear {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        padding: 10px;
+    }
+
+    .day {
+        padding: 10px;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .day.current {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .day.selected {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .input-container {
+        position: relative;
+
+    }
+
+
+    .label-inside {
+        position: absolute;
+        top: 50%;
+        left: 30px;
+
+        transform: translateY(-50%);
+        pointer-events: none;
+        background-color: white;
+        transition: all 0.3s ease;
+
+    }
+
+    .form-control:focus+.label-inside,
+    .form-control:not(:placeholder-shown)+.label-inside {
+        top: 0;
+        font-size: 12px;
+
+
+    }
+
+    .bs {
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+    }
+
+    .bs_sm {
+        box-shadow: inset 2px 2px 5px 3px rgba(0, 0, 0, 0.199);
+    }
+
+    .tb {
+        color: black;
+    }
+
+    .tg {
+        color: rgb(0, 140, 7);
+    }
+
+    .tr {
+        color: rgb(218, 0, 0);
+    }
+
+    .btn_add {
+        background-color: orange;
+        color: black;
+    }
+
+    .btn_add:hover {
+        background-color: rgb(234, 152, 0);
+        color: black;
+    }
+
+    .bg-pink {
+        background-color: rgb(239, 3, 82)
+    }
+
+    ::-webkit-scrollbar {
+        display: none
+    }
+
+    .custom-btn-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .custom-btn-group .btn {
+
+        border-radius: 0;
+    }
+
+    .bs {
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+    }
+
+    .bs_sm {
+        box-shadow: inset 2px 2px 5px 3px rgba(0, 0, 0, 0.199);
+    }
+
+    .paiddiv {
+        color: black;
+        height: 10vh;
+        width: 20vh;
+        padding-left: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        margin-left: 7vh;
+        border-radius: 8px;
+        background-color: lightgray;
+    }
+
+    .unpaiddiv {
+        color: black;
+        height: 10vh;
+        width: 20vh;
+        padding-left: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        margin-left: 7vh;
+        border-radius: 8px;
+        background-color: lightsteelblue;
+    }
+
+    .totaldiv {
+        color: black;
+        height: 10vh;
+        width: 20vh;
+        padding-left: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        margin-left: 7vh;
+        border-radius: 8px;
+        background-color: lightgreen;
+    }
+
+    #billtable tbody {
+        cursor: pointer;
+    }
+
+    #emptyMessage {
+        display: none;
+        /* font-size: x-large;
+        font-weight: bold;
+        color: rgb(0, 0, 0); */
+    }
+
+    #emptyMessage1 {
+        display: none;
+        /* font-size: x-large;
+        font-weight: bold;
+        color: rgb(0, 0, 0); */
+    }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+        padding: 10px;
+        z-index: 1;
+        width: 15%;
+    }
+
+    .dropdown-content label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .dropdown-content input {
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+    .tplus {
+        margin-top: 3vh;
+        margin-left: 5vh;
+        margin-right: -2vh;
+    }
+
+    .tequal {
+        margin-top: 3vh;
+        margin-left: 5vh;
+        margin-right: -2vh;
+    }
+
+    .tg {
+        color: rgb(0, 140, 7);
+    }
+
+    .tr {
+        color: rgb(218, 0, 0);
+    }
+
+    .tj {
+        color: #E4A11B;
+    }
+
+    .th {
+        color: rgb(12, 79, 234);
+    }
+
+    @media print {
+        body {
+            visibility: hidden !important;
+
+        }
+
+        .printContainer {
+            visibility: visible !important;
+
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+        }
+
+        #calcdiv {
+            visibility: visible;
+            margin-top: -30vh;
+            margin-left: -9vh;
+            margin-bottom: 30vh;
+        }
+
+        #billtable {
+            margin-top: 10vh;
+            margin-bottom: 20vh;
+        }
+
+        #billtable th {
+            font-size: medium;
+        }
+
+        .extra {
+            display: none;
+        }
+    }
+
+    ::-webkit-scrollbar {
+        display: none
+    }
+
+
+
+
+    @media (max-width: 480px) {
+        .main-div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .topdiv {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+
+
+        }
+
+        .search-excel {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+
+        }
+
+
+        .big-div {
+            width: 90vw;
+        }
+
+
+    }
+
+
+    @media (min-width: 481px) and (max-width:767px) {
+        .main-div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+    }
+
+
+
+    @media (min-width: 768px) and (max-width:991px) {
+        .main-div {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+    }
+
+
+
+
+    @media (min-width: 992px) and (max-width:1199px) {
+        .main-div {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+    }
+
+    @media (min-width: 1200px) and (max-width:1919px) {
+        .main-div {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+    }
+
+
+    @media (min-width: 1920px) {
+        .main-div {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+    }
+
+    .calendar-title {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .calendar {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        position: absolute;
+
+        left: 51% !important;
+        z-index: 1;
+        display: none;
+    }
+
+    .header {
+        background-color: #3498db;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    #prevBtn,
+    #nextBtn {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    #monthYear {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        padding: 10px;
+    }
+
+    .day {
+        padding: 10px;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .day.current {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .day.selected {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .input-container {
+        position: relative;
+
+    }
+
+
+    .label-inside {
+        position: absolute;
+        top: 50%;
+        left: 30px;
+
+        transform: translateY(-50%);
+        pointer-events: none;
+        background-color: white;
+        transition: all 0.3s ease;
+
+    }
+
+    .form-control:focus+.label-inside,
+    .form-control:not(:placeholder-shown)+.label-inside {
+        top: 0;
+        font-size: 12px;
+
+
+    }
+
+    .calendar-title2 {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .calendar2 {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        position: absolute;
+        top: 20% !important;
+        left: 51% !important;
+        z-index: 1;
+        display: none;
+    }
+
+    .header2 {
+        background-color: #3498db;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    #prevBtn2,
+    #nextBtn2 {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    #monthYear2 {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .days2 {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        padding: 10px;
+    }
+
+    .day2 {
+        padding: 10px;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .day2.current {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .day2.selected {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .input-container2 {
+        position: relative;
+    }
+
+    .label-inside2 {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        /* Adjusted left value */
+        transform: translateY(-50%);
+        pointer-events: none;
+        background-color: white;
+        transition: all 0.3s ease;
+        font-size: 16px;
+        /* Adjusted font-size */
+    }
+
+    .form-control:focus+.label-inside2,
+    .form-control:not(:placeholder-shown)+.label-inside2 {
+        top: 0;
+        font-size: 12px;
+    }
+</style>
+
+
+<div class="body-wrapper ">
+    <br><br><br><br>
+    <div class=" bg-light bg-light pb-0 mb-0 p-2" style="height:100%;width:100%">
+        <div class="d-flex flex-column justify-content-center d-md-none">
+            <a href="{% url 'add_loan_accounts' %}" id="b1" class="btn text-white mb-2"
+                style="background-color: rgb(252, 3, 3,0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                Add Loan Account <i class="fa fa-plus"></i>
+            </a>
+            <a data-bs-toggle="modal" data-bs-target="#exampleModal" id="b2" class="btn text-white mb-2"
+                style="background-color: rgba(3, 161, 252, 0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                Make Payment <i class="fa fa-plus"></i>
+            </a>
+            <a data-bs-toggle="modal" data-bs-target="#formoreloan" id="b3" class="btn text-primary"
+                style="border-radius: 20px;border: 1px solid rgb(40, 12, 222);background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                Additional Loan <i class="fa fa-plus"></i>
+            </a>
+        </div>
+        <div class="d-none d-md-flex justify-content-center">
+            <a href="{% url 'add_loan_accounts' %}" id="b1" class="btn text-white mx-2"
+                style="background-color: rgb(252, 3, 3,0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                Add Loan Account <i class="fa fa-plus"></i>
+            </a>
+            <a data-bs-toggle="modal" data-bs-target="#exampleModal" id="b2" class="btn text-white mx-2"
+                style="background-color: rgba(3, 161, 252, 0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                Make Payment <i class="fa fa-plus"></i>
+            </a>
+            <a data-bs-toggle="modal" data-bs-target="#formoreloan" id="b3" class="btn text-primary mx-2"
+                style="border-radius: 20px;border: 1px solid rgb(40, 12, 222);background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                Additional Loan <i class="fa fa-plus"></i>
+            </a>
+        </div>
+        <hr>
+
+        <h5 class="text-center">Loan Accounts</h5>
+
+
+
+
+        <br>
+
+        {% if data %}
+        <!-- style="display: flex;flex-direction: row ; justify-content:space-around;  " -->
+        <div class="p-2 main-div">
+
+            <div class=" side-div "
+                style=" background-color: white; height:67vh;  box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.249); ">
+                <div class=" ">
+                    <div class="col-sm-12 container bg-light mt-2">
+
+                        <div class="ms-2">
+                            <small>
+                                Business Loans up to 30 lakhs!<br>
+                                Now avail loans with completely digital process,<br> no collateral and fast disbursal
+                            </small>
+                            <br>
+                            <button style="border-radius: 30px;" type="button"
+                                class="btn  btn-light mt-2 text-primary bg-white">Explore Now</button>
+
+                        </div>
+                        <br>
+                    </div>
+
+
+
+                </div>
+
+                <div style="display: flex; flex-direction: row; justify-content:space-between;" class="mx-2 ">
+
+                    <div id="searchContainer">
+                        <button id="searchButton" style="border-radius:50%; width: 50px; height: 50px;" type="button"
+                            class="btn btn-light mt-2">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                    <div class="mx-auto mt-2">
+                        <input placeholder="Search..." id="searchField" type="text" class="form-control" placeholder="">
+                    </div>
+
+                    <div id="addLoanContainer" style="display: block;">
+                        <button style="border-radius: 10px;" type="button"
+                            class="btn btn-light mt-2 text-white bg-info">
+                            <a class="text-white" href="{% url 'add_loan_accounts' %}">Add Loan A/C</a>
+                        </button>
+
+                    </div>
+
+
+                </div>
+                <br>
+                <div style="display: flex; justify-content: space-between; max-height: 230px; overflow-y: auto;">
+                    <div class="w-100" style="display: flex; justify-content: space-between;">
+                        {% if data %}
+                            <table class="table" id="loanTable1">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"> ACCOUNT</th>
+                                        <th scope="col"> AMOUNT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for d in data %}
+                                    <tr onclick="showDetails('{{ d.account_name }}')">
+                                        <td class="showDetails">{{ d.account_name }}</td>
+                                            <td class="showDetails text-danger">₹ {{d.total_amount}}</td>
+                                            <td class="showDetails text-danger" hidden>{{d.account_number}}</td>
+                                            <td class="showDetails text-danger" hidden>{{d.lender_bank}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div>
+                                <p id="emptyMessage1" style="text-align: center;" class="text-danger"> <br> Sorry We Couldn't
+                                    find any result </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                
+
+
+
+            </div>
+            <script>
+                function showDetails(accountName) {
+                    var table = document.getElementById('billtable');
+                    var rows = table.getElementsByTagName('tr');
+            
+                    for (var i = 0; i < rows.length; i++) {
+                        var accountCell = rows[i].getElementsByTagName('td')[1]; // Assuming account name is in the second column
+                        if (accountCell && accountCell.innerText === accountName) {
+                            rows[i].style.display = '';
+                        } else {
+                            rows[i].style.display = 'none';
+                        }
+                    }
+                }
+            </script>
+            
+            
+            <!-- gttttg -->
+
+
+
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var loanTable = document.getElementById('loanTable1');
+                    var lendingBankAgencyElement = document.getElementById('lendingBankAgency');
+                    var accountNumberElement = document.getElementById('accountNumber');
+                    var bankAmountElement = document.getElementById('bankAmount');
+
+                    loanTable.addEventListener('click', function (event) {
+                        if (event.target.tagName === 'TD' && event.target.classList.contains('showDetails')) {
+                            var partyName = event.target.parentElement.querySelector('td:first-child').innerText;
+                            var totalAmount = event.target.parentElement.querySelector('td:nth-child(2)').innerText;
+                            var accountNumber = event.target.parentElement.querySelector('td:nth-child(3)').innerText;
+                            var lenderBank = event.target.parentElement.querySelector('td:nth-child(4)').innerText;
+
+                            lendingBankAgencyElement.innerText = 'Lending Bank / Agency: ' + lenderBank;
+                            accountNumberElement.innerText = 'Account Number: ' + accountNumber;
+                            bankAmountElement.innerText = 'Bank Amount: ' + totalAmount;
+                        }
+                    });
+                });
+            </script>
+
+
+
+
+
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const searchButton = document.getElementById('searchButton');
+                    const searchField = document.getElementById('searchField');
+                    const loanTable = document.getElementById('loanTable1');
+                    const emptyMessage = document.getElementById('emptyMessage1');
+
+                    console.log("Script loaded.");
+
+                    // Retrieve the search term from sessionStorage
+                    const savedSearchTerm = sessionStorage.getItem('searchTerm');
+                    if (savedSearchTerm) {
+                        searchField.value = savedSearchTerm;
+                        searchButton.click();
+                    }
+
+                    searchButton.addEventListener('click', function () {
+                        searchField.style.display = searchField.style.display === 'none' ? 'block' : 'none';
+                    });
+
+                    searchField.addEventListener('input', function () {
+                        console.log("Input event fired.");
+                        const searchTerm = searchField.value.toLowerCase();
+                        const rows = loanTable.querySelectorAll('tbody tr');
+                        let anyVisible = false;
+
+                        rows.forEach(row => {
+                            const accountName = row.querySelector('td:first-child').innerText.toLowerCase();
+                            const amount = row.querySelector('td:nth-child(2)').innerText.toLowerCase();
+                            const isVisible = accountName.includes(searchTerm) || amount.includes(searchTerm);
+                            row.style.display = isVisible ? '' : 'none';
+                            anyVisible = anyVisible || isVisible;
+                        });
+
+                        console.log("Search term:", searchTerm);
+                        console.log("Any visible:", anyVisible);
+
+                        emptyMessage.style.display = anyVisible ? 'none' : 'block';
+
+
+                        sessionStorage.setItem('searchTerm', searchTerm);
+                    });
+                });
+            </script>
+
+
+
+            <div class="">
+                <div class=" ">
+                    <div class="  " style="background-color: white;box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.249);">
+
+                        <div style=" display: flex; justify-content: space-between;"
+                            class="topdiv mt-3 mt-lg-0  pt-3    ">
+
+
+                            <div class="text-dark  mx-2 ">
+                                <h6 id="lendingBankAgency">Lending Bank / Agency:</h6>
+                                <h6 id="accountNumber">Account Number:</h6>
+                                <h6 id="bankAmount">Bank Amount:</h6>
+                            </div>
+
+
+
+
+                            <div class="dropdown mt-3 mt-lg-0" style="border-radius: 500px;" class=" ">
+
+
+                                <div class="custom-btn-group mx-2">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal">
+                                        <i class="fa-solid fa-sliders"></i>&nbsp; Make Payment
+                                    </button>
+
+                                    <button class="btn btn-primary dropdown-toggle" type="button"
+                                        id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                            <li><a class="dropdown-item" data-bs-toggle="modal"
+                                                    data-bs-target="#formoreloan">
+                                                    &nbsp;&nbsp;Additional Loan
+
+                                                </a></li>
+                                            <!-- <li><a class="dropdown-item" href="#">Charges on loan</a></li> -->
+
+                                        </ul>
+
+                                    </button>
+                                </div>
+
+
+                                <br> <br>
+
+
+                            </div>
+
+
+
+
+
+                        </div>
+
+                    </div>
+                    <script>
+                        function showDetails(accountName) {
+                            var table = document.getElementById('billtable');
+                            var rows = table.getElementsByTagName('tr');
+                    
+                            for (var i = 0; i < rows.length; i++) {
+                                var accountCell = rows[i].getElementsByTagName('td')[1]; // Assuming account name is in the second column
+                                if (accountCell && accountCell.innerText === accountName) {
+                                    rows[i].style.display = '';
+                                } else {
+                                    rows[i].style.display = 'none';
+                                }
+                            }
+                        }
+                    </script>
+
+                    <div class=" mt-3 big-div " style=" height: 50vh ; background-color: white;box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.249); 
+                     ">
+
+                        <br>
+
+                        <div class="search-excel" style="display: flex; justify-content: space-between;" class="mx-2">
+                            <div style="display: flex; ">
+
+                                <button class="btn " type="button" onclick="ExportToExcel()">
+                                    <span><img width="22px" src="{% static 'assets/excel2.png' %}" alt="no img"></span>
+                                    <br><span style="color: black; font-size: small; font-weight: bold;">Excel</span>
+                                </button>
+
+                                <button class="btn " type="button" onclick="printfunction()">
+                                    <span><img width="30px" src="{% static 'images/printer.jpeg' %}"
+                                            alt="no img"></span>
+                                    <br><span style="color: black; font-size: small; font-weight: bold;">Print</span>
+                                </button>
+
+                                <button class="btn " type="button" data-toggle="modal" data-target="#excelModal"
+                                    onclick="excelmodel()">
+                                    <span><img width="30px" src="{% static 'images/import.png' %}" alt="no img"></span>
+                                    <br><span style="color: black; font-size: small; font-weight: bold;">Import</span>
+                                </button>
+
+                            </div>
+                            <div class="input-group rounded  w-75 mx-5 input-search-table" style=" height: 10px;">
+                                <span class="input-group-text border-0 bg-light" id="search-addon">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input id="search_input" type="search" class="form-control rounded" aria-label="Search"
+                                    aria-describedby="search-addon" />
+
+                            </div>
+                        </div>
+                        <script>
+                            function showDetails(accountName) {
+                                var table = document.getElementById('billtablew');
+                                var rows = table.getElementsByTagName('tr');
+    
+                                for (var i = 0; i < rows.length; i++) {
+                                    var accountCell = rows[i].getElementsByTagName('td')[2]; // Assuming account name is in the third column
+                                    if (accountCell && accountCell.innerText === accountName) {
+                                        rows[i].style.display = '';
+                                    } else {
+                                        rows[i].style.display = 'none';
+                                    }
+                                }
+                            }
+                        </script>
+                        <br>
+                        <div class="container-fluid ">
+                            <div class="table-responsive" style="height: 230px; overflow: auto;">
+                                <table class="table  table-hover"  id="billtable" >
+                                    <thead>
+
+                                        <tr>
+                                            <th scope="col">DATE
+                                                <a class="extra text-info ms-5" onclick="toggleDropdown(0)">&nbsp;<i
+                                                        class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent0">
+                                                    <label for="filterInput0"
+                                                        style="color: black; text-align: left;">Equal
+                                                        To</label>
+                                                    <input type="date" id="filterInput0" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(0)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(0)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th scope="col">
+
+
+                                                TYPE
+                                                &nbsp;&nbsp;&nbsp;&nbsp; <a class="extra text-info ms-5"
+                                                    onclick="toggleDropdown(1)"><i class="fa fa-filter"
+                                                        aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent1">
+                                                    <label for="filterInput1"
+                                                        style="color: black; text-align: left;">Equal
+                                                        To</label>
+                                                    <input type="text" id="filterInput1" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(1)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(1)">Apply</a>
+                                                </div>
+
+                                            </th>
+
+
+
+                                            <th scope="col">PRINCIPAL
+                                                <a class="extra text-info ms-5" onclick="toggleDropdown(2)">&nbsp;<i
+                                                        class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent2">
+                                                    <label for="filterInput2"
+                                                        style="color: black; text-align: left;">Equal
+                                                        To</label>
+                                                    <input type="text" id="filterInput2" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(2)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(2)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th scope="col">INTEREST
+                                                <a class="extra text-info ms-5" onclick="toggleDropdown(3)">&nbsp;<i
+                                                        class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent3">
+                                                    <label for="filterInput3"
+                                                        style="color: black; text-align: left;">Equal
+                                                        To</label>
+                                                    <input type="text" id="filterInput3" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(3)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(3)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th scope="col">TOTAL AMOUNT
+                                                <a class="extra text-info ms-5" onclick="toggleDropdown(4)">&nbsp;<i
+                                                        class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent4">
+                                                    <label for="filterInput5"
+                                                        style="color: black; text-align: left;">Equal
+                                                        To</label>
+                                                    <input type="text" id="filterInput4" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(4)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(4)">Apply</a>
+                                                </div>
+                                            </th>
+                                        </tr>
+
+                                    </thead>
+                                    <tbody id="billtablew">
+                                        {% for i in data %}
+                                        <tr>
+                                            <td class="clickable-row" style="color: black;"
+                                                data-href="loan_accounts_view_page/{{ i.id }}">{{i.date | date:'d-m-Y'}}
+                                            </td>
+                                            <td>Opening Loan</td>
+                                            <td hidden>{{i.account_name}}</td>
+
+                                         
+
+                                            <td class="clickable-row" style="color: black;"
+                                                data-href="loan_accounts_view_page/{{ i.id }}">₹ {{i.loan_amount}}</td>
+                                            <td class="clickable-row" style="color: black;"
+                                                data-href="loan_accounts_view_page/{{ i.id }}">{{i.interest_rate}}</td>
+                                            <td class="clickable-row" style="color: black;"
+                                                data-href="loan_accounts_view_page/{{ i.id }}">₹ {{i.total_amount}}</td>
+
+
+                                            <td>
+                                                <div class="dropdown">
+                                                    <a class="" href="#" role="button" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-vertical fa-lg"></i>
+                                                    </a>
+
+
+                                                    <!-- href="{% url 'LoanAccountDelete' i.id %}">  -->
+
+
+                                                    <ul class="dropdown-menu"
+                                                        style="z-index: 999999999999999999999999;">
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'loan_accounts_view_page' i.id %}"><span
+                                                                    class="fa fa-eye pe-2 tg "
+                                                                    style="color: green;"></span>
+                                                                Statement</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'edit_loan_page' i.id %}"><span
+                                                                    class="fa fa-edit pe-2 tg "
+                                                                    style="color: blue;"></span>
+                                                                Edit</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'loan_account_history' i.id %}"><span
+                                                                    class="fa fa-history pe-2 tg "
+                                                                    style="color: black;"></span>
+                                                                History</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_d"
+                                                                onclick="deletedebt('{{i.id}}')"><span
+                                                                    class="fa fa-trash tr"
+                                                                    style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;color: red;"></span>
+                                                                Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% for j in data2 %}
+                                        <tr>
+                                            <td>{{ j.date|date:"d/m/Y"|default:"No Date" }}</td>
+                                            <td>Paid</td>
+                                            <td hidden>{{j.loan_account.account_name}}</td>
+
+
+                                            <td class="clickable-row" style="color: black;"
+                                                data-href="loan_accounts_view_page/{{ j.loan_account.id }}">₹
+                                                {{j.principal_amount}}</td>
+                                            <td class="clickable-row" style="color: black;"
+                                                data-href="loan_accounts_view_page/{{ j.loan_account.id }}">
+                                                {{j.interest_amount}}</td>
+                                            <td class="clickable-row" style="color: black;"
+                                                data-href="loan_accounts_view_page/{{ j.loan_account.id }}">
+                                                {{j.total_amount}}</td>
+
+
+                                            <td>
+                                                <div class="dropdown">
+                                                    <a class="" href="#" role="button" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-vertical fa-lg"></i>
+                                                    </a>
+
+
+
+
+
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'loan_accounts_view_page' j.loan_account.id %}"><span
+                                                                    class="fa fa-eye pe-2 tg "
+                                                                    style="color: green;"></span>
+                                                                Statement</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'edit_loan_page' j.loan_account.id %}"><span
+                                                                    class="fa fa-edit pe-2 tg "
+                                                                    style="color: blue;"></span>
+                                                                Edit</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'loan_account_history' j.loan_account.id %}"><span
+                                                                    class="fa fa-history pe-2 tg "
+                                                                    style="color: black;"></span>
+                                                                History</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_d"
+                                                                onclick="deletedebt('{{j.loan_account.id}}')"><span
+                                                                    class="fa fa-trash tr"
+                                                                    style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;color: red;"></span>
+                                                                Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+
+
+                                        </tr>
+                                        {% endfor %}
+                                        {% for k in data3 %}
+                                        <tr>
+                                            <td>{{ k.date|date:"d/m/Y"|default:"No Date" }}</td>
+                                            <td>Additional Loan</td>
+
+                                            <td hidden>{{k.loan_account.account_name}}</td>
+
+                                            <td class="clickable-row" style="color: black;"
+                                                data-href="loan_accounts_view_page/{{ k.loan_account.id }}">₹
+                                                {{k.additional_loan}}</td>
+                                            <td class="clickable-row" style="color: black;"
+                                                data-href="loan_accounts_view_page/{{ k.loan_account.id }}">
+                                                {{k.interest_amount}}</td>
+                                            <td class="clickable-row" style="color: black;"
+                                                data-href="loan_accounts_view_page/{{ k.loan_account.id }}">
+                                                {{k.total_loan}}</td>
+
+
+                                            <td>
+                                                <div class="dropdown">
+                                                    <a class="" href="#" role="button" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-vertical fa-lg"></i>
+
+                                                    </a>
+
+
+
+
+
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'loan_accounts_view_page' k.loan_account.id %}"><span
+                                                                    class="fa fa-eye pe-2 tg "
+                                                                    style="color: green;"></span>
+                                                                Statement</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'edit_loan_page' k.loan_account.id %}"><span
+                                                                    class="fa fa-edit pe-2 tg "
+                                                                    style="color: blue;"></span>
+                                                                Edit</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'loan_account_history' k.loan_account.id %}"><span
+                                                                    class="fa fa-history pe-2 tg "
+                                                                    style="color: black;"></span>
+                                                                History</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_d"
+                                                                onclick="deletedebt('{{k.loan_account.id}}')"><span
+                                                                    class="fa fa-trash tr"
+                                                                    style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;color: red;"></span>
+                                                                Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+
+
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+
+                                </table>
+                            </div>
+                            <div>
+                                <p id="emptyMessage" style="text-align: center; " class="text-danger"> <br> Sorry We
+                                    Couldn't
+                                    find
+                                    any result </p>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+                        <table class="table table-hover" id="excelbilltable" hidden>
+                            <thead>
+
+                                <tr>
+                                    <th scope="col">
+
+
+                                        TYPE
+
+
+                                    </th>
+                                    <th scope="col">DATE
+
+                                    </th>
+                                    <th scope="col">PRINCIPAL
+
+                                    </th>
+                                    <th scope="col">INTEREST
+
+                                    </th>
+                                    <th scope="col">TOTAL AMOUNT
+
+                                    </th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                {% for i in data %}
+                                <tr>
+                                    <td>Opening Loan</td>
+                                    <td>{{ i.date|date:"d/m/Y"|default:"No Date" }}</td>
+
+
+                                    <td>₹ {{i.loan_amount}}</td>
+                                    <td>{{i.interest_rate}}</td>
+                                    <td>₹ {{i.loan_amount}}</td>
+
+
+
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                        <table class="table table-hover" id="billtablemodel" hidden>
+                            <thead>
+
+                                <tr>
+                                    <th scope="col">DATE</th>
+                                    <th scope="col">LENDER BANK</th>
+                                    <th scope="col">ACCOUNT NAME</th>
+                                    <th scope="col">ACCOUNT NUMBER </th>
+                                    <th scope="col">DESCRIPTION</th>
+                                    <th scope="col">LOAN AMOUNT</th>
+                                    <th scope="col">LOAN RECEIVED</th>
+                                    <th scope="col">CHEQUE NUMBER</th>
+                                    <th scope="col">UPI ID</th>
+                                    <th scope="col">INTEREST RATE</th>
+                                    <th scope="col">DURATION</th>
+                                    <th scope="col">PROCCESSING FEE</th>
+                                    <th scope="col">LOAN RECEIVED</th>
+                                    <th scope="col">CHEQUE NUMBER</th>
+                                    <th scope="col">UPI ID</th>
+
+                                </tr>
+
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td> </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td> </td>
+                                    <td> </td>
+                                    <td> </td>
+                                    <td> </td>
+                                    <td> </td>
+                                    <td> </td>
+                                    <td> </td>
+                                    <td> </td>
+                                    <td> </td>
+                                    <td> </td>
+                              
+                                    
+
+
+
+                                </tr>
+
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <div class="mt-3" id="tablediv" hidden>
+                        <h1 class="text-info text-center mt-5">Loan Account Transactions</h1>
+                        <table class="table  table-info  tb table-responsive w-100" id="billtable"
+                            style="text-align: center;">
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+
+
+                                        TYPE
+
+
+                                    </th>
+                                    <th scope="col">DATE
+
+                                    </th>
+                                    <th scope="col">PRINCIPAL
+
+                                    </th>
+                                    <th scope="col">INTEREST
+
+                                    </th>
+                                    <th scope="col">TOTAL AMOUNT
+
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in data %}
+                                <tr>
+                                    <td>Opening Loan</td>
+                                    <td>{{ i.date|date:"d/m/Y"|default:"No Date" }}</td>
+
+
+                                    <td>₹ {{i.loan_amount}}</td>
+                                    <td>{{i.interest_rate}}%</td>
+                                    <td>₹ {{i.loan_amount}}</td>
+
+
+
+                                </tr>
+                                {% endfor %}
+
+                                {% for j in data2 %}
+                                <tr>
+                                    <td>Paid</td>
+                                    <td>{{ j.date|date:"d/m/Y"|default:"No Date" }}</td>
+
+
+
+
+                                    <td class="clickable-row" style="color: black;"
+                                        data-href="loan_accounts_view_page/{{ j.loan_account.id }}">₹
+                                        {{j.principal_amount}}</td>
+                                    <td class="clickable-row" style="color: black;"
+                                        data-href="loan_accounts_view_page/{{ j.loan_account.id }}">
+                                        {{j.interest_amount}}</td>
+                                    <td class="clickable-row" style="color: black;"
+                                        data-href="loan_accounts_view_page/{{ j.loan_account.id }}">
+                                        {{j.total_amount}}</td>
+                                </tr>
+                                {% endfor %}
+                                {% for k in data3 %}
+                                <tr>
+                                    <td>Additional Loan</td>
+                                    <td>{{ j.date|date:"d/m/Y"|default:"No Date" }}</td>
+
+
+
+
+                                    <td class="clickable-row" style="color: black;"
+                                        data-href="loan_accounts_view_page/{{ k.loan_account.id }}">₹
+                                        {{k.additional_loan}}</td>
+                                    <td class="clickable-row" style="color: black;"
+                                        data-href="loan_accounts_view_page/{{ k.loan_account.id }}">
+                                        {{k.interest_amount}}</td>
+                                    <td class="clickable-row" style="color: black;"
+                                        data-href="loan_accounts_view_page/{{ k.loan_account.id }}">
+                                        {{k.total_loan}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                    {% else %}
+                    <div class="p-5 text-center" style="display: flex;justify-content: center;">
+                        <div class="card "
+                            style="background-color: white;width:50rem;box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.249);">
+                            <div class="row">
+                                <div class="col-sm-12  ">
+                                    <center>
+                                        <img class="img-fluid" style="width: 300px; height: 300px;"
+                                            src="{% static 'images/cheque.jpg' %}" alt="no img">
+                                    </center>
+                                    <p>Add your loan accounts & track loan transactions all at one place.</p>
+                                    <form action="{% url 'add_loan_accounts' %}">
+                                        <button class="btn btn-primary">Add Your First Loan</button>
+                                    </form>
+                                    <br><br>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal" id="excelModal" tabindex="-1" role="dialog" aria-labelledby="excelModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="excelModalLabel">Upload File
+                            <label for="" style="color: red; font-size: x-small;">* Refer Downloaded Sheet For Format
+                            </label><br>
+                        </h5>
+                        <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" enctype="multipart/form-data" action="{% url 'import_loan_accounts' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="file" style="color: black;">Choose Excel File </label> <br>
+                                <input type="file" class="form-control-file" id="exceladd" name="exceladd"
+                                    accept=".xls, .xlsx" required>
+
+                            </div>
+
+
+
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Make Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    {% for i in data %}
+                    <form action="{% url 'make_payment' eid=i.id %}" method="post">
+                        {% endfor %}
+                        {% csrf_token %}
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label for="party_instance" >Account Name</label>
+                                <select name="party_instance" class="form-select" aria-label="Account Name" id="change">
+                                    {% for data in data %}
+                                    <option value="{{ data.id }}">{{ data.account_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="dateInput"  >Select Date</label>
+                                <div class="calendar-box">
+                                    <input name="date" type="text" class="form-control" id="dateInput" value=""
+                                        required>
+                                    <div class="calendar" id="calendar">
+                                        <div class="header">
+                                            <button id="prevBtn">&lt;</button>
+                                            <h2 id="monthYear">Month Year</h2>
+                                            <button id="nextBtn">&gt;</button>
+                                        </div>
+                                        <div class="days" id="daysContainer"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row mb-4">
+                            <div class="col-sm-12 col-md-6">
+                                <label>Principal Amount</label>
+                                <input type="number" name="principal_amount" id="id_principal_amount"
+                                    class="form-control" required onchange="updateTotalAmount()">
+                            </div>
+                            <div class="col"></div>
+                        </div>
+                        <label>Interest Amount</label>
+           
+                        <div class="row mb-4">
+                            <div class="col-sm-12 col-md-6">
+                                <input type="number" name="interest_amount" id="id_interest_amount" class="form-control"
+                                    placeholder=""   onchange="updateTotalAmount()">
+                            </div>
+                            <div class="col"></div>
+                        </div>
+
+     
+                        <div class="row mb-4">
+                            <label>Total Amount</label>
+                            <div class="col-sm-12 col-md-6">
+                                <input type="number" name="total_amount" id="id_total_amount" class="form-control"
+                                    aria-label="Total Amount" readonly>
+                            </div>
+                            <div class="col"></div>
+                        </div>
+
+                        <div class="col-md-6 input-container mt-3 mt-lg-0">
+                            <label>Amount Received</label>
+                            <select name="loan_received" class="form-select" id="loanReceivedSelect" required>
+                                <option value="" selected hidden>Select</option>
+                                <option id="Cash" value="cash">Cash</option>
+                                <option id="Cheque" value="cheque">Cheque</option>
+                                <option id="UPI" value="upi">UPI</option>
+                                {% for b in bank %}
+                                <option value="{{b.id}}">{{b.bank_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row  mb-4 mt-3 ">
+
+                            <div class="col col-lg-6   " id="chequeInput" style="display: none;">
+                                <label for="chequeNumber">Cheque Number:</label>
+                                <input type="text" name="cheque_number" id="chequeNumber" class="form-control">
+                            </div>
+
+                            <div class="col col-lg-6  " id="upiInput" style="display: none;">
+                                <label for="upiID">UPI ID:</label>
+                                <input type="text" name="upi_id" id="upiID" class="form-control">
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#loanReceivedSelect').change(function () {
+                var selectedOption = $(this).val();
+
+
+                $('#chequeInput, #upiInput').hide();
+
+                if (selectedOption === 'cheque') {
+                    $('#chequeInput').show();
+                } else if (selectedOption === 'upi') {
+                    $('#upiInput').show();
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function updateTotalAmount() {
+            var principal = parseFloat(document.getElementById('id_principal_amount').value) || 0;
+            var interest = parseFloat(document.getElementById('id_interest_amount').value) || 0;
+            var total = principal + interest;
+            document.getElementById('id_total_amount').value = total.toFixed(2);
+        }
+    </script>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="formoreloan" tabindex="-1" aria-labelledby="formoreloanLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="formoreloanLabel">Additional Loan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    {% for i in data %}
+                    <form action="{% url 'additional_loan_function' eid=i.id %}" method="post">
+                        {% endfor %}
+                        {% csrf_token %}
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label >Account Name</label>
+                                <!-- Party Instance Dropdown -->
+                                <select name="party_instance" class="form-select" aria-label="Default select example"
+                                    id="partyInstanceSelect">
+                                    {% for data in data %}
+                                    <option value="{{ data.id }}">{{ data.account_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="dateInput2"  >Select Date</label>
+                                <div class="calendar-box2">
+                                    <input name="date" type="text" class="form-control" id="dateInput2" value=""
+                                        required>
+                                    <div class="calendar2" id="calendar2">
+                                        <div class="header2">
+                                            <button id="prevBtn2">&lt;</button>
+                                            <h2 id="monthYear2">Month Year</h2>
+                                            <button id="nextBtn2">&gt;</button>
+                                        </div>
+                                        <div class="days2" id="daysContainer2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Additional Loan Amount -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label  >Additional loan amount</label>
+                                <input type="number" id="additional_loan" name="additional_loan" class="form-control"
+                                    placeholder="" required>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
+
+                        <!-- Interest Amount -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label  >Interest Amount</label>
+                                <input type="number" id="interest_amount" name="interest_amount" class="form-control"
+                                    placeholder="" >
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
+
+                        <!-- Loan Received Dropdown -->
+                        <div class="col-md-6 input-container mt-3 mt-lg-0">
+                            <label>Loan Received</label>
+                            <select name="loan_received" class="form-select" id="loanReceivedSelect2" required>
+                                <option value="" selected hidden>Select</option>
+                                <option id="Cash" value="CASH">Cash</option>
+                                <option id="Cheque" value="CHEQUE">Cheque</option>
+                                <option id="UPI" value="UPI">UPI</option>
+                                {% for b in bank %}
+                                <option value="{{b.id}}">{{b.bank_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row  mb-4 mt-3 ">
+
+                            <div class="col col-lg-6   " id="chequeInput2" style="display: none;">
+                                <label for="chequeNumber">Cheque Number:</label>
+                                <input type="text" name="cheque_number" id="chequeNumber" class="form-control">
+                            </div>
+
+                            <div class="col col-lg-6  " id="upiInput2" style="display: none;">
+                                <label for="upiID">UPI ID:</label>
+                                <input type="text" name="upi_id" id="upiID" class="form-control">
+                            </div>
+                        </div>
+                        <script>
+                            $(document).ready(function () {
+                                $('#loanReceivedSelect2').change(function () {
+                                    var selectedOption = $(this).val();
+
+
+                                    $('#chequeInput2, #upiInput2').hide();
+
+                                    if (selectedOption === 'CHEQUE') {
+                                        $('#chequeInput2').show();
+                                    } else if (selectedOption === 'UPI') {
+                                        $('#upiInput2').show();
+                                    }
+                                });
+                            });
+                        </script>
+
+                        <!-- Total Amount (readonly) -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <input type="number" id="total_loan" name="total_loan" class="form-control"
+                                    placeholder="Total Amount" aria-label="Total Amount" readonly>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
+
+
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var additionalLoanInput = document.getElementById('additional_loan');
+            var interestAmountInput = document.getElementById('interest_amount');
+            var totalLoanInput = document.getElementById('total_loan');
+
+            additionalLoanInput.addEventListener('input', updateTotalLoan);
+            interestAmountInput.addEventListener('input', updateTotalLoan);
+
+            function updateTotalLoan() {
+                var additionalLoan = parseFloat(additionalLoanInput.value) || 0;
+                var interestAmount = parseFloat(interestAmountInput.value) || 0;
+                var totalLoan = additionalLoan + interestAmount;
+                totalLoanInput.value = totalLoan.toFixed(2);
+            }
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".datepicker").datepicker();
+
+            // Update total amount on input change
+            $("input[name='principal_amount'], input[name='interest_amount']").on("input", function () {
+                updateTotalAmount();
+            });
+        });
+
+        function updateTotalAmount() {
+            var principal = parseFloat($("input[name='principal_amount']").val()) || 0;
+            var interest = parseFloat($("input[name='interest_amount']").val()) || 0;
+            var totalAmount = principal + interest;
+            $("input[name='total_amount']").val(totalAmount.toFixed(2));
+        }
+    </script>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = document.getElementById("billtable");
+        var rows = table.getElementsByTagName("tr");
+        for (var i = 1; i < rows.length; i++) {
+            var bankid = rows[i].getElementsByTagName("td")[3].innerText;
+            if (bankid != 'Cash' && bankid != 'Cheque' && bankid != 'UPI') {
+                changetobankname(i, bankid)
+            }
+        }
+
+        function changetobankname(rowid, bankid) {
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'bankdata' %}",
+                data: {
+                    id: bankid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function (data) {
+                    rows[rowid].getElementsByTagName("td")[3].innerText = data.bank_name
+                }
+            });
+        }
+    });
+
+    $(document).ready(function () {
+        var table = document.getElementById("excelbilltable");
+        var rows = table.getElementsByTagName("tr");
+        for (var i = 1; i < rows.length; i++) {
+            var bankid = rows[i].getElementsByTagName("td")[3].innerText;
+            if (bankid != 'Cash' && bankid != 'Cheque' && bankid != 'UPI') {
+                changetobankname(i, bankid)
+            }
+        }
+
+        function changetobankname(rowid, bankid) {
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'bankdata' %}",
+                data: {
+                    id: bankid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function (data) {
+                    rows[rowid].getElementsByTagName("td")[3].innerText = data.bank_name
+                }
+            });
+        }
+    });
+</script>
+
+<script>
+    var table = document.getElementById('billtable');
+    var rows = table.getElementsByTagName('tr');
+    for (var i = 1; i < rows.length; i++) {
+        var pid = rows[i].getElementsByTagName('td')[1].innerText;
+        findhistory(i, pid)
+    }
+    function findhistory(rowid, pid) {
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'billhistory' %}",
+            data: {
+                id: pid,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                rows[rowid].getElementsByTagName('td')[6].innerText = data.action;
+                rows[rowid].getElementsByTagName('td')[7].innerText = data.name;
+                if (data.action == 'Created') {
+                    rows[rowid].getElementsByTagName('td')[6].style.color = 'Red'
+                } else {
+                    rows[rowid].getElementsByTagName('td')[6].style.color = '#154c79'
+                }
+            }
+        });
+    }
+</script>
+
+<script>
+    function uploadFile() {
+        const form = document.getElementById('excelForm');
+        const formData = new FormData(form);
+        fetch('import_purchase_bill', {
+            method: 'POST',
+            body: formData
+        })
+            .then(data => {
+                swal({
+                    title: "Imported !",
+                    text: "Purchase Bill Import Successfull!",
+                    icon: "success",
+                    buttons: false,
+                })
+            })
+            .then(response => {
+                setTimeout(function () {
+                    location.reload();
+                }, 1250);
+            })
+            .catch(error => {
+                swal({
+                    title: "Error !",
+                    text: "Purchase Bill Import Unuccessfull!",
+                    icon: "warning",
+                    buttons: false,
+                })
+            });
+    }
+</script>
+
+<script>
+    function printfunction() {
+        print4 = document.getElementById('tablediv')
+        if (print4.style.display !== 'none') {
+            var printContents = document.getElementById("tablediv").innerHTML;
+        } else {
+            var printContents = document.getElementById("whatToPrint").innerHTML;
+        }
+        var $printerDiv = $('<div class="printContainer" id=printContainer></div>');
+        $printerDiv.html(printContents);
+        $('body').append($printerDiv).addClass("printingContent");
+        var h1Element = document.createElement("h1");
+        // h1Element.textContent = "Loan Account";
+        var head = document.getElementById("printContainer");
+        head.insertBefore(h1Element, head.firstChild);
+        window.print();
+        $printerDiv.remove();
+        $('body').removeClass("printingContent");
+    }
+</script>
+
+<script>
+    calculatetotal()
+
+    function calculatetotal() {
+        var table = document.getElementById('billtable');
+        var rows = table.getElementsByTagName('tr');
+        tpaid = 0;
+        tunpaid = 0;
+        ttotal = 0;
+        for (var i = 1; i < rows.length; i++) {
+            if (rows[i].style.display != 'none') {
+                var pcells = rows[i].getElementsByTagName('td')[9];
+                var ptextValue = pcells.textContent || pcells.innerText;
+                tpaid += parseFloat(ptextValue)
+
+                var ucells = rows[i].getElementsByTagName('td')[5];
+                var utextValue = ucells.textContent || ucells.innerText;
+                tunpaid += parseFloat(utextValue)
+
+                var tcells = rows[i].getElementsByTagName('td')[4];
+                var ttextValue = tcells.textContent || tcells.innerText;
+                ttotal += parseFloat(ttextValue)
+            }
+        }
+        document.getElementById('paidval').textContent = tpaid
+        document.getElementById('unpaidval').textContent = tunpaid
+        document.getElementById('totalval').textContent = ttotal
+    }
+</script>
+
+<script>
+    function cleardropdown(index) {
+        if (index == 0) {
+            document.getElementById('filterInput' + index).value = '';
+        } else {
+            document.getElementById('filterInput' + index).value = null;
+        }
+    }
+
+    function toggleDropdown(index) {
+        var dropdownContent = document.getElementById('dropdownContent' + index);
+        var isVisible = dropdownContent.style.display === 'block';
+        var allDropdowns = document.querySelectorAll('.dropdown-content');
+        allDropdowns.forEach(function (dropdown) {
+            dropdown.style.display = 'none';
+        });
+        dropdownContent.style.display = isVisible ? 'none' : 'block';
+    }
+
+    function filterTable(index) {
+        var input;
+        document.getElementById('dropdownContent' + index).style.display = 'none';
+        if (index === 0) {
+            input = document.getElementById('filterInput' + index).value;
+        } else {
+            input = document.getElementById('filterInput' + index).value.toUpperCase();
+        }
+        var table = document.getElementById('billtable');
+        var rows = table.getElementsByTagName('tr');
+        var emptyMessage = document.getElementById('emptyMessage');
+        var isEmpty = true;
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var cell = cells[index];
+            if (cell) {
+                var textValue = cell.textContent || cell.innerText;
+                if (index === 0) {
+                    if (input == '') {
+                        rows[i].style.display = 'table-row';
+                        isEmpty = false;
+                    } else {
+                        dateval = textValue.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                        inputval = input.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                        const formattedDate = formatDateString(input);
+                        if (dateval === formattedDate) {
+                            rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                        } else {
+                            rows[i].style.display = 'none';
+                        }
+                    }
+                } else {
+                    if (textValue.toUpperCase().includes(input)) {
+                        rows[i].style.display = 'table-row';
+                        isEmpty = false;
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+        emptyMessage.style.display = isEmpty ? 'block' : 'none';
+        calculatetotal()
+    }
+
+    function formatDateString(inputDate) {
+        const parsedDate = new Date(inputDate);
+        const day = parsedDate.getDate();
+        const month = parsedDate.getMonth() + 1;
+        const year = parsedDate.getFullYear();
+        const formattedDate = `${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}-${year}`;
+        return formattedDate;
+    }
+</script>
+
+<script>
+    function filterDates() {
+        var fromDate = document.getElementById("fromDate").value;
+        var selectedDate = new Date(fromDate);
+        selectedDate.setDate(selectedDate.getDate() - 1);
+        var toDate = document.getElementById("toDate").value;
+        var table = document.getElementById("billtable");
+        var rows = table.getElementsByTagName("tr");
+        var emptyMessage = document.getElementById('emptyMessage');
+        var isEmpty = true;
+        for (var i = 1; i < rows.length; i++) {
+            var currentDate = rows[i].getElementsByTagName("td")[0].innerText;
+            var date = new Date(currentDate.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2/$1/$3"));
+            if ((fromDate && date >= selectedDate) || !fromDate) {
+                if ((toDate && date <= new Date(toDate)) || !toDate) {
+                    rows[i].style.display = "table-row";
+                    isEmpty = false;
+                } else {
+                    rows[i].style.display = "none";
+                }
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+        emptyMessage.style.display = isEmpty ? 'block' : 'none';
+        calculatetotal()
+    }
+</script>
+
+<script>
+    jQuery(document).ready(function ($) {
+        $(".clickable-row").click(function () {
+            window.location = $(this).data("href");
+        });
+    });
+</script>
+
+<script>
+    function deletepbill(Id) {
+        swal({
+            title: "Confirmation !",
+            text: "Do you want to Delete this Purchase Bill?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    swal({
+                        title: "Deleted !",
+                        text: "Purchase Bill Deleted Successfully!",
+                        icon: "success",
+                        buttons: false,
+                    })
+                        .then((willDelete) => {
+                            if (willDelete) {
+                                window.location.href = "{% url 'delete_purchasebill' 0 %}".replace('0', Id);
+                            } else {
+                                window.location.href = "{% url 'delete_purchasebill' 0 %}".replace('0', Id);
+                            }
+                        });
+                } else {
+                    swal("Action Cancelled!");
+                }
+            });
+    }
+</script>
+
+<script>
+    document.getElementById("search_input").addEventListener("input", function () {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search_input");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("billtable");
+        tr = table.getElementsByTagName("tr");
+        var emptyMessage = document.getElementById("emptyMessage");
+        var anyMatch = false;
+        for (i = 1; i < tr.length; i++) {
+            tr[i].style.display = "table-row";
+            var found = false;
+            for (td of tr[i].getElementsByTagName("td")) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().includes(filter)) {
+                    found = true;
+                    anyMatch = true;
+                    break;
+                }
+            }
+            if (!found) {
+                tr[i].style.display = "none";
+            }
+        }
+        emptyMessage.style.display = anyMatch ? "none" : "block";
+        calculatetotal()
+    });
+</script>
+
+<script>
+    function ExportToExcel() {
+        const table = document.querySelector('#excelbilltable');
+        const ws = XLSX.utils.table_to_sheet(table);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, 'LoanAccountStatement.xlsx');
+    }
+</script>
+
+<script>
+    function excelmodel() {
+        const table1 = document.querySelector('#billtablemodel');
+        const ws1 = XLSX.utils.table_to_sheet(table1);
+        const wb1 = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb1, ws1, 'Sheet1');
+        XLSX.writeFile(wb1, 'LoanAccountStatement.xlsx');
+
+
+    }
+</script>
+<script>
+    $('#change').change(function () {
+        var selectedOption = $(this).val();
+
+        if (selectedOption === "1") {
+
+        } else if (selectedOption === "this") {
+
+            $('.modal').modal('show');
+        }
+    });
+</script>
+
+
+<script>
+    const daysContainer = document.getElementById("daysContainer");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const monthYear = document.getElementById("monthYear");
+    const dateInput = document.getElementById("dateInput");
+    const calendar = document.getElementById("calendar");
+
+    let currentDate = new Date();
+    let selectedDate = null;
+
+    function handleDayClick(day) {
+        selectedDate = new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth(),
+            day
+        );
+
+
+        const formattedDate = `${selectedDate.getDate().toString().padStart(2, '0')}/${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}/${selectedDate.getFullYear()}`;
+
+        dateInput.value = formattedDate;
+        calendar.style.display = "none";
+        renderCalendar();
+    }
+
+    function createDayElement(day) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        const dayElement = document.createElement("div");
+        dayElement.classList.add("day");
+
+        if (date.toDateString() === new Date().toDateString()) {
+            dayElement.classList.add("current");
+        }
+        if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
+            dayElement.classList.add("selected");
+        }
+
+        dayElement.textContent = day;
+        dayElement.addEventListener("click", () => {
+            handleDayClick(day);
+        });
+        daysContainer.appendChild(dayElement);
+    }
+
+    function renderCalendar() {
+        daysContainer.innerHTML = "";
+        const firstDay = new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth(),
+            1
+        );
+        const lastDay = new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth() + 1,
+            0
+        );
+
+        monthYear.textContent = `${currentDate.toLocaleString("default", {
+            month: "long"
+        })} ${currentDate.getFullYear()}`;
+
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            createDayElement(day);
+        }
+    }
+
+    prevBtn.addEventListener("click", () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    nextBtn.addEventListener("click", () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    dateInput.addEventListener("click", () => {
+        calendar.style.display = "block";
+        positionCalendar();
+    });
+
+    document.addEventListener("click", (event) => {
+        if (!dateInput.contains(event.target) && !calendar.contains(event.target)) {
+            calendar.style.display = "none";
+        }
+    });
+
+    function positionCalendar() {
+        const inputRect = dateInput.getBoundingClientRect();
+        calendar.style.top = inputRect.bottom + "px";
+        calendar.style.left = inputRect.left + "px";
+    }
+
+    window.addEventListener("resize", positionCalendar);
+
+    renderCalendar();
+
+
+
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const day = currentDate.getDate().toString().padStart(2, '0');
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        const year = currentDate.getFullYear();
+
+        const formattedDate = `${day}/${month}/${year}`;
+        dateInput.value = formattedDate;
+    });
+
+
+
+
+    $(function () {
+
+        $('.hidden').hide();
+
+        $('.trigger').change(function () {
+
+
+            var hiddenId = $(this).attr("data-trigger");
+
+            if ($(this).is(':checked')) {
+
+                $("#" + hiddenId).show();
+            } else {
+                $("#" + hiddenId).hide();
+            }
+        });
+    });
+
+
+    var rawDate = $('#dateInput').val();
+    var formattedDate = moment(rawDate, 'DD-MM-YYYY').format('YYYY-MM-DD');
+
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var searchButton = document.getElementById('searchButton');
+        var searchField = document.getElementById('searchField');
+        var addLoanContainer = document.getElementById('addLoanContainer');
+
+        // Retrieve the visibility state from sessionStorage
+        var isSearchFieldVisible = sessionStorage.getItem('isSearchFieldVisible');
+
+        if (isSearchFieldVisible === 'true') {
+            // If the search field was visible, show it and hide the button and container
+            searchButton.style.display = 'none';
+            addLoanContainer.style.display = 'none';
+            searchField.style.display = 'block';
+            searchField.focus();
+        } else {
+            // If the search field was not visible, hide it and show the button and container
+            searchButton.style.display = 'block';
+            addLoanContainer.style.display = 'block';
+            searchField.style.display = 'none';
+        }
+
+        searchButton.addEventListener('click', function (event) {
+            // Toggle visibility and store the state in sessionStorage
+            searchButton.style.display = 'none';
+            addLoanContainer.style.display = 'none';
+            searchField.style.display = 'block';
+            searchField.focus();
+
+            sessionStorage.setItem('isSearchFieldVisible', 'true');
+
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function () {
+            // Toggle visibility and store the state in sessionStorage
+            searchButton.style.display = 'block';
+            addLoanContainer.style.display = 'block';
+            searchField.style.display = 'none';
+
+            sessionStorage.setItem('isSearchFieldVisible', 'false');
+        });
+    });
+</script>
+
+
+<script>
+    function deletedebt(Id) {
+        swal({
+            title: "Confirmation !",
+            text: "Do you want to Delete this Loan Account ?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    swal({
+                        title: "Deleted !",
+                        text: "Loan Account Deleted Successfilly!",
+                        icon: "success",
+                        buttons: false,
+                    })
+                        // 
+                        .then((willDelete) => {
+                            if (willDelete) {
+
+                                window.location.href = "{% url 'LoanAccountDelete' 0 %}".replace('0', Id);
+
+                            } else {
+                                window.location.href = "{% url 'LoanAccountDelete' 0 %}".replace('0', Id);
+                            }
+                        });
+                    // 
+                } else {
+                    swal("Action Cancelled!");
+                }
+            });
+    }
+</script>
+
+<script>
+    function deletedebt2(Id) {
+        swal({
+            title: "Confirmation !",
+            text: "Do you want to Delete this Loan Account ?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    swal({
+                        title: "Deleted !",
+                        text: "Loan Account Deleted Successfilly!",
+                        icon: "success",
+                        buttons: false,
+                    })
+
+                        .then((willDelete) => {
+                            if (willDelete) {
+
+                                window.location.href = "{% url 'LoanAccountDelete' 0 %}".replace('0', Id);
+
+                            } else {
+                                window.location.href = "{% url 'LoanAccountDelete' 0 %}".replace('0', Id);
+                            }
+                        });
+
+                } else {
+                    swal("Action Cancelled!");
+                }
+            });
+    }
+</script>
+</script>
+
+
+<script>
+    const daysContainer2 = document.getElementById("daysContainer2");
+    const prevBtn2 = document.getElementById("prevBtn2");
+    const nextBtn2 = document.getElementById("nextBtn2");
+    const monthYear2 = document.getElementById("monthYear2");
+    const dateInput2 = document.getElementById("dateInput2");
+    const calendar2 = document.getElementById("calendar2");
+
+    let currentDate2 = new Date();
+    let selectedDate2 = null;
+
+    function handleDayClick2(day) {
+        selectedDate2 = new Date(
+            currentDate2.getFullYear(),
+            currentDate2.getMonth(),
+            day
+        );
+
+        const formattedDate2 = `${selectedDate2.getDate().toString().padStart(2, '0')}/${(selectedDate2.getMonth() + 1).toString().padStart(2, '0')}/${selectedDate2.getFullYear()}`;
+
+        dateInput2.value = formattedDate2;
+        calendar2.style.display = "none";
+        renderCalendar2();
+    }
+
+    function createDayElement2(day) {
+        const date2 = new Date(currentDate2.getFullYear(), currentDate2.getMonth(), day);
+        const dayElement2 = document.createElement("div");
+        dayElement2.classList.add("day2");
+
+        if (date2.toDateString() === new Date().toDateString()) {
+            dayElement2.classList.add("current");
+        }
+        if (selectedDate2 && date2.toDateString() === selectedDate2.toDateString()) {
+            dayElement2.classList.add("selected");
+        }
+
+        dayElement2.textContent = day;
+        dayElement2.addEventListener("click", () => {
+            handleDayClick2(day);
+        });
+        daysContainer2.appendChild(dayElement2);
+    }
+
+    function renderCalendar2() {
+        daysContainer2.innerHTML = "";
+        const firstDay2 = new Date(
+            currentDate2.getFullYear(),
+            currentDate2.getMonth(),
+            1
+        );
+        const lastDay2 = new Date(
+            currentDate2.getFullYear(),
+            currentDate2.getMonth() + 1,
+            0
+        );
+
+        monthYear2.textContent = `${currentDate2.toLocaleString("default", {
+            month: "long"
+        })} ${currentDate2.getFullYear()}`;
+
+        for (let day = 1; day <= lastDay2.getDate(); day++) {
+            createDayElement2(day);
+        }
+    }
+
+    prevBtn2.addEventListener("click", () => {
+        currentDate2.setMonth(currentDate2.getMonth() - 1);
+        renderCalendar2();
+    });
+
+    nextBtn2.addEventListener("click", () => {
+        currentDate2.setMonth(currentDate2.getMonth() + 1);
+        renderCalendar2();
+    });
+
+    dateInput2.addEventListener("click", () => {
+        calendar2.style.display = "block";
+        positionCalendar2();
+    });
+
+    document.addEventListener("click", (event) => {
+        if (!dateInput2.contains(event.target) && !calendar2.contains(event.target)) {
+            calendar2.style.display = "none";
+        }
+    });
+
+    function positionCalendar2() {
+        const inputRect2 = dateInput2.getBoundingClientRect();
+        calendar2.style.top = inputRect2.bottom + "px";
+        calendar2.style.left = inputRect2.left + "px";
+    }
+
+    window.addEventListener("resize", positionCalendar2);
+
+    renderCalendar2();
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const day2 = currentDate2.getDate().toString().padStart(2, '0');
+        const month2 = (currentDate2.getMonth() + 1).toString().padStart(2, '0');
+        const year2 = currentDate2.getFullYear();
+        const formattedDate2 = `${day2}/${month2}/${year2}`;
+        dateInput2.value = formattedDate2;
+    });
+
+    $(function () {
+        $('.hidden').hide();
+
+        $('.trigger').change(function () {
+            var hiddenId = $(this).attr("data-trigger");
+
+            if ($(this).is(':checked')) {
+                $("#" + hiddenId).show();
+            } else {
+                $("#" + hiddenId).hide();
+            }
+        });
+    });
+
+    var rawDate2 = $('#dateInput2').val();
+    var formattedDate2 = moment(rawDate2, 'DD/MM/YYYY').format('YYYY-MM-DD');
+</script>
+
+
+
+{% endblock %}

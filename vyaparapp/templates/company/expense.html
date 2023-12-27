@@ -1,0 +1,1075 @@
+<!-- create by athul -->
+
+{% extends 'company/src/html/base.html' %}
+
+{% block content %}
+{% load static %}
+
+<style>
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+        padding: 10px;
+        z-index: 1;
+        width: 15%;
+    }
+
+    .dropdown-content label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .dropdown-content input {
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+    @media screen and (max-width: 768px) {
+        #col1 {
+            width: 25% !important;
+            height: 550px !important;
+            padding: 3px !important;
+
+
+        }
+
+        #col2 {
+            width: 78% !important;
+            margin-left: 100px !important;
+            
+
+
+
+        }
+
+        #col2 h4 {
+            font-size: 15px !important;
+        }
+
+        #col2 label {
+            font-size: 10px;
+        }
+
+        #search {
+            width: 100% !important;
+            padding: 10px !important;
+            height: 30px !important;
+
+        }
+
+        #plus {
+            width: 20px !important;
+            height: 30px !important;
+            padding: 2px !important;
+        }
+
+        #cols {
+            padding: 5px !important;
+        }
+
+        #partysearch th {
+            font-size: 10px !important;
+        }
+
+        #partysearch td {
+            font-size: 10px !important;
+        }
+
+        #col3 {
+            padding: 2px !important;
+        }
+
+        #t1 {
+            width: 100%;
+        }
+
+        #t1 .btn {
+            width: 50px !important;
+        }
+
+        #t1 .btn span img {
+            width: 10px !important;
+        }
+        #t1 .btn span {
+            font-size: 8px !important;
+        }
+       
+        #r1{
+            width: 98% !important;
+        }
+        #billtable th{
+            font-size: 10px !important;
+        }
+        #billtable td{
+            font-size: 8px !important;
+        }
+        #default{
+            padding: 10px !important;
+        }
+        #default .card #img{
+            border-radius: 10px 10px 0px 0px !important;
+            height: 300px;
+        }
+        #default .d-flex{
+            padding-left: 70px !important;
+        }
+        #default .btn{
+            width: 40% !important;
+            font-size: 10px !important;
+        }
+        #default h5{
+            font-size: 15px !important;
+        }
+        #default #text{
+            padding: 10px !important;
+        }
+
+        
+
+
+    }
+
+    @media print {
+        body {
+            visibility: hidden !important;
+            /* hide everything in body when in print mode*/
+        }
+
+        #r1 {
+            visibility: visible !important;
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+
+        }
+
+        .printContainer {
+            visibility: visible !important;
+            /* Override the rule above to only show the printables*/
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+        }
+
+        #calcdiv {
+            visibility: visible;
+            margin-top: -30vh;
+            margin-left: -5vh;
+        }
+
+        #billtable {
+            margin-top: 20vh;
+        }
+
+        .extra {
+            display: none;
+        }
+    }
+
+    #billtable th {
+        font-size: 12px;
+    }
+
+    #billtable td {
+        font-size: 12px;
+    }
+
+    ::-webkit-scrollbar {
+        display: none
+    }
+</style>
+
+<body style="background-color: rgba(176, 199, 205, 0.4);">
+    <div class="body-wrapper">
+        <div class="container-fluid">
+
+            {% if expenses %}
+
+
+            <div class="row">
+                <div class="col-md-3 pt-4 p-3" id="col1"
+                    style="overflow: auto; width: 17%; background-color: white; height: 640px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);position: fixed; ">
+
+                    <div class="card bg-light bs" style="height:100%;">
+                        <div class="row m-0">
+                            <div class="col-12 p-3 pt-3" style="z-index:2" id="cols">
+                                <form action="" method="post">
+                                    {% csrf_token %}
+                                    <div class="d-flex justify-content-between">
+                                        <input type="text" id="search" class="form-control text-dark mb-2"
+                                            placeholder="search......"
+                                            style="border-radius: 10px 0px 0px 10px; border: 1px solid skyblue;">
+                                        <a style="color: white;   height: 39px; border-radius: 0px 10px 10px 0px;"
+                                            id="plus" class="btn btn-secondary pt-2" href="{% url 'newexpenses' %}">
+                                            <i class="fa-solid fa fa-plus"></i>
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="col-12 p-3 pt-0" id="col3">
+                                <form action="" method="post">
+                                    {% csrf_token %}
+
+                                    <div style="height: 42rem;">
+                                        <table class="table w-100 table-light " id="partysearch">
+                                            <thead class="bg-primary">
+                                                <th class="text-start fs-2 tb"><b>CATEGORY</b></th>
+                                                <th class=" fs-2" style="padding-left: 30px;"><b>AMOUNT</b></th>
+                                                <!-- <th></th> -->
+                                            </thead>
+                                            <tbody>
+                                                {% for a in allcat %}
+                                                <tr>
+                                                    <td style="border: none;">
+                                                        <a href="{% url 'view_expense' a.id %}" id="category"
+                                                            style="color: black; ">{{a.expense_category}}</a>
+
+                                                    </td>
+
+                                                    <td style="border: none; position: relative;text-align: right;"
+                                                        id="amount">
+
+                                                        <span><b>{{a.grant}}</b></span>
+                                                    </td>
+                                                    <!-- <td style="border: none;">
+                                                        <span class="three-dots p-2 "
+                                                            style=" cursor: pointer;border: none;  transform: translateY(-50%); font-weight: bold;"
+                                                            onclick="toggleDropdown(this)">&#8942;</span> -->
+                                                        <!-- <div class="dropdown-menu"
+                                                            style="display: none; position: absolute; right: 0;">
+                                                            <a class="dropdown-item"
+                                                                href="">Edit</a>
+                                                            <a class="dropdown-item"
+                                                                href="">Delete</a>
+                                                        </div> -->
+                                                    <!-- </td> -->
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="col-md-9 ps-2 pe-3" id="col2" style="height: 80%;margin-left: 270px;width: 80%;">
+
+                    <div class="row m-0" style="height:20%;" id="r1">
+                        <div class="card  bs p-3 mb-3"
+                            style="border-radius: 0px; background-origin: padding-box;background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                            <div class="row" id="r11">
+                                <div class="col-md-9">
+                                    <h4
+                                        style="color: black;text-transform: uppercase;font-weight: bold;font-family: 'Times New Roman', Times, serif;">
+                                        {% for f in first %}
+
+                                        {{ f.expense_category}}
+                                        {% endfor %}
+                                     
+                                    </h4>
+                                </div>
+                                <div class="col">
+                                    <div class="row pt-3 p-1">
+                                        <div class="d-flex">
+                                            <div class="col"><label for=""><b>Total</b></label></div>
+                                            <div class="col">
+                                                {% for f in first %}
+                                                <label for="" style="color: orange;font-weight: bold;">
+                                                    <b style="color: black;">:</b><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="currentColor" class="bi bi-currency-rupee"
+                                                        viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M4 3.06h2.726c1.22 0 2.12.575 2.325 1.724H4v1.051h5.051C8.855 7.001 8 7.558 6.788 7.558H4v1.317L8.437 14h2.11L6.095 8.884h.855c2.316-.018 3.465-1.476 3.688-3.049H12V4.784h-1.345c-.08-.778-.357-1.335-.793-1.732H12V2H4z" />
+                                                    </svg>
+                                                    {{ f.grant}}</label>
+                                                {% endfor %}
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="row p-1">
+                                        <div class="d-flex">
+                                            <div class="col"><label for=""><b>Balance</b></label></div>
+                                            <div class="col">
+                                                {% for f in first %}
+                                                <label for="" style="color: orange;font-weight: bold;">
+                                                    <b style="color: black;">:</b><svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="currentColor" class="bi bi-currency-rupee"
+                                                        viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M4 3.06h2.726c1.22 0 2.12.575 2.325 1.724H4v1.051h5.051C8.855 7.001 8 7.558 6.788 7.558H4v1.317L8.437 14h2.11L6.095 8.884h.855c2.316-.018 3.465-1.476 3.688-3.049H12V4.784h-1.345c-.08-.778-.357-1.335-.793-1.732H12V2H4z" />
+                                                    </svg>
+                                                    {{ f.balance}}</label>
+                                                {% endfor %}
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+
+
+
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="row" id="t1">
+                        <div class="col-md-12"
+                            style="margin-left: 2vh;background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);width: 97%;height: 520px;">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="text" id="search1" class="form-control text-dark  mt-4"
+                                        placeholder="search......" style="border:2px solid skyblue;">
+                                </div>
+                                <div class="col">
+
+                                    <div class="row mt-3 mb-3">
+                                        <div class="col-md-4"></div>
+                                        <div class="col text-right">
+
+                                            <button class="btn mt-3" type="button" onclick="ExportToExcel()"
+                                                style="margin-right: 1vh; margin-left: 1vh;border: 2px solid skyblue;"
+                                                title="Covert To Excel">
+                                                <span><img width="17px" src="{% static 'assets/excel2.png' %}"
+                                                        alt="no img"></span>
+                                                <span
+                                                    style="color: black; font-size: small; font-weight: bold;" id="text"><b>Excel</b></span>
+                                            </button>
+
+                                            <button class="btn mt-3" type="button" onclick="printfunction()"
+                                                style="margin-right: 1vh;border: 2px solid skyblue;" title="Print">
+                                                <span><img width="23px" src="{% static 'images/printer.jpeg' %}"
+                                                        alt="no img"></span>
+                                                <span
+                                                    style="color: black; font-size: small; font-weight: bold;" id="text">Print</span>
+                                            </button>
+
+                                            <button class="btn mt-3" type="button" onclick="excelmodel()" data-bs-toggle="modal" data-target="#excelModal" style="border: 2px solid skyblue;" title="Import">
+                                                <span><img width="23px" src="{% static 'images/import.png' %}" alt="no img"></span>
+                                                <span style="color: black; font-size: small; font-weight: bold;" id="text">Import</span>
+                                            </button>
+
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            
+
+
+
+
+
+
+
+                            <div class="mt-3" style="height: 28rem; width: 100%;display: none;" id="tablediv1">
+                                <table class="table table-bordered table-info table-striped tb table-responsive w-100"
+                                    id="billtable1" style="text-align: center;">
+                                    <thead>
+                                        <tr class="fs-2 tb">
+                                            <th class="bg-secondary text-white">
+                                                DATE
+                                                &nbsp;
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                EXPENSE NO
+                                                &nbsp;
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                PARTY NAME
+                                                &nbsp;
+
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                PAYMENT TYPE
+                                                &nbsp;
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                AMOUNT
+                                                &nbsp;
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                BALANCE
+                                                &nbsp;
+
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if ex %}
+                                        {% for e in ex %}
+                                        {% for f in first %}
+                                        
+                                        {% if e.expense_category_id == f.id %}
+                                        
+
+
+                                        <tr>
+                                            <td class="date clickable-row" style="color: black;" data-href="">
+                                                {{e.expense_date |date:'d-m-Y'}}</td>
+                                            <td class="number clickable-row" style="color: black;" data-href="">
+                                                0{{e.EXP_NO}}</td>
+                                            <td class="name clickable-row" style="color: black;" data-href="">
+                                                {{e.party_id.party_name}}
+                                            </td>
+                                            <td class="type clickable-row" style="color: black;" data-href="">
+                                                {{e.payment_type}}</td>
+                                            <td class="total clickable-row" style="color: black;" data-href="">
+                                                {{e.total}}</td>
+                                            <td class="balance clickable-row" style="color: black;" data-href="">
+                                                {{e.balance}}</td>
+
+
+                                        </tr>
+                                        {% endif %}
+                                        {% endfor %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                {% endif %}
+                            </div>
+
+
+
+
+
+
+                            <div class="mt-3" style="height: 28rem; width: 100%;overflow: auto;" id="tablediv">
+                                <table class="table table-bordered table-info table-striped tb table-responsive w-100"
+                                    id="billtable" style="text-align: center;">
+                                    <thead>
+                                        <tr class="fs-2 tb">
+                                            <th class="bg-secondary text-white" style="white-space: nowrap;">
+                                                DATE
+                                                &nbsp; <a onclick="toggleDropdown1(0)"><i class="fa fa-filter"
+                                                        aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent0"
+                                                    style="display: none;">
+                                                    <label for="filterInput0"
+                                                        style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="date" id="filterInput0" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(0)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(0)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white"  style="white-space: nowrap;">
+                                                EXPENSE NO
+                                                &nbsp; <a onclick="toggleDropdown1(1)"><i class="fa fa-filter"
+                                                        aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent1"
+                                                    style="display: none;">
+                                                    <label for="filterInput1"
+                                                        style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput1" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(1)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(1)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white"  style="white-space: nowrap;">
+                                                PARTY NAME
+                                                &nbsp; <a onclick="toggleDropdown1(2)"><i class="fa fa-filter"
+                                                        aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent2"
+                                                    style="display: none;">
+                                                    <label for="filterInput2"
+                                                        style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput2" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(2)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(2)">Apply</a>
+                                                </div>
+
+                                            </th>
+                                            <th class="bg-secondary text-white"  style="white-space: nowrap;">
+                                                PAYMENT TYPE
+                                                &nbsp; <a onclick="toggleDropdown1(3)"><i class="fa fa-filter"
+                                                        aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent3"
+                                                    style="display: none;">
+                                                    <label for="filterInput3"
+                                                        style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput3" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(3)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(3)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white"  style="white-space: nowrap;">
+                                                AMOUNT
+                                                &nbsp; <a onclick="toggleDropdown1(4)"><i class="fa fa-filter"
+                                                        aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent4"
+                                                    style="display: none;">
+                                                    <label for="filterInput4"
+                                                        style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput4" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(4)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(4)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white"  style="white-space: nowrap;">
+                                                BALANCE
+                                                &nbsp; <a onclick="toggleDropdown1(5)"><i class="fa fa-filter"
+                                                        aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent5"
+                                                    style="display: none;">
+                                                    <label for="filterInput5"
+                                                        style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput5" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(5)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(5)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white"  style="white-space: nowrap;">
+                                                BY
+                                                &nbsp; <a onclick="toggleDropdown1(6)"><i class="fa fa-filter"
+                                                        aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent6"
+                                                    style="display: none;">
+                                                    <label for="filterInput6"
+                                                        style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput6" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(6)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(6)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <!-- <th class="bg-secondary text-white">
+                                                BY
+                                                &nbsp; <a onclick="toggleDropdown1(7)"><i class="fa fa-filter"
+                                                        aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent7" style="display: none;">
+                                                    <label for="filterInput7"
+                                                        style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput7" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(7)">Clear</a>
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(7)">Apply</a>
+                                                </div>
+                                            </th> -->
+                                            <th class="bg-secondary text-white extra"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if ex %}
+                                        {% for e in ex %}
+                                        {% for f in first %}
+                                        {% if e.expense_category_id.id == f.id %}
+                                        
+                                        
+
+                                        <tr>
+                                            <td class="clickable-row" style="color: black;" data-href="">
+                                                {{e.expense_date |date:'d-m-Y'}}</td>
+                                            <td class="clickable-row" style="color: black;" data-href="">
+                                               0{{e.EXP_NO}}</td>
+                                            <td class="clickable-row" style="color: black;" data-href="">
+                                                {{e.party_id.party_name}}
+                                            </td>
+                                            <td class="clickable-row" style="color: black;" data-href="">
+                                                {{e.payment_type}}</td>
+                                            <td class="clickable-row" style="color: black;" data-href="">{{e.total}}
+                                            </td>
+                                            <td class="clickable-row" style="color: black;" data-href="">
+                                                {{e.balance}}</td>
+
+                                            <td class="clickable-row" style="color: black;" data-href="">
+                                                {% if e.staff_id.position == 'company' %}
+                                                {{ e.staff_id.company.company_name }}
+                                                {% else %}
+                                                {{ e.staff_id.first_name }} {{ e.staff_id.last_name }}
+                                                {% endif %}
+                                                {% if e.action == 0 %}
+                                                [<b style="color: green;">Create</b>]
+                                                {% else %}
+                                                [<b style="color: orange;">Update</b>]
+                                                {% endif %}
+                                            </td>
+                                            <!-- <td class="clickable-row" style="color: black;"
+                                                data-href="details_purchasebill/{{ p.billno }}"></td> -->
+                                            <td class="pt-3 m-0 extra">
+                                                <div class="btn-group">
+                                                    <button style="border: none;background: none;" type="button"
+                                                        class="ropdown-toggle dropdown-toggle-split"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" id="d1">
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'expense_details' f.id %}"><span
+                                                                    class="fa fa-eye pe-2 tg"></span> View </a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v"
+                                                                href="{% url 'edit_expense' f.id %}"><span
+                                                                    class="fa fa-edit pe-2 tj"></span> Edit</a></li>
+
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_d"
+                                                                href="{% url 'delete_expense' f.id %}"><span
+                                                                    class="fa fa-trash-alt tr"
+                                                                    style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span>
+                                                                Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                        {% endif %}
+                                       
+                                        {% endfor %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                {% else %}
+
+                                <p id="emptyMessage" style="text-align: center;">
+                                    <br><br><br>
+                                    No Expense to Show
+                                </p>
+                                {% endif %}
+
+                                <table id="billtablemodel" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th>Party</th>
+                                            <th>Expense Category</th>
+                                            <th>Expense Date</th>
+                                            <th>cgst</th>
+                                            <th>sgst</th>
+                                            <th>Tax Amount</th>
+                                            <th>Payment Type</th>
+                                            <th>Subtotal</th>
+                                            <th>Adjustment</th>
+                                            <th>Total</th>
+                                            <th>Paid</th>
+                                            <th>Balance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+                                            <td>Cash/Cheque/UPI/Bank Name</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table id="billtableitemmodel" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th>Expense</th>
+                                            <th>Discription</th>
+                                            <th>Tax</th>
+                                            <th>Amount</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+                </div>
+            </div>
+
+            {% else %}
+            <!-- <div class="d-flex justify-content-center">
+                <center><img src="{% static 'images/no-data-file.png' %}" alt="" class="mt-5"></center>
+
+            </div>
+            <div class="d-flex  justify-content-center">
+                <a href="{% url 'newexpenses' %}" class="btn btn-primary"><b>ADD EXPENSES</b></a>
+            </div> -->
+            
+                
+                <div class="p-5 text-center" style="display: flex;justify-content: center;" id="default">
+                    <div class="card"
+                        style="background-color: white;width:60rem;box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.249);">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <img height="500vw" src="{{'static/images/expense1.jpeg'}}" id="img" class="card-img" alt="no img" style="border-radius: 10px 0px 0px 10px;">
+                                <!-- <div class="card-img-overlay">
+                                                <h5 class="card-title">Card title</h5>
+                                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                                <p class="card-text"><small>Last updated 3 mins ago</small></p>
+                                            </div> -->
+                            </div>
+                            <div class="col-sm-12 col-md-6 ps-3 pe-4">
+                                <div class="p-1 rounded" style="border: 1px solid rgba(0, 0, 0, 0);border-bottom: none;">
+                                    <p style="margin-bottom: 4rem;"></p>
+                                    <div class="d-flex" style="padding-left: 130px;">
+                                        <img src="{% static 'assets/images/logos/favicon.png' %}"  width="30" height="30" alt="" />
+                                        <h3 style="font-family: 'Times New Roman', Times, serif; "><b class="p-3">VYAPAR</b></h3>
+                                    </div>
+                                    <!-- <h5 class="card-title">Card title</h5> -->
+                                    <p style="margin-bottom: 0.5rem;"></p>
+                                    <p class="card-text p-5" id="text" style="text-align: justify;font-family: 'Times New Roman', Times, serif;font-weight: bold;font-size: 16px;">Welcome to vyapar, We're committed to providing a seamless and secure
+                                        online marketplace for buyers and sellers. Our platform offers a range of features.</p>
+                                    <h5 style="color: rgb(10, 164, 28);font-weight: bold;font-family: 'Times New Roman', Times, serif;" class="card-text">Please Create Your first
+                                        Expense</h5>
+                                    <p class="mt-4"></p>
+                                    <a class="btn btn-lg btn-primary btn-gradient" href="{% url 'newexpenses' %}">ADD EXPENSES</a>
+                                    <p style="margin-bottom: 4rem;"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+           
+            {% endif %}
+
+
+
+
+        </div>
+    </div>
+    <script>
+
+        $(document).ready(function () {
+            var $rows = $('#billtable tbody tr');
+            $('#search1').keyup(function () {
+                var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+                $rows.show().filter(function () {
+                    console.log($rows.show())
+
+                    var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+                    console.log(text)
+                    return !~text.indexOf(val);
+                }).hide();
+            });
+        });
+
+        $(document).ready(function () {
+            var $rows = $('#billtable1 tbody tr');
+            $('#search').keyup(function () {
+                var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+                $rows.hide().filter(function () {
+                    var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+                    var date = $(this).find('.date').text().toLowerCase();
+                    var name = $(this).find('.name').text().toLowerCase();
+                    var amount = $(this).find('.amount').text().toLowerCase();
+                    var type = $(this).find('.type').text().toLowerCase();
+                    var total = $(this).find('.total').text().toLowerCase();
+
+
+
+                    // Check if any of the fields (name, number, date) contains the search term.
+                    return (name.indexOf(val) !== -1 || amount.indexOf(val) !== -1 || date.indexOf(val) !== -1 || type.indexOf(val) !== -1 || total.indexOf(val) !== -1);
+                }).show();
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+    <script>
+        function cleardropdown(index) {
+            if (index == 0) {
+                document.getElementById('filterInput' + index).value = '';
+            } else {
+                document.getElementById('filterInput' + index).value = null;
+            }
+        }
+
+
+
+
+        function ExportToExcel() {
+            try {
+                const table1 = document.querySelector('#billtable1');
+                const d1Element = document.getElementById("d1");
+
+                if (d1Element) {
+                    d1Element.style.display = 'none'; // Hide the element before exporting
+
+                    const ws1 = XLSX.utils.table_to_sheet(table1);
+                    const wb1 = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb1, ws1, 'Sheet1');
+
+                    XLSX.writeFile(wb1, 'expense.xlsx', { bookType: 'xlsx' }, function () {
+                        d1Element.style.display = 'block'; // Show the element after exporting
+                    });
+                } else {
+                    console.error("Element with ID 'd1' not found.");
+                }
+            } catch (error) {
+                console.error("Error exporting to Excel:", error);
+            }
+        }
+
+
+
+
+        function filterTable(index) {
+            var input;
+            document.getElementById('dropdownContent' + index).style.display = 'none';
+            if (index === 0) {
+                input = document.getElementById('filterInput' + index).value;
+            } else {
+                input = document.getElementById('filterInput' + index).value.toUpperCase();
+            }
+            var table = document.getElementById('billtable');
+            var rows = table.getElementsByTagName('tr');
+            var emptyMessage = document.getElementById('emptyMessage');
+            var isEmpty = true;
+            for (var i = 1; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName('td');
+                var cell = cells[index];
+                if (cell) {
+                    var textValue = cell.textContent || cell.innerText;
+                    if (index === 0) {
+                        if (input == '') {
+                            rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                        } else {
+                            dateval = textValue.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                            inputval = input.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                            const formattedDate = formatDateString(input);
+                            if (dateval === formattedDate) {
+                                rows[i].style.display = 'table-row';
+                                isEmpty = false;
+                            } else {
+                                rows[i].style.display = 'none';
+                            }
+                        }
+                    } else {
+                        if (textValue.toUpperCase().includes(input)) {
+                            rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                        } else {
+                            rows[i].style.display = 'none';
+                        }
+                    }
+                }
+            }
+            emptyMessage.style.display = isEmpty ? 'block' : 'none';
+
+        }
+
+        function formatDateString(inputDate) {
+            const parsedDate = new Date(inputDate);
+            const day = parsedDate.getDate();
+            const month = parsedDate.getMonth() + 1;
+            const year = parsedDate.getFullYear();
+            const formattedDate = `${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}-${year}`;
+            return formattedDate;
+        }
+
+        function printfunction() {
+            print4 = document.getElementById('tablediv')
+            if (print4.style.display !== 'none') {
+                var printContents = document.getElementById("tablediv").innerHTML;
+            } else {
+                var printContents = document.getElementById("whatToPrint").innerHTML;
+            }
+            var $printerDiv = $('<div class="printContainer"></div>');
+            $printerDiv.html(printContents);
+            $('body').append($printerDiv).addClass("printingContent");
+            window.print();
+            $printerDiv.remove();
+            $('body').removeClass("printingContent");
+        }
+
+
+
+
+
+
+
+
+
+
+        function toggleDropdown1(index) {
+            var dropdownContent = document.getElementById('dropdownContent' + index);
+            var isVisible = dropdownContent.style.display === 'block';
+            var allDropdowns = document.querySelectorAll('.dropdown-content');
+            allDropdowns.forEach(function (dropdown) {
+                dropdown.style.display = 'none';
+            });
+            dropdownContent.style.display = isVisible ? 'none' : 'block';
+        }
+        function toggleDropdown(dotsElement) {
+            var dropdownMenu = dotsElement.nextElementSibling;
+            if (dropdownMenu.style.display === 'block' || dropdownMenu.style.display === '') {
+                dropdownMenu.style.display = 'none';
+            } else {
+                dropdownMenu.style.display = 'block';
+
+                // Close the dropdown if the user clicks outside of it
+                window.addEventListener('click', function (event) {
+                    if (event.target !== dotsElement && event.target !== dropdownMenu) {
+                        dropdownMenu.style.display = 'none';
+                    }
+                });
+            }
+
+            // Prevent the click event from propagating to the window
+            event.stopPropagation();
+        }
+
+        $(document).ready(function () {
+            var $rows = $('#partysearch tbody tr');
+            $('#search').keyup(function () {
+                var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+                $rows.hide().filter(function () {
+                    var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+                    return ~text.indexOf(val);
+                }).show();
+            });
+        });
+
+
+
+        $(document).ready(function () {
+            var $rows = $('#partiessearch tbody tr');
+            $('#search').keyup(function () {
+                var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+                $rows.hide().filter(function () {
+                    var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+                    var name = $(this).find('.name').text().toLowerCase();
+                    var number = $(this).find('.amount').text().toLowerCase();
+
+
+                    // Check if any of the fields (name, number, date) contains the search term.
+                    return (name.indexOf(val) !== -1 || number.indexOf(val) !== -1 || date.indexOf(val) !== -1);
+                }).show();
+            });
+        });
+
+
+    </script>
+    <!-- modal start -->
+
+
+    <div class="modal" id="excelModal" tabindex="-1" aria-labelledby="excelModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="excelModalLabel">Upload File
+                        <label for="" style="color: red; font-size: x-small;">* Refer Downloaded Sheet For Format
+                        </label><br>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="excelForm" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="file" style="color: black;">Choose Excel File for Purchase Bill- </label> <br>
+                            <input type="file" class="form-control-file" id="billfile" name="billfile"
+                                accept=".xls, .xlsx"><br><br>
+    
+                            <label for="file" style="color: black;">Choose Excel File for Purchase Bill Products-
+                            </label> <br>
+                            <input type="file" class="form-control-file" id="prdfile" name="prdfile"
+                                accept=".xls, .xlsx"><br>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="button" class="btn btn-primary" id="uploadButton">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function excelmodel() {
+            $('#excelModal').modal('show');
+        }
+    
+        function uploadFile() {
+            const form = document.getElementById('excelForm');
+            const formData = new FormData(form);
+            fetch('import_expense', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                swal({
+                    title: "Imported!",
+                    text: "Purchase Bill Import Successful!",
+                    icon: "success",
+                    buttons: false,
+                });
+            })
+            .catch(error => {
+                swal({
+                    title: "Error!",
+                    text: "Purchase Bill Import Unsuccessful!",
+                    icon: "warning",
+                    buttons: false,
+                });
+            });
+        }
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add click event listener to the upload button
+            const uploadButton = document.getElementById('uploadButton');
+            uploadButton.addEventListener('click', function () {
+                uploadFile(); // Call the uploadFile function when the button is clicked
+                $('#excelModal').modal('hide'); // Hide the modal after uploading
+            });
+        });
+    </script>
+
+    <!-- end modal -->
+</body>
+
+
+{% endblock %}

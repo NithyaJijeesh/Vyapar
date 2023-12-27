@@ -1,0 +1,611 @@
+{% extends 'company/src/html/base.html' %}
+{% block content %}
+{% load static %}
+{% load social_share %}
+<!---------------------- script------------------------------------------------>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js" integrity="sha512-8+n4PSpp8TLHbSf28qpjRfu51IuWuJZdemtTC1EKCHsZmWi2O821UEdt6S3l4+cHyUQhU8uiAAUeVI1MUiFATA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!-----------------------------------script----------------------->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
+
+
+
+
+<style>
+    
+</style>
+
+
+<div class="body-wrapper">
+    <div class="container-fluid">
+
+
+      
+        <div class="col-sm-12 col-lg-12 ">
+            <div id="item_get_detail_target">
+                <div class="row m-2" style="height:20%">
+                    <div class="card bg-light bs p-3 mb-3">
+                        <div class="bar d-flex justify-content-between">
+                            <div class=" card-group">
+                                <div class="px-2">
+                                    <label style="text-align:left ">From</label><br>
+                                    <input name="FromDate" class="inputdate form-control" type="date" id="in1">
+                                </div>
+                                <div class="px-2">
+                                    <label style="text-align:left ">To</label><br>
+                                    <input name="ToDate" class="inputdate form-control" type="date" id="in2">
+                                </div>
+                            </div>
+                            <div class=" card-group">
+                                <div class="right mt-3">
+                                    <a class="btn " title="export to excel"onclick="exportAsExcel()">
+                                        <span><img width="25px"src="{% static 'assets/excel2.png' %}" alt="no img"></span>
+                                    </a>
+                                    <a class="btn " title="export to PDF"onclick="exportAsPDF()">
+                                        <span><img width="25px"src="{% static 'assets/PDF_icon.png' %}" alt="no img"></span>
+                                    </a>
+                                    <a class="btn  btn_print  " title="PRINT"onclick="()">
+                                        <span><img width="25px"src="{% static 'assets/printer1.png' %}" alt="no img"></span>
+                                    </a>
+                                    <a class="btn  p-0 ps-2" title="share">
+                                        <div class="btn-group dropleft">
+                                            <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa-solid fa-share"></i>
+                                            </a>
+                                            <div class="dropdown-menu">
+                                                <button type="button" class="btn " data-toggle="modal" data-target="#exampleModal">
+                                                    Share Via mail
+                                                  </button>
+                                                  <button type="button" class="btn " id="sendWhatsApp">
+                                                 {% post_to_whatsapp objects_or_url "whatsapp" %}
+                                                  </button>
+                                            </div>
+                                          </div>
+                                    </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Send template via mail</h5>
+                    
+                    </div>
+                    <div class="modal-body">
+                      <form method="post" action="{% url 'send_sale_report_via_mail' %}"    id="email">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <lable>Mail id</lable>
+                            <input type="mail" name='email' required class="form-control" id="message">
+                        </div>
+                        <div class="form-group">
+                            <lable>Message</lable>
+                            <input type="text"  name="message" required class="form-control">
+                        </div>
+                        <button type="submit" class=" btn  btn-primary mx-auto d-block">Share</button>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary "  data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+
+
+
+                        
+        <script>
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = cookies[i].trim();
+                        // Check if the cookie name matches the CSRF cookie name
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            function uploadFile() {
+                const fileInput = document.getElementById("file-input");
+                const file = fileInput.files[0];
+                const csrfToken = getCookie('csrftoken')
+
+                const formData = new FormData();
+                formData.append("file", file);
+
+                fetch("/import_excel", {
+                    method: "POST",
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: formData
+                })
+                window.location.href = '/sale_order';
+
+
+            }
+        </script>
+
+        <div class="row pt-0 m-0">
+            <div class="card p-0 bg-light" style="min-height: 60vh;">
+                <div class="row m-0 p-0 pt-3">
+                    <div class="col-sm-12 col-lg-3">
+                        <p class="tb fw-bolder pt-2">SALE Report</p>
+                        <div class="pt-2">
+                            <div class="position-relative">
+                                <div class="position-absolute" style="margin-top:0.4rem;margin-left: 0.5rem;">
+                                    <span class="fa fa-search fs-5 text-info"></span>
+                                </div>
+                            </div>
+                            <input id="search_input1" style="padding-inline-start: 2rem;"
+                                class="w-100 border-secondary text-dark pt-1 pb-1 rounded" type="text"
+                                placeholder=" search here..">
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-7">
+
+                    </div>
+
+                    <div class="col-sm-12 col-lg-2 pt-1">
+
+                        
+                    </div>
+                    <div class="mt-3" id="content-div">
+                        <div class="table-responsive">
+                        <table id="myTable"
+                            class="table table-bordered table-info table-hover  tb  w-100">
+                            <h3 class="text-center mb-7">{{staff.company.company_name}}</h3>
+                            <thead>
+                                <th>#</th>
+                                <th class="text-center fs-2">
+                                    PARTY&nbsp;NAME
+                                    <div class="dropdown export-hide">
+                                        <div class=" dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </div>
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-secondary">
+                                                <button class="btn apply-filter btn-sm btn-secondary">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-secondary">Clear</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                   
+                                </th>
+                                <th class="text-center fs-2">
+                                    NUMBER
+                                    <div class="dropdown">
+                                        <div class=" dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </div>
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-secondary">
+                                                <button class="btn apply-filter btn-sm btn-secondary">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-secondary">Clear</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                   
+                                    
+                                </th>
+                                <th class="text-center fs-2">DATE 
+                                    <div class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+                                        aria-expanded="false"><i class="fas fa-filter filter-button"></i></div>
+
+                                    <div class="dropdown-menu "
+                                        style="box-shadow:  2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+
+                                        <div class="p-2 filter-dropdown">
+                                            <label for="">Equel to:</label>
+
+                                            <input type="text" class="form-control filter-value border-secondary">
+                                            
+                                                <button class="btn apply-filter btn-sm btn-secondary">Apply</button>
+                                                <button
+                                                    class="btn clear-filter btn-sm  btn-secondary">Clear</button>
+                                            
+
+                                        </div>
+
+                                    </div>
+                                </th>
+                                <th class="text-center fs-2">DUE DATE 
+                                    <div class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+                                        aria-expanded="false"><i class="fas fa-filter filter-button"></i></div>
+
+                                    <div class="dropdown-menu "
+                                        style="box-shadow:  2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+
+                                        <div class="p-2 filter-dropdown">
+                                            <label for="">Equel to:</label>
+
+                                            <input type="text" class="form-control filter-value border-secondary">
+                                            
+                                                <button class="btn apply-filter btn-sm btn-secondary">Apply</button>
+                                                <button
+                                                    class="btn clear-filter btn-sm  btn-secondary">Clear</button>
+                                            
+
+                                        </div>
+
+                                    </div>
+                                </th>
+                                <th class="text-center fs-2">TOTAL
+                                    <div class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+                                        aria-expanded="false"><i class="fas fa-filter filter-button"></i></div>
+
+                                    <div class="dropdown-menu "
+                                        style="box-shadow:  2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+
+                                        <div class="p-2 filter-dropdown">
+                                            <label for="">Equel to:</label>
+
+                                            <input type="text" class="form-control filter-value border-secondary">
+                                            
+                                                <button class="btn apply-filter btn-sm btn-secondary">Apply</button>
+                                                <button
+                                                    class="btn clear-filter btn-sm  btn-secondary">Clear</button>
+                                            
+
+                                        </div>
+
+                                    </div>
+                                </th>
+
+                                <th class="text-center fs-2">
+                                    Advance<div class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+                                    aria-expanded="false"><i class="fas fa-filter filter-button"></i></div>
+
+
+                                    <div class="dropdown-menu "
+                                    style="box-shadow:  2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+
+                                    <div class="p-2 filter-dropdown">
+                                        <label for="">Equel to:</label>
+
+                                        <input type="text" class="form-control filter-value border-secondary">
+                                        
+                                            <button class="btn apply-filter btn-sm btn-secondary">Apply</button>
+                                            <button
+                                                class="btn clear-filter btn-sm  btn-secondary">Clear</button>
+                                        
+
+                                    </div>
+
+                                </div>
+
+
+                                </th>
+
+                                <th class="text-center fs-2">BALANCE<div class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+                                    aria-expanded="false"><i class="fas fa-filter filter-button"></i></div>
+
+                                <div class="dropdown-menu "
+                                    style="box-shadow:  2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+
+                                    <div class="p-2 filter-dropdown">
+                                        <label for="">Equel to:</label>
+
+                                        <input type="text" class="form-control filter-value border-secondary">
+                                        
+                                            <button class="btn apply-filter btn-sm btn-secondary">Apply</button>
+                                            <button
+                                                class="btn clear-filter btn-sm  btn-secondary">Clear</button>
+                                        
+
+                                    </div>
+
+                                </div>
+                                    
+                                </th>
+                                <th class="text-center fs-2">TYPE
+                                    <div class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+                                        aria-expanded="false"><i class="fas fa-filter filter-button"></i></div>
+
+                                    <div class="dropdown-menu "
+                                        style="box-shadow:  2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+
+                                        <div class="p-2 filter-dropdown">
+                                            <label for="">Equel to:</label>
+
+                                            <input type="text" class="form-control filter-value border-secondary">
+                                            
+                                                <button class="btn apply-filter btn-sm btn-secondary">Apply</button>
+                                                <button
+                                                    class="btn clear-filter btn-sm  btn-secondary">Clear</button>
+                                            
+
+                                        </div>
+
+                                    </div>
+                                </th>
+                                <th class="text-center fs-2">STATUS
+                                    <div class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+                                        aria-expanded="false"><i class="fas fa-filter filter-button"></i></div>
+
+                                    <div class="dropdown-menu "
+                                        style="box-shadow:  2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+
+                                        <div class="p-2 filter-dropdown">
+                                            <label for="">Equel to:</label>
+
+                                            <input type="text" class="form-control filter-value border-secondary">
+                                            
+                                                <button class="btn apply-filter btn-sm btn-secondary">Apply</button>
+                                                <button
+                                                    class="btn clear-filter btn-sm  btn-secondary">Clear</button>
+                                            
+
+                                        </div>
+
+                                    </div>
+                                </th>
+                               
+                                
+                                
+                               
+                            </thead>
+                            <tbody>
+                                {% for i in sale %}
+                                <tr>
+                                    <td>{{forloop.counter }}</td>
+                                    <td>{{i.partyname}}</td>
+                                    <td>{{i.orderno}}</td>
+                                    <td>{{i.orderdate}}</td>
+                                    <td>{{i.duedate}}</td>
+                                    <td>{{i.grandtotal}}</td>
+                                    <td>{{i.paid}}</td>
+                                    <td>{{i.balance}}</td>
+                                    <td>{{i.payment_method}}</td>
+                                    <td
+                                        class="{% if i.status == 'open' %}text-primary{% else %}text-success{% endif %} text-center">
+                                        {{i.status}}</td>
+                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div>
+                            <p>TOTAL Amount:{{s}}</p>
+                            <p>TOTAL Order:{{c}}</p>
+                        </div>
+
+
+                    </div>
+                        <table class="table" id="myTable1" style="display: none;">
+                            <thead>
+                                <th>#</th>
+                                <th>PARTY NAME</th>
+                                <th>NUMBER</th>
+                                <th>DATE</th>
+                                <th>DUE DATE</th>
+                                <th>TOTAL</th>
+                                <th>Advance</th>
+                                <th>BALANCE</th>
+                                <th>TYPE</th>
+                                <th>STATUS</th>
+                            </thead>
+                            <tbody>
+                                {% for i in sale %}
+                                <tr>
+                                    <td>{{forloop.counter }}</td>
+                                    <td>{{i.partyname}}</td>
+                                    <td>{{i.orderno}}</td>
+                                    <td>{{i.orderdate}}</td>
+                                    <td>{{i.duedate}}</td>
+                                    <td>{{i.grandtotal}}</td>
+                                    <td>{{i.paid}}</td>
+                                    <td>{{i.balance}}</td>
+                                    <td>sale order</td>
+                                    <td>{{i.status}}</td>
+                                </tr>
+                                    {% endfor %}
+                            </tbody>
+                            
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+         </div>
+        
+</div>
+
+<script>
+    // jQuery(document).ready(function ($) {
+    //     $(".clickable-row").click(function () {
+    //         window.location = $(this).data("href");
+    //     });
+    // });
+    jQuery(document).ready(function ($) {
+        $("#search_input1").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+        $(document).on('click', '.btn_print', function (event) {
+            $('#myTable1').removeClass('table-hover');
+            var printContents = document.getElementById("content-div").innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+
+            $('#myTable1').addClass('table-hover');
+
+        });
+    });
+
+    var table = document.getElementById("myTable");
+
+    var fromDate;
+    $('#in1').on('change', function () {
+        fromDate = $(this).val();
+        $('#in2').prop('min', function () {
+            return fromDate
+        });
+        var startDate = new Date(document.getElementById("in1").value);
+        var endDate = new Date(document.getElementById("in2").value);
+        var rows = table.getElementsByTagName("tr")
+
+        console.log(startDate);
+        for (var i = 1; i < rows.length; i++) {
+            var row = rows[i];
+            var dateCell = row.cells[3];
+            var rowDate = new Date(dateCell.textContent);
+
+            if ((rowDate >= startDate) || (rowDate <= endDate && rowDate >= startDate)) {
+                row.style.display = "";
+
+            } else {
+                row.style.display = "none";
+
+            }
+        }
+
+
+
+        // var tdate = new Date(fromDate)
+        // var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        // document.getElementById("d1").innerHTML = tdate.toLocaleDateString(undefined, options);
+
+    });
+    var toDate;
+    $('#in2').on('change', function () {
+        toDate = $(this).val();
+        $('#in1').prop('max', function () {
+            return toDate
+        })
+        var startDate = new Date(document.getElementById("in1").value);
+        var endDate = new Date(document.getElementById("in2").value);
+        var rows = table.getElementsByTagName("tr");
+
+        for (var i = 1; i < rows.length; i++) {
+            var row = rows[i];
+            var dateCell = row.cells[3];
+            var rowDate = new Date(dateCell.textContent);
+            if (rowDate <= endDate && rowDate >= startDate) {
+                row.style.display = "";
+
+            } else {
+                row.style.display = "none";
+
+            }
+        }
+        // var tdate = new Date(toDate)
+        // var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        // document.getElementById("d2").innerHTML = "  To  " + tdate.toLocaleDateString(undefined, options);
+
+    })
+    function exportAsExcel() {
+        console.log("myTable1");
+        $('in1').prop
+        const table = document.getElementById('myTable1'); // Replace 'myTable' with your table's ID
+        const wb = XLSX.utils.table_to_book(table);
+
+        XLSX.writeFile(wb, 'saleorder.xlsx');
+    }
+</script>
+
+<script>
+    function exportAsPDF() {
+    console.log("myTable1");
+
+    // Use the correct selector to get the element by ID
+    const table = document.getElementById('myTable1'); // Replace 'myTable1' with your table's ID
+
+    // Check if the table exists
+    if (table) {
+        // Create a new jsPDF instance
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+
+        // Convert the table to PDF and save it
+        pdf.autoTable({ html: table });
+        pdf.save('salereport.pdf');
+    } else {
+        console.error("Table with ID 'myTable1' not found");
+    }
+}
+
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('.apply-filter').on('click', function () {
+            const $table = $('#myTable');
+            const columnIndex = $(this).closest('th').index();
+            const filterValue = $(this).siblings('.filter-value').val().trim();
+            console.log("=============================+++++++++++++++");
+            console.log(filterValue)
+
+            $table.find('tbody tr').hide(); // Hide all rows
+            console.log("hide");
+            applyEqualToFilter($table, columnIndex, filterValue);
+
+            // Close the filter dropdown
+            // $(this).closest('.filter-dropdown').hide();
+        });
+
+        function applyEqualToFilter($table, columnIndex, filterValue) {
+            console.log("filter");
+            $table.find(`tbody tr td:nth-child(${columnIndex + 1})`).each(function () {
+                const cellValue = $(this).text().trim();
+                if (cellValue === filterValue) {
+                    $(this).parent().show();
+                    console.log(this)
+                }
+            });
+        }
+
+        $('.clear-filter').on('click', function () {
+            $('#myTable tbody tr').show();
+            $(this).siblings('.filter-value').val('');
+
+            // Close the filter dropdown
+            // $(this).closest('.filter-dropdown').hide();
+        });
+    });
+</script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    {% for msg in messages %}
+    swal({
+    title: "{{msg}}",
+    text: "{{msg.tags}}",
+    icon: "{{msg.tags}}",
+  });
+    {% endfor %}
+   </script>
+
+
+
+{% endblock %}

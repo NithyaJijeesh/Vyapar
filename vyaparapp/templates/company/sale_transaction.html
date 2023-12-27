@@ -1,0 +1,85 @@
+<!-- create by nasneen -->
+
+{% extends 'company/src/html/base.html' %}
+{% load static %}
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<style>
+    .bs {
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+    }
+
+    .bs_sm {
+        box-shadow: inset 2px 2px 5px 3px rgba(0, 0, 0, 0.199);
+    }
+
+    .tb {
+        color: rgba(3, 161, 252, 0.7);
+    }
+</style>
+
+<div class="body-wrapper">
+    <br><br><br>
+    <div class="row p-0 m-0">
+        <div class="col-12  p-0 m-0">
+            <div class=" bg-light bg-light pb-0 mb-0 p-2 " style="height:100%;width:100%;">
+                <div class="d-flex justify-content-center pt-4">
+                    <a href="" id="b1" class="btn  text-white"
+                        style="margin-right: 10px; background-color: rgb(252, 3, 3,0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">Add
+                        Sale <i class="fa fa-plus"></i></a>
+                    <a href="" id="b2" class="btn  text-white"
+                        style="margin-right: 10px;background-color: rgba(3, 161, 252, 0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">Add
+                        Purchase <i class="fa fa-plus"></i></a>
+                    <a href="" id="b3" class="btn text-primary"
+                        style="border-radius: 20px;border: 1px solid rgb(40, 12, 222);background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">Add
+                        More <i class="fa fa-plus"></i></a>
+                </div>
+                <p></p>
+
+
+
+                <div class="d-flex justify-content-center ">
+                    <div class="bg-light bs p-4 rounded mb-5" style="width: 80%;">
+                        <div class="d-md-flex d-sm-block "
+                            style="justify-content: space-between;align-items: center;display: flex;">
+                            <h4><strong class="fw-bolder text-primary">SALE ORDER HISTORY</strong></h4>
+                            <a href="{% url 'sale_order'  %}"><span class="fa fa-times fs-5 p-1"></span></a>
+                        </div>
+                        <div class="tablediv pt-3" style="height: 35rem; width: 100%;">
+                            <table class="table table-bordered table-info table-striped tb table-responsive w-100" id="billtable"  style="text-align: center;">
+                                <thead >
+                                    <tr class="fs-2 tb" >
+                                        <th class="bg-secondary text-white">
+                                            # 
+                                        </th>
+                                        <th class="bg-secondary text-white">
+                                            DATE 
+                                        </th>
+                                        <th class="bg-secondary text-white">
+                                            NAME 
+                                        </th>
+                                        <th class="bg-secondary text-white">
+                                            ACTION
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in tr %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{i.date}}</td>
+                                        <td>{{i.staff.first_name}}</td>
+                                        <td class="{% if i.action == 'Created' %}text-danger{% else %}text-primary{% endif %}">{{i.action}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

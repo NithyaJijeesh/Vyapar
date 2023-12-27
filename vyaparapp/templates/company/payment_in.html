@@ -1,0 +1,779 @@
+{% extends 'company/src/html/base.html' %}
+{% load static %}
+{% block content %}
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+{% load my_extras %}
+
+<style>
+    .bs{
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+    }
+
+    .bs_sm{
+        box-shadow: inset 2px 2px 5px 3px rgba(0, 0, 0, 0.199);
+    }
+
+    .paiddiv{
+        color: black;
+        height: 10vh;
+        width: 20vh;
+        padding-left: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        margin-left: 7vh;
+        border-radius: 8px;
+        background-color: lightgray;
+    }
+
+    .unpaiddiv{
+        color: black;
+        height: 10vh;
+        width: 20vh;
+        padding-left: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        margin-left: 7vh;
+        border-radius: 8px;
+        background-color: lightsteelblue;
+    }
+
+    .totaldiv{
+        color: black;
+        height: 10vh;
+        width: 20vh;
+        padding-left: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        margin-left: 7vh;
+        border-radius: 8px;
+        background-color: lightgreen;
+    }
+
+    #paymentInTable tbody{
+        cursor: pointer;
+    }
+
+    #emptyMessage {
+        display: none;
+        font-size: x-large;
+        font-weight: bold;
+        color: red;
+    }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+        padding: 10px;
+        z-index: 1;
+        width: 15%;
+    }
+
+    .dropdown-content label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .dropdown-content input {
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+    .tplus{
+        margin-top: 3vh;
+        margin-left: 5vh;
+        margin-right: -2vh;
+    }
+
+    .tequal{
+        margin-top: 3vh;
+        margin-left: 5vh;
+        margin-right: -2vh;
+    }
+
+    .tg{
+        color: rgb(0, 140, 7);
+    }
+
+    .tr{
+        color: rgb(218, 0, 0);
+    }
+
+    .tj{
+        color:#E4A11B;
+    }
+
+    .th{
+        color: rgb(12, 79, 234);
+    }
+
+    @media print{
+        body{
+            visibility: hidden !important; /* hide everything in body when in print mode*/
+        }
+
+        .printContainer {
+            visibility: visible !important; /* Override the rule above to only show the printables*/
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+        } 
+
+        #calcdiv{
+            visibility: visible;
+            margin-top: -30vh;
+            margin-left: -9vh;
+            margin-bottom: 30vh;
+        }
+
+        #paymentInTable{
+            margin-top: 3vh;
+            /* margin-bottom: 20vh; */
+        }
+
+        #paymentInTable th{
+            font-size: medium;
+        }
+
+        .extra{
+            display: none;
+        }
+    }
+    
+    /* ::-webkit-scrollbar{
+        display: none
+    } */
+    /* #paymentInTableSection::-webkit-scrollbar{
+        display: none
+    } */
+</style>
+
+
+<div class="body-wrapper">
+    <br><br><br>
+    <div class="d-flex justify-content-center pt-4">
+        <a href="" id="b1" class="btn  text-white"
+            style="margin-right: 10px; background-color: rgb(252, 3, 3,0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+            Add Sale <i class="fa fa-plus"></i>
+        </a>
+        <a href="{% url 'add_purchasebill' %}" id="b2" class="btn  text-white"
+            style="margin-right: 10px;background-color: rgba(3, 161, 252, 0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+            Add Purchase <i class="fa fa-plus"></i>
+        </a>
+        <a href="" id="b3" class="btn text-primary"
+            style="border-radius: 20px;border: 1px solid rgb(40, 12, 222);background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+            Add More <i class="fa fa-plus"></i>
+        </a>
+    </div>
+    <p></p>
+    {% if paymentIn %}
+    <div class="row ps-3 pe-3 m-0" >
+        <div class="col-sm-12 ps-2 pe-3">
+            <div class="row pt-0 m-0">
+                <div class="card bg-light bs d-flex">
+                    <div class="row px-2 py-5">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="fromDate" style="color: black; margin-bottom: 1vh;">From Date:</label>
+                                <input type="date" class="form-control h-100 border-secondary" id="fromDate" style="color: black; background-color: white;" onchange="filterDates()">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="toDate" style="color: black; margin-bottom: 1vh;">To Date:</label>
+                                <input type="date" class="form-control h-100 border-secondary" id="toDate" style="color: black; background-color: white;" onchange="filterDates()">
+                            </div>
+                        </div>
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
+                            <button class="btn mt-3" type="button" onclick="ExportToExcel()">
+                                <span><img width="25px" src="{% static 'assets/excel2.png' %}" alt="Excel"></span>
+                                <br><span style="color: black; font-size: small; font-weight: bold;">Excel</span>
+                            </button>
+                            <button class="btn mt-3" type="button" onclick="printTable()">
+                                <span><img width="25px" src="{% static 'images/printer.jpeg' %}" alt="Print"></span>
+                                <br><span style="color: black; font-size: small; font-weight: bold;">Print</span>
+                            </button>
+                            <button class="btn mt-3" type="button" data-toggle="modal" data-target="#importPayment">
+                                <span><img width="25px" src="{% static 'images/import.png' %}" alt="Import"></span>
+                                <br><span style="color: black; font-size: small; font-weight: bold;">Import</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pt-0 m-0">
+                <div class="card p-0 bg-light bs" style="height: 40rem;">
+                    <div class="row m-0 p-0 pt-3">
+                        <div class="col-sm-12 col-lg-3">
+                            <h4 class="tb fw-bolder pt-2 text-secondary">Payment In</h4>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input id="search_input" style="padding-inline-start: 2rem; margin-left: 1vh; " class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" Search">
+                        </div>
+                        <div class="col-md-6"></div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary bg-gradient" href="{% url 'createPaymentIn' %}" style="color: white;"> 
+                                <i class="fa fa-plus border-dark me-1" aria-hidden="true" style="color: white;"></i>Payment In
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mt-3 table-responsive" style="height: 33rem;" id="paymentInTableSection">
+                                <table class="table table-bordered table-info table-striped tb" id="paymentInTable" style="text-align: center; width: max-content;">
+                                    <thead >
+                                        <tr class="fs-2 tb">
+                                            <th class="bg-secondary text-white">
+                                                DATE
+                                                <a class="extra text-white" onclick="toggleDropdown(0)" data-bs-toggle="dropdown">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent0">
+                                                    <label for="filterInput0" class="d-block" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="date" id="filterInput0" class="d-block"/>
+                                                    <a class="btn btn-info" onclick="cleardropdown(0)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(0)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                REF NO 
+                                                <a class="extra text-white" onclick="toggleDropdown(1)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent1">
+                                                    <label for="filterInput1" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput1"  />
+                                                    <a class="btn btn-info" onclick="cleardropdown(1)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(1)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                PARTY NAME 
+                                                <a class="extra text-white" onclick="toggleDropdown(2)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent2">
+                                                    <label for="filterInput2" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput2"  />
+                                                    <a class="btn btn-info" onclick="cleardropdown(2)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(2)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                CATEGORY NAME
+                                                <a class="extra text-white" onclick="toggleDropdown(3)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent3">
+                                                    <label for="filterInput3" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput3"  />
+                                                    <a class="btn btn-info" onclick="cleardropdown(3)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(3)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                TYPE
+                                                <a class="extra text-white" onclick="toggleDropdown(4)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent4">
+                                                    <label for="filterInput4" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput4" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(4)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(4)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                TOTAL
+                                                <a class="extra text-white" onclick="toggleDropdown(5)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent5">
+                                                    <label for="filterInput5" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput5" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(5)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(5)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                RECEIVED
+                                                <a class="extra text-white" onclick="toggleDropdown(6)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent6">
+                                                    <label for="filterInput6" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput6" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(6)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(6)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                BALANCE
+                                                <a class="extra text-white" onclick="toggleDropdown(7)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent7">
+                                                    <label for="filterInput7" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput7" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(7)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(7)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white extra">
+                                                ACTION
+                                                &nbsp; <a onclick="toggleDropdown(8)"><i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent8">
+                                                    <label for="filterInput8" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput8" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(8)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(8)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white extra">
+                                                BY
+                                                &nbsp; <a onclick="toggleDropdown(9)"><i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent9">
+                                                    <label for="filterInput9" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput9" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(9)">Clear</a> 
+                                                    <a class="btn btn-info" onclick="filterTable(9)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white extra"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for p in paymentIn %}
+                                        <tr>
+                                            <td class="clickable-row" style="color: black;" data-href="view_payment_in/{{ p.id }}">{{p.date | date:'d-m-Y'}}</td>
+                                            <td class="clickable-row" style="color: black;" data-href="view_payment_in/{{ p.id }}">{{p.rec_no}}</td>
+                                            <td class="clickable-row" style="color: black;" data-href="view_payment_in/{{ p.id }}">{{p.party.party_name}}</td>
+                                            <td class="clickable-row" style="color: black;" data-href="view_payment_in/{{ p.id }}"></td>
+                                            <td class="clickable-row" style="color: black;" data-href="view_payment_in/{{ p.id }}">{{p.payment_type}}</td>
+                                            <td class="clickable-row" style="color: black;" data-href="view_payment_in/{{ p.id }}">{{p.total_amount}}</td>
+                                            <td class="clickable-row" style="color: black;" data-href="view_payment_in/{{ p.id }}">{{p.payment_received}}</td>
+                                            <td class="clickable-row" style="color: black;" data-href="view_payment_in/{{ p.id }}">{{p.balance}}</td>
+                                            <td class="clickable-row extra" style="color: black;" data-href="view_payment_in/{{ p.id }}"></td>
+                                            <td class="clickable-row extra" style="color: black;" data-href="view_payment_in/{{ p.id }}"></td>
+                                            <td class="pt-3 m-0 extra">
+                                                <div class="btn-group">
+                                                    <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                      <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'viewPaymentIn' p.id %}"><span class="fa fa-eye pe-2 tg"></span> View </a></li>
+                                                      <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'editPaymentIn' p.id %}"><span class="fa fa-edit pe-2 tj"></span> Edit</a></li>
+                                                      <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'paymentInHistory' p.id %}"><span class="fa fa-history pe-2 th"></span> History</a></li>
+                                                      <li><a class="dropdown-item fw-bold tb hide_table_text_d" onclick="deletePaymentIn(`{{p.id}}`)"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="color: black;" hidden>{{p.advance}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+
+                                <p id="emptyMessage" style="text-align: center;">
+                                    <br><br><br>
+                                    No Data
+                                </p>
+                            </div>
+                        </div>
+                    </div>                        
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="p-5 text-center" style="display: flex;justify-content: center;">
+        <div class="card " style="background-color: white;width:50rem;box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.249);">
+            <div class="row">
+                <div class="col-sm-12 col-md-6">
+                    <img height="500vw" src="{% static 'images/payment_in.png' %}" class="card-img" alt="no img">
+                </div>
+                <div class="col-sm-12 col-md-6 ps-4 pe-4">
+                    <div class="p-1 rounded" style="border: 1px solid rgba(0, 0, 0, 0);border-bottom: none;">
+                        <p style="margin-bottom: 4rem;"></p>
+                        <img width="100vw" src="{% static 'images/fav.png' %}" alt="no img">
+                        <p></p>
+                        <h1 style="font-weight:900;color:rgba(0, 0, 0, 0.644);font-size: 1.5rem;">VYAPAR</h1>
+                        <!-- <h5 class="card-title">Card title</h5> -->
+                        <p style="margin-bottom: 1.5rem;"></p>
+                        <p class="card-text">Welcome to vyapar, We're committed to providing a seamless and secure online marketplace for buyers and sellers. Our platform offers a range of features.</p>
+                        <p style="color: rgb(0, 89, 10);font-weight: light;" class="card-text">You can manage all your Payment In here..</p>
+                        <p class="mt-4"></p>
+                        <a class="btn btn-lg btn-info btn-gradient" href="{% url 'createPaymentIn' %}">Add First Payment In Details</a>
+                        <p style="margin-bottom: 4rem;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+        
+</div>
+
+
+<table id="paymentInExcelTable" hidden>
+    <thead >
+        <tr class="fs-2 tb" >
+            <th> DATE </th>
+            <th> REF NO </th>
+            <th> PARTY NAME </th>
+            <th> CATEGORY NAME </th>
+            <th> TYPE </th>
+            <th> TOTAL </th>
+            <th> RECEIVED </th>
+            <th> BALANCE </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in paymentIn %}
+        <tr>
+            <td>{{p.date | date:'d-m-Y'}}</td>
+            <td>{{p.rec_no}}</td>
+            <td>{{p.party.party_name}}</td>
+            <td></td>
+            <td>{{p.payment_type}}</td>
+            <td>{{p.total_amount}}</td>
+            <td>{{p.payment_received}}</td>
+            <td>{{p.balance}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Import Payment modal -->
+<div class="modal fade" id="importPayment">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-body bg-light rounded-1">
+                <div class="d-flex justify-content-between">
+                    <h3 class="m-3">IMPORT PAYMENT IN</h3>
+                    <button type="button" class="btn fs-4" data-dismiss="modal" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
+                </div>
+                <div class="file_instructions">
+                    <div class="alert alert-danger" role="alert">
+                        <span class="fw-bolder">IMPORTANT:</span>
+                        <p>File should have a sheet named 'payment' and column names & order should be in the given formate(Uppercase).</p>
+                        <p class="fw-bolder">Payment sheet - SLNO, DATE, NAME*, PAYMENT METHOD, ACCOUNT NUMBER, CHEQUE ID, UPI ID, TOTAL*, RECEIVED*, BALANCE, DESCRIPTION </p>
+                        <p>* All required columns should be filled.</p>
+                        <p>Payment Methods should any of 'Cash', 'Cheque','UPI' or name of bank and related data should be entered according to the method.</p>
+                        <p>Date format should be 'YYYY-MM-DD' or 'DD-MM-YYYY'.</p>
+                    </div>
+                </div>
+                <div class="sample_file mb-2">
+                    <a href="{% url 'downloadPaymentSampleImportFile' %}" class="fw-bolder">Download Sample File</a>
+                </div>
+                <form id="importPaymentForm" action="{% url 'importPaymentFromExcel' %}" method="POST" class="form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="excel_file" class="form-label">File</label>
+                        <input id="excel_file" class="form-control" type="file" name="excel_file" required>
+                    </div>
+                    <div class="d-flex justify-content-center mt-2">
+                        <input id="submit_import_excel" value="IMPORT" class="btn btn-info bg-gradient" type="submit">
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var table = document.getElementById('paymentInTable');
+    var rows = table.getElementsByTagName('tr');
+    for (var i = 1; i < rows.length; i++) {
+        var pid = rows[i].getElementsByTagName('td')[1].innerText;
+        fetchTransactionHistory(i,pid)            
+    }
+
+    function fetchTransactionHistory( rowId,pid){
+        $.ajax({
+            type : 'POST',
+            url: "{% url 'paymentHistory' %}",
+            data: { 
+                id: pid,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data){
+                console.log(data.action);
+                console.log(data.name);
+                rows[rowId].getElementsByTagName('td')[8].innerText=data.action;
+                rows[rowId].getElementsByTagName('td')[9].innerText=data.name;
+                if(data.action== 'Created'){
+                    rows[rowId].getElementsByTagName('td')[8].style.color = 'Green'
+                }else{
+                    rows[rowId].getElementsByTagName('td')[8].style.color = '#154c79'
+                }
+            }
+        });
+    }
+</script>
+
+<script>
+    function printTable(){
+        printSection = document.getElementById('paymentInTableSection')
+        if (printSection.style.display !== 'none'){
+            var printContents = document.getElementById("paymentInTableSection").innerHTML;
+        }else{
+            var printContents = document.getElementById("whatToPrint").innerHTML;
+        }
+        var $printerDiv = $('<div class="printContainer" id=printContainer></div>');
+        $printerDiv.html(printContents); 
+        $('body').append($printerDiv).addClass("printingContent"); 
+        var h1Element = document.createElement("h1");
+        h1Element.textContent = "Payment In";
+        var head = document.getElementById("printContainer");
+        head.insertBefore(h1Element, head.firstChild);
+        window.print();
+        $printerDiv.remove();
+        $('body').removeClass("printingContent");
+    }
+</script>
+
+<script>
+    function cleardropdown(index){
+        if(index == 0){
+            document.getElementById('filterInput'+index).value = '';
+        }else{
+            document.getElementById('filterInput'+index).value = null;
+        }
+    }
+
+    function toggleDropdown(index) {
+        var dropdownContent = document.getElementById('dropdownContent' + index);
+        var isVisible = dropdownContent.style.display === 'block';
+        var allDropdowns = document.querySelectorAll('.dropdown-content');
+        allDropdowns.forEach(function (dropdown) {
+            dropdown.style.display = 'none';
+        });
+        dropdownContent.style.display = isVisible ? 'none' : 'block';
+    }
+
+    function filterTable(index) {
+        var input;
+        document.getElementById('dropdownContent' + index).style.display = 'none';
+        if (index === 0) {
+            input = document.getElementById('filterInput' + index).value;
+        } else {
+            input = document.getElementById('filterInput' + index).value.toUpperCase();
+        }
+        var table = document.getElementById('paymentInTable');
+        var rows = table.getElementsByTagName('tr');
+        var emptyMessage = document.getElementById('emptyMessage');
+        var isEmpty = true;
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var cell = cells[index];
+            if (cell) {
+                var textValue = cell.textContent || cell.innerText;
+                if (index === 0) {
+                    if (input==''){
+                        rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                    }else{
+                        dateval  = textValue.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                        inputval  = input.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                        const formattedDate = formatDateString(input);
+                        if (dateval === formattedDate) {
+                            rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                        } else {
+                            rows[i].style.display = 'none';
+                        }
+                    }
+                } else {
+                    if (textValue.toUpperCase().includes(input)) {
+                        rows[i].style.display = 'table-row';
+                        isEmpty = false;
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+        emptyMessage.style.display = isEmpty ? 'block' : 'none';
+    }
+
+    function formatDateString(inputDate) {
+        const parsedDate = new Date(inputDate);
+        const day = parsedDate.getDate();
+        const month = parsedDate.getMonth() + 1;
+        const year = parsedDate.getFullYear();
+        const formattedDate = `${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}-${year}`;
+        return formattedDate;
+    }
+</script>
+
+<script>
+    function filterDates() {
+        var fromDate = document.getElementById("fromDate").value;
+        var selectedDate = new Date(fromDate);
+        selectedDate.setDate(selectedDate.getDate() - 1);
+        var toDate = document.getElementById("toDate").value;
+        var table = document.getElementById("paymentInTable");
+        var rows = table.getElementsByTagName("tr");
+        var emptyMessage = document.getElementById('emptyMessage');
+        var isEmpty = true;
+        for (var i = 1; i < rows.length; i++) {
+            var currentDate = rows[i].getElementsByTagName("td")[0].innerText;
+            var date = new Date(currentDate.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2/$1/$3"));
+            if ((fromDate && date >= selectedDate) || !fromDate) {
+                if ((toDate && date <= new Date(toDate)) || !toDate) {
+                    rows[i].style.display = "table-row";
+                    isEmpty = false;
+                } else {
+                    rows[i].style.display = "none";
+                }
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+        emptyMessage.style.display = isEmpty ? 'block' : 'none';
+    }
+</script>
+
+<script>
+    jQuery(document).ready(function($) {
+        $(".clickable-row").click(function() {
+            window.location = $(this).data("href");
+        });
+    });
+</script>
+
+<script>
+    function deletePaymentIn(Id){
+        swal({
+            title: "Confirmation !",
+            text: "Do you want to Delete this Payment In Data.?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                window.location.href = "{% url 'deletePaymentIn' 0 %}".replace('0', Id);
+            }
+        });
+    }
+</script>
+
+<script>
+    document.getElementById("search_input").addEventListener("input", function() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search_input");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("paymentInTable");
+        tr = table.getElementsByTagName("tr");
+        var emptyMessage = document.getElementById("emptyMessage");
+        var anyMatch = false;
+        for (i = 1; i < tr.length; i++) {
+            tr[i].style.display = "table-row";
+            var found = false;
+            for (td of tr[i].getElementsByTagName("td")) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().includes(filter)) {
+                    found = true;
+                    anyMatch = true;
+                    break;
+                }
+            }
+            if (!found) {
+                tr[i].style.display = "none";
+            }
+        }
+        emptyMessage.style.display = anyMatch ? "none" : "block";
+    });
+
+    $(document).ready(function(){
+        var date1 = "";
+        $('#fromDate').on('change',function(){
+            date1 = $(this).val()
+            $('#toDate').prop('min',date1)
+        })
+    })
+    $(document).ready(function(){
+        var date2 = "";
+        $('#toDate').on('change',function(){
+            date2 = $(this).val()
+            $('#fromDate').prop('max',date2)
+        })
+    })
+
+</script>
+
+<script>
+    function ExportToExcel(){
+        const table = document.querySelector('#paymentInExcelTable');
+        const ws = XLSX.utils.table_to_sheet(table);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, 'PaymentIn.xlsx');
+    }
+</script>
+
+<script>
+    function excelmodel(){
+        const table1 = document.querySelector('#billtablemodel');
+        const ws1 = XLSX.utils.table_to_sheet(table1);
+        const wb1 = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb1, ws1, 'Sheet1');
+        XLSX.writeFile(wb1, 'PurchaseBillModel.xlsx');
+
+        const table2 = document.querySelector('#billtableitemmodel');
+        const ws2 = XLSX.utils.table_to_sheet(table2);
+        const wb2 = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb2, ws2, 'Sheet1');
+        XLSX.writeFile(wb2, 'PurchaseBillItemModel.xlsx');
+    }
+</script>
+{%if messages%} {%for message in messages%} {%if message.tags == "success"%}
+<script>
+    swal({
+    position: "top-end",
+    icon: "success",
+    title: "{{message}}",
+    });
+</script>
+{%elif message.tags == "warning"%}
+<script>
+    swal({
+    position: "top-end",
+    icon: "warning",
+    title: "{{message}}",
+    });
+</script>
+{%elif message.tags == "error"%}
+<script>
+    swal({
+    position: "top-end",
+    icon: "error",
+    title: "{{message}}",
+    });
+</script>
+{%else%}
+<script>
+    swal({
+    position: "top-end",
+    icon: "info",
+    title: "{{message}}",
+    });
+</script>
+{%endif%} {%endfor%} {%endif%}
+{% endblock  %}

@@ -1,0 +1,444 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    {% block content %}
+{% load social_share %}
+{% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+
+
+
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.6"
+    integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
+<!-- Include html2pdf library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+<script src="https://unpkg.com/htmx.org@1.9.6"
+    integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+    crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+
+
+
+    #tab_logic {
+        margin-left: 10px;
+        width: 98%;
+    }
+
+    #tab_logic thead th {
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        background-color: rgba(103, 198, 226, 0.205);
+    }
+
+    #tab_logic tbody td {
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        background-color: rgba(203, 241, 252, 0.205);
+    }
+
+    
+
+
+
+
+   
+
+</style>
+<body>
+    
+
+
+<div class="equal-length-container">
+<div class="body-wrapper scrollable-div">
+    <br><br><br>
+
+    <div class="row p-0 m-0">
+        <div class="col-12  p-0 m-0">
+            <div class=" bg-light bg-light pb-0 mb-0 p-2" style="height:50px; width:150px;">
+              
+
+
+
+                <div>
+                    <div class="container">
+
+                            <div class="row clearfix">
+                                <div class="col-md-12 table-responsive-md mt-3">
+                                  
+                                       
+                                        <!-- < class="col-md-8"> -->
+                                        <DIV id="pdfdwnld">
+
+                                            <div class="row">
+                                                <h1 class="h1 text-center pt-3 pb-2"
+                                                    style="text-transform:uppercase; font-family: 'Times New Roman', Times, serif;padding-left: 5px;">
+                                                    <b>{{staff.company.company_name}}</b>
+                                                </h1>
+
+                                            </div>
+
+                                            <div class="dc_table_exprt " id="print_export_section">
+                                                <H4 style="font-weight: bolder;">GSTR3B REPORT</H4>
+                                                <br>
+                                  
+                                                    <p>1. Details of outward supplies and inward supplies liable to
+                                                        reverse
+                                                        charge</p>
+                                                    <table
+                                                        class="table table-secondary table-striped table-hover  mt-3"
+                                                        id="tab_logic">
+                                                        <thead>
+                                                            <tr style="color: black;">
+                                                                <th class="text-center">Nature Of Supplies</th>
+                                                                <th class="text-center">Total Taxable Value</th>
+                                                                <th class="text-center">Integrated Tax</th>
+                                                                <th class="text-center">Central Tax</th>
+                                                                <th class="text-center">State/UT tax</th>
+                                                                <th class="text-center">Cess</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="items-table-body">
+                                                            <tr>
+                                                                <td>(a) Outward taxable supplies(other than zero
+                                                                    rated,nil rated and exempted)</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td>(b) Outward taxable supplies(zero
+                                                                    rated)</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td>(c) Other outward supplies(nil rated, exempted)</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td>(d) Inward supplies(liable to reverse charge)</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>(e) Non-GST outward supplies</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Total Value</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+
+                                                            </tr>
+                                                        </tbody>
+
+                                                    </table>
+                                                    <br>
+                                                    <br>
+                                                    <div class="row clearfix">
+                                                        <div class="col-md-12 table-responsive-md mt-3">
+                                                
+                                                                <p>2. Details of inter-state supplies made to
+                                                                    unregisterd
+                                                                    persons, composition dealer and UIN holders</p>
+                                                                <table
+                                                                    class="table table-bordered table-secondary table-striped table-hover  mt-3"
+                                                                    id="tab_logic">
+                                                                    <thead>
+                                                                        <tr style="color: black;">
+                                                                            <th class="text-center" rowspan="2">Place Of
+                                                                                Supply
+                                                                                <br> (State/UT)
+                                                                            </th>
+                                                                            <th colspan="2"
+                                                                                style="text-align:center; width: 50%;">
+                                                                                Supplies
+                                                                                Made To Unregisterd Persons</th>
+                                                                            <th colspan="2"
+                                                                                style="text-align:center; width: 50%;">
+                                                                                Supplies
+                                                                                Made To Composition Taxable Persons</th>
+                                                                            <th colspan="2"
+                                                                                style="text-align:center; width: 50%;">
+                                                                                Supplies
+                                                                                Made To UIN Holders</th>
+
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th scope="col" class="text-center">Total
+                                                                                Taxable
+                                                                                Value</th>
+                                                                            <th scope="col" class="text-center">Amount
+                                                                                Of
+                                                                                Integrated Tax</th>
+                                                                            <th scope="col" class="text-center">Total
+                                                                                Taxable
+                                                                                Value</th>
+                                                                            <th scope="col" class="text-center">Amount
+                                                                                Of
+                                                                                Integrated Tax</th>
+                                                                            <th scope="col" class="text-center">Total
+                                                                                Taxable
+                                                                                Value</th>
+                                                                            <th scope="col" class="text-center">Amount
+                                                                                Of
+                                                                                Integrated Tax</th>
+
+                                                                        </tr>
+
+                                                                    </thead>
+                                                                    <tbody id="items-table-body">
+                                                                        <tr>
+                                                                            <td class=""></td>
+                                                                            <td></td>
+                                                                            <td>0</td>
+                                                                            <td>0</td>
+                                                                            <td>0</td>
+                                                                            <td>0</td>
+                                                                            <td>0</td>
+
+                                                                        </tr>
+
+                                                                    </tbody>
+
+                                                                </table>
+                                                                <br><br>
+
+                                                                <div class="row clearfix">
+                                                                    <div class="col-md-12 table-responsive-md mt-3">
+                                                               
+                                                                            <p>3. Details of eligible Input Tax Credit
+                                                                            </p>
+                                                                            <table
+                                                                                class="table table-bordered table-secondary table-striped table-hover  mt-3"
+                                                                                id="tab_logic">
+                                                                                <thead>
+                                                                                    <tr style="color: black;">
+                                                                                        <th class="text-center">Details
+                                                                                        </th>
+                                                                                        <th class="text-center">Total
+                                                                                            Taxable
+                                                                                            Value</th>
+                                                                                        <th class="text-center">
+                                                                                            Integrated Tax
+                                                                                        </th>
+                                                                                        <th class="text-center">Central
+                                                                                            Tax</th>
+                                                                                        <th class="text-center">State/UT
+                                                                                            tax
+                                                                                        </th>
+                                                                                        <th class="text-center">Cess
+                                                                                        </th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody id="items-table-body">
+                                                                                    <tr>
+                                                                                        <td colspan="6"
+                                                                                            style="font-weight: bold;">
+                                                                                            (A)ITC Available(whether
+                                                                                            in full of part)</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(1) Import of goods</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(2) Import of services</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(3) Inward supplies liable
+                                                                                            to
+                                                                                            reverse charge(other tham 1
+                                                                                            & 2
+                                                                                            above)</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(4) Inward supplies from ISD
+                                                                                        </td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(5) All other ITC</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td colspan="6"
+                                                                                            style="font-weight: bold;">
+                                                                                            (D)Inelegible ITC</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(1) As per section 17(5)
+                                                                                        </td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(2) Others</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                    </tr>
+                                                                                </tbody>
+
+                                                                            </table>
+                                                                            <br><br>
+
+                                                                            <div class="row clearfix">
+                                                                                <div
+                                                                                    class="col-md-12 table-responsive-md mt-3">
+                                                                                   
+                                                                                        <p>4. Details of exempt,
+                                                                                            nil-rated and
+                                                                                            non-GST inward supplies</p>
+                                                                                        <table
+                                                                                            class="table table-bordered table-secondary table-striped table-hover  mt-3"
+                                                                                            id="tab_logic">
+                                                                                            <thead>
+                                                                                                <tr
+                                                                                                    style="color: black;">
+                                                                                                    <th
+                                                                                                        class="text-center">
+                                                                                                        Nature Of
+                                                                                                        Supplies</th>
+                                                                                                    <th
+                                                                                                        class="text-center">
+                                                                                                        Inter-State
+                                                                                                        Supplies
+                                                                                                    </th>
+                                                                                                    <th
+                                                                                                        class="text-center">
+                                                                                                        Intra-State
+                                                                                                        Supplies
+                                                                                                    </th>
+
+                                                                                                </tr>
+                                                                                            </thead>
+                                                                                            <tbody
+                                                                                                id="items-table-body">
+
+                                                                                                <tr>
+                                                                                                    <td>From a supplier
+                                                                                                        under
+                                                                                                        composition
+                                                                                                        scheme.
+                                                                                                        Exempt and Nil
+                                                                                                        rated
+                                                                                                        supply</td>
+                                                                                                    <td>0</td>
+                                                                                                    <td>0</td>
+
+                                                                                                </tr>
+                                                                                                <tr>
+                                                                                                    <td>Non GST supply
+                                                                                                    </td>
+                                                                                                    <td>0</td>
+                                                                                                    <td>0</td>
+
+
+                                                                                                </tr>
+
+                                                                                            </tbody>
+
+                                                                                        </table>
+                                                                                </div>
+                                                                            </div>
+                                                               
+                                                                    </div>
+                                                                </DIV>
+                                                     
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div></div>
+</div>
+</body>
+{% endblock %}
+</html>

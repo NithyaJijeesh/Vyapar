@@ -1,0 +1,1598 @@
+<!-- create by shemeem -->
+
+{% extends 'company/src/html/base.html' %}
+{% load static %}
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<style>
+    .form-control {
+        border: 1.5px solid #2196F3;
+        transition: border-color 0.3s;
+    }
+
+    .modal-dialog {
+        align-items: center;
+        justify-content: center;
+        width: 850px
+    }
+</style>
+<style>
+    .bs {
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+    }
+
+    .bs_sm {
+        box-shadow: inset 2px 2px 5px 3px rgba(0, 0, 0, 0.199);
+    }
+
+    .tb {
+        color: black;
+    }
+
+    .tg {
+        color: rgb(0, 140, 7);
+    }
+
+    .tr {
+        color: rgb(218, 0, 0);
+    }
+
+    .btn_add {
+        background-color: orange;
+        color: black;
+    }
+
+    .btn_add:hover {
+        background-color: rgb(234, 152, 0);
+        color: black;
+    }
+
+    ::-webkit-scrollbar {
+        display: none
+    }
+
+    select option:hover {
+        background-color: black;
+    }
+
+    .table .form-control,
+    .calc .form-control {
+        background-color: rgb(255, 255, 255);
+        color: black;
+        padding: 8px 5px
+    }
+
+    .calc label {
+        text-transform: uppercase;
+        color: black;
+        font-weight: 600;
+    }
+
+    label,
+    .table .form-control,
+    .form-control {
+        font-size: 0.7rem;
+    }
+
+    .table th {
+        font-size: 0.82em;
+    }
+</style>
+
+<div class="body-wrapper">
+    <br><br><br>
+    <div class="row p-0 m-0">
+        <div class="col-12  p-0 m-0">
+            <div class=" bg-light bg-light pb-0 mb-0 p-2" style="height:100%;width:100%">
+                <div class="d-flex justify-content-center pt-4">
+                    <a href="" id="b1" class="btn  text-white"
+                        style="margin-right: 10px; background-color: rgb(252, 3, 3,0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">Add
+                        Sale <i class="fa fa-plus"></i></a>
+                    <a href="" id="b2" class="btn  text-white"
+                        style="margin-right: 10px;background-color: rgba(3, 161, 252, 0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">Add
+                        Purchase <i class="fa fa-plus"></i></a>
+                    <a href="" id="b3" class="btn text-primary"
+                        style="border-radius: 20px;border: 1px solid rgb(40, 12, 222);background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">Add
+                        More <i class="fa fa-plus"></i></a>
+                </div>
+                <p></p>
+
+
+
+                <form action="{% url 'saveEstimateToSalesOrder' estimate.id %}" method="post" enctype="multipart/form-data" id="myForm">
+                    {% csrf_token %}
+                    <div class="position-relative">
+                        <div class="position-absolute end-0">
+                            <div class="d-flex pt-3 pe-3">
+                                
+                                <a href="{% url 'estimate_quotation' %}"><span class="fa fa-times fs-5 tb p-1"></span></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-light bs p-4 rounded mb-5">
+                        <div class="">
+                            <h4><strong>CONVERT ESTIMATE TO SALE ORDER</strong></h4>
+                            <h6><strong>ESTIMATE - BILL-{{estimate.ref_no}}</strong></h6>
+                            <!-- <div class="form-check form-switch d-flex">
+                            <label id="lbl1" class="form-check-label fw-bolder" for="flexSwitchCheckChecked">PRODUCTS</label>
+                            <input class="form-check-input fs-5 ms-2 me-2" type="checkbox" role="switch" id="flexSwitchCheckChecked"
+                              >
+                            <label id="lbl2" class="form-check-label fw-bolder" for="flexSwitchCheckChecked">SERVICES</label>
+                          </div> -->
+                        </div>
+                        <br>
+                        <div id="main_form_div">
+
+                            
+                            <script>
+                                $(document).ready(function () {
+                                    var party = $('#partyin').val();
+                                    $.ajax({
+                                        type: "GET",
+                                        url: "{% url 'getparty' %}",
+                                        data: {
+                                            id: party
+                                        },
+                                        success: function (response) {
+                                            console.log(response.email)
+
+                                            $('#p_email').val(response.email);
+                                            $('#p_bal').text(response.balance);
+                                            if(response.payment == 'To Pay'){
+                                                $('#p_bal').css('color', 'red');
+                                            }
+                                            else{
+                                                $('#p_bal').css('color', 'green');
+                                            }
+                                        }
+                                    });
+                                    var selectedOption = $('#stateofsply').val();
+                                                if (selectedOption === 'other state') {
+                                                    $('#igst1').show();
+                                                    $('#cgst1').hide();
+                                                    $('#sgst1').hide();
+                                                }
+                                                else if (selectedOption === 'state') {
+                                                    $('#igst1').hide();
+                                                    $('#cgst1').show();
+                                                    $('#sgst1').show();
+                                                }
+                                });
+                                $(document).on('change', '#partyin', function () {
+                                    var party = $('#partyin').val();
+                                    $.ajax({
+                                        type: "GET",
+                                        url: "{% url 'getparty' %}",
+                                        data: {
+                                            id: party
+                                        },
+                                        success: function (response) {
+                                            console.log(response.email)
+
+                                            $('#p_email').val(response.email);
+                                            $('#p_bal').text(response.balance);
+                                            if(response.payment == 'To Pay'){
+                                                $('#p_bal').css('color', 'red');
+                                            }
+                                            else{
+                                                $('#p_bal').css('color', 'green');
+                                            }
+                                        }
+                                    });
+                                });
+                            </script>
+                            <div>
+                                <p></p>
+                                <hr class="p-0 m-0">
+
+
+                                <!-- pricing template start -->
+                                <div style="background-color: rgba(144, 211, 117, 0.098);">
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-1">
+
+                                        </div>
+                                        <div class="col-sm-12 col-md-10 pb-4">
+                                            <div class="d-flex pt-5">
+                                                <input style="color: black;background-color: white; " placeholder="PARTY NAME" name="party" list="party"
+                                                    class="form-control   border-secondary fw-bolder" id="partyin"  value="{{estimate.party_name}}">
+                                                <datalist id="party">
+                                                    {% for i in party %}
+                                                    <option value="{{i.party_name}}">
+                                                        {% endfor %}
+                                                </datalist>
+                                                <input style="color: black;background-color: white; " class="form-control  border-secondary ms-2 fw-bolder me-2"
+                                                    type="text" placeholder="EMAIL" name="email" id="p_email">
+                                                <!-- <input style="color: black;" class="form-control  border-secondary ms-2 fw-bolder me-2"
+                                                    type="text" placeholder="BALANCE" name="balance" > -->
+                                                <!-- <button class="btn bg-warning"><span class="fa fa-plus"></span></button> -->
+                
+                                                
+                                                <button id="modal_closing" type="button" class="btn bg-secondary text-light"
+                                                    data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo"><span
+                                                        class="fa fa-plus"></span></button>
+                                                        
+                
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="d-flex pt-2">
+                                                    <label class="pt-1 fs-3" for="">Opening Balance:</label>
+                                                    <div class="fs-5" id="p_bal"></div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="d-flex pt-5">
+                                                <div class="w-50 me-3">
+                                                    <label class="tb fw-bold" for="pur_price">ORDER NO.</label><br>
+                                                    <input style="color: black;background-color: white; " id="orderno"
+                                                        class="form-control fw-normal border-secondary  fs-3"
+                                                        type="number" placeholder="Order Number" name="orderno"
+                                                        value="{{order}}">
+                                                </div>
+                                                <div class="w-50">
+                                                    <label class="tb fw-bold" for="">ORDER DATE</label><br>
+                                                    <input style="color: black;background-color: white;" id="orderdate"
+                                                        class="form-control fw-normal border-secondary  fs-3"
+                                                        type="date" name="orderdate" value="{{estimate.date | date:'Y-m-d'}}" required>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex mt-4">
+                                                <div class="w-50 me-3">
+                                                    <label class="tb fw-bold" for="">DUE DATE</label><br>
+                                                    <input style="color: black;background-color: white;" id="duedate"
+                                                        class="form-control fw-normal border-secondary  fs-3"
+                                                        type="date" name="duedate" value="{{estimate.date | date:'Y-m-d'}}" required>
+                                                </div>
+                                                <div class="w-50">
+                                                    <label class="tb fw-bold" for="">STATE OF SUPPLY</label><br>
+
+                                                    <select name="stateofsply" id="stateofsply"
+                                                        style="color: black;background-color: white;"
+                                                        class="form-control fw-normal border-secondary  fs-3">
+                                                        <!-- <option value="{{estimate.state_of_supply}}">{{estimate.state_of_supply}}</option> -->
+                                                        <option value="state">state</option>
+                                                        <option value="other state">other State</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex mt-4">
+                                                <div class="w-50 me-3">
+                                                    <label class="tb fw-bold" for="">PAYMENTH METHOD</label><br>
+
+                                                    <select name="paymethode" id="paymethode" style="color: black;background-color: white;" class="form-control fw-normal border-secondary  fs-3">
+                                                        <option value="Cash">Cash</option>
+                                                        <option value="Cheque">Cheque</option>
+                                                        <option value="UPI">UPI</option>
+                                                        {% for i in bnk %}
+                                                        <option value="{{i.id}}">{{i.bank_name}}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="w-50" id="check" style="display: none;">
+                                                    <label class="tb fw-bold" for="">CHEQUE NO.</label><br>
+                                                    <input style="color: black;background-color: white;" id="checkno"
+                                                        class="form-control fw-normal border-secondary  fs-3"
+                                                        type="text" name="checkno" value="{{sale.checkno}}">
+                                                </div>
+                                                <div class="w-50 " id="upi" style="display: none;">
+                                                    <label class="tb fw-bold" for="">UPI ID</label><br>
+                                                    <input style="color: black;background-color: white;" id="upiid"
+                                                        class="form-control fw-normal border-secondary  fs-3"
+                                                        type="text" name="upiid" value="{{sale.UPI}}">
+                                                </div>
+                                                <div class="w-50 " style="display: none;" id="account">
+                                                    <label class="tb fw-bold" for="">ACC NO.</label><br>
+                                                    <input style="color: black;background-color: white;" id="accno"
+                                                        class="form-control fw-normal border-secondary  fs-3"
+                                                        type="text" name="accno" value="{{sale.accno}}">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="col-sm-12 col-md-1">
+
+                                        </div>
+                                    </div>
+
+                                    <script>
+                                       
+                                        $(document).ready(function () {
+                                            $('#paymethode').change(function () {
+
+                                                $('#upi').hide();
+                                                $('#check').hide();
+                                                $('#account').hide();
+                                                // Show the selected div based on the selected option
+                                                var selectedOption = $(this).val();
+                                                if (selectedOption === 'Cheque') {
+                                                    $('#check').show();
+                                                    $('#upi').hide();
+                                                    $('#account').hide();
+                                                    $('#checkno').prop('required', true);
+                                                    $('#upiid').prop('required', false);
+                                                }
+                                                if (selectedOption === 'UPI') {
+                                                    $('#upi').show();
+                                                    $('#check').hide();
+                                                    $('#account').hide();
+                                                    $('#upiid').prop('required', true);
+                                                    $('#checkno').prop('required', false);
+                                                }
+                                                if (selectedOption != 'UPI' && selectedOption != 'Cheque' && selectedOption != 'Cash' ){
+                                                    $('#account').show();
+                                                    $('#upi').hide();
+                                                    $('#check').hide();
+                                    $.ajax({
+                                        type: "GET",
+                                        url: "{% url 'getacc' %}",
+                                        data: {
+                                            id: selectedOption
+                                        },
+                                        success: function (response) {
+                                            console.log(response)
+                                            $('#accno').val(response.acc);
+                                            
+                                        }
+                                    });
+                                                }
+
+                                            });
+
+                                            
+                                            $('#stateofsply').change(function () {
+
+
+                                                var selectedOption = $(this).val();
+                                                if (selectedOption === 'other state') {
+                                                    $('#igst1').show();
+                                                    $('#cgst1').hide();
+                                                    $('#sgst1').hide();
+                                                }
+                                                else if (selectedOption === 'state') {
+                                                    $('#igst1').hide();
+                                                    $('#cgst1').show();
+                                                    $('#sgst1').show();
+                                                }
+
+                                            });
+                                        });
+                                        
+                                        window.onload = function(){
+                                            var val = ""
+                                            if(`{{estimate.state_of_supply}}` == 'State'){
+                                                val = 'state'
+                                            }else{
+                                                val = 'other state'
+                                            }
+                                            document.querySelector('#stateofsply').value = val;
+                                        }
+                                    </script>
+
+                                    <div class="row">
+
+                                        <div class="col-sm-12 col-md-12 pb-4">
+                                            <br><br>
+                                            <div class="row clearfix mx-1">
+                                                <div class="col-md-12 table-responsive-md mt-3">
+                                                    <table class="table table-bordered table-info  tb table-responsive"
+                                                        id="tab_logic">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center">#</th>
+                                                                <th class="text-center">PRODUCT / SERVICE</th>
+                                                                <th class="text-center">HSN</th>
+                                                                <!-- <th class="text-center">DESCRIPTION</th> -->
+                                                                <th class="text-center">QTY</th>
+                                                                <th class="text-center">PRICE</th>
+                                                                <th class="text-center">TAX (%)</th>
+                                                                <th class="text-center">DISCOUNT</th>
+                                                                <th class="text-center">TOTAL</th>
+                                                                <th></th>
+
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="items-table-body">
+                                                            {% for i in est_items %}
+                                                            <tr id='addr0{{forloop.counter}}'>
+                                                                <td class="nnum">{{forloop.counter}}<input type="text"  name='id[]' value="{{ j.id }}" hidden></td>
+                                                                <td style="width: 20%;">
+
+                                                                    <div class="d-flex">
+                                                                        <select name='product[]' id="product{{forloop.counter}}"
+                                                                            style="margin-right: 0.5em;"
+                                                                            class="form-control product border-secondary">
+                                                                            <option value="{{i.item.id}}" selected>{{i.item.item_name}}
+                                                                            </option>
+
+                                                                            {% for i in item %}
+                                                                            <option value="{{i.id}}">{{i.item_name}}
+                                                                            </option>
+                                                                            {% endfor %}
+                                                                        </select>
+
+                                                                        <a href="#">
+                                                                            <button type="button"
+                                                                                class="btn btn-outline-secondary ml-1"
+                                                                                data-bs-toggle="modal" data-bs-target="#newitem">+</button>
+                                                                        </a>
+                                                                    </div>
+
+
+                                                                </td>
+                                                                <td><input type="text" name='hsn[]' id="hsn{{forloop.counter}}"
+                                                                        placeholder='HSN Code'
+                                                                        class="form-control border-secondary" value="{{i.hsn}}" readonly>
+                                                                </td>
+                                                                <!-- <td><input type="text" name='description[]' id="description" placeholder='Description' class="form-control"  /></td> -->
+                                                                <td><input type="number" name='qty[]'
+                                                                        placeholder='Enter Qty' id="qty{{forloop.counter}}"
+                                                                        class="form-control border-secondary qty" value="{{i.quantity}}"  step=0
+                                                                        min=0 />
+                                                                    <!-- <div style="margin-top: 5Px;" class="d-flex">
+                                                                        <span>Available Qty :</span> <span id="qtyspan1"
+                                                                            class=''></span></div> -->
+                                                                </td>
+                                                                <td><input type="number" name='price[]' id="unit{{forloop.counter}}"
+                                                                        placeholder='Enter Unit Price'
+                                                                        class="form-control price border-secondary"
+                                                                        step="0.00" min="0" value="{{i.price}}"  />
+                                                                </td>
+
+
+
+                                                                <td>
+                                                                    <input hidden id="cmpstate">
+                                                                    <input type="text" id="select_tax{{forloop.counter}}" name="tax1[]"
+                                                                        placeholder="Tax Rate"
+                                                                        class="form-control seltax d-flex border-secondary"
+                                                                        style="width: 8vw;"value="{{i.tax}}"  >
+
+
+                                                                </td>
+                                                                <td><input type="number" name='discount[]'
+                                                                        placeholder='Enter Discount' id="disc{{forloop.counter}}"
+                                                                        class="form-control disc border-secondary"
+                                                                        step=0 min=0 value="{{i.discount}}" />
+
+                                                                <td><input type="number" name='total[]' id="total{{forloop.counter}}"
+                                                                        placeholder=0
+                                                                        class="form-control total border-secondary"
+                                                                        step="any" value="{{i.total}}"   readonly />
+                                                                </td>
+                                                                <td style="display: none;"><input type="number"
+                                                                        step="any" name='taxamount1' id="taxamount{{forloop.counter}}"
+                                                                        class="form-control taxamount border-secondary" />
+                                                                </td>
+                                                                </td>
+                                                                <td class="d-flex">
+                                                                    <button type="button" id="{{forloop.counter}}"
+                                                                        class="btn btn-primary font-weight-bold clone_row px-2 my-1 py-1"
+                                                                        title="Clone Row"><i
+                                                                            class="fas fa-clone"></i></button><br>
+                                                                    <button type="button" id="{{forloop.counter}}"
+                                                                        class="btn btn-danger font-weight-bold remove_row px-2 my-1 py-1 mx-1"
+                                                                        title="Remove Row"><i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                        <tr>
+                                                            <td style="border: none;background: none;"><a
+                                                                    class="btn btn-outline-secondary ml-1" role="button"
+                                                                    id="add">+</a></td>
+                                                        </tr>
+                                                    </table>
+
+                                                </div>
+                                            </div>
+                                            <div class="row clearfix calc" style="margin-top:20px">
+                                                <div class="col-md-6 col-lg-6 col-sm-12 px-5">
+
+                                                    <textarea class="form-control border-secondary" id="" name="note"
+                                                        placeholder="Note"
+                                                        style="height: 150px;color: black;"></textarea>
+
+                                                    <input type="file" name="attach"
+                                                        style="margin-top: 10px; width: 70%;">
+                                                </div>
+
+
+
+                                                <div class="ol-md-6 col-lg-6 col-sm-12 table-responsive-md mt-3"
+                                                    id="tab_logic_total">
+                                                    <div class="p-3">
+                                                        <div class="row container-fluid p-2 m-0">
+                                                            <div class="col-sm-4 mt-2"><label class="text-left">Sub
+                                                                    Total</label></div>
+                                                            <div class="col-sm-1 mt-2">:</div>
+                                                            <div class="col-sm-7 mt-2"><input type="number" step="any"
+                                                                    name='subtotal' placeholder=0
+                                                                    class="form-control border-secondary"
+                                                                    id="sub_total" value="{{estimate.subtotal}}">
+                                                            </div>
+                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        </div>
+                                                        <div class="row container-fluid p-2 m-0" id="igst1">
+                                                            <div class="col-sm-4 mt-2"><label for="a"
+                                                                    class="text-center">IGST</label></div>
+                                                            <div class="col-sm-1 mt-2">:</div>
+                                                            <div class="col-sm-7 mt-2"><input type="number" name='igst'
+                                                                    step="any" id="igst" placeholder=0
+                                                                    class="form-control border-secondary" value="{{estimate.igst}}"/>
+                                                            </div>
+                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        </div>
+                                                        <div class="row container-fluid p-2 m-0" style="display: none;"
+                                                            id="cgst1">
+                                                            <div class="col-sm-4 mt-2"><label for="a"
+                                                                    class="text-center">CGST</label></div>
+                                                            <div class="col-sm-1 mt-2">:</div>
+                                                            <div class="col-sm-7 mt-2"><input type="number" name='cgst'
+                                                                    step="any" id="cgst" placeholder=0
+                                                                    class="form-control border-secondary" value="{{estimate.cgst}}"/>
+                                                            </div>
+                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        </div>
+                                                        <div class="row container-fluid p-2 m-0" style="display: none;"
+                                                            id="sgst1">
+                                                            <div class="col-sm-4 mt-2"><label for="a"
+                                                                    class="text-center">SGST</label></div>
+                                                            <div class="col-sm-1 mt-2">:</div>
+                                                            <div class="col-sm-7 mt-2"><input type="number" name='sgst'
+                                                                    step="any" id="sgst" placeholder=0
+                                                                    class="form-control border-secondary" value="{{estimate.sgst}}" />
+                                                            </div>
+                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        </div>
+                                                        <div class="row container-fluid p-2 m-0">
+                                                            <div class="col-sm-4 mt-2"><label for="a"
+                                                                    class="text-center">Tax Amount</label></div>
+                                                            <div class="col-sm-1 mt-2">:</div>
+                                                            <div class="col-sm-7 mt-2"><input type="number" step="any"
+                                                                    name='taxamount' id="tax_amount" placeholder='0.00'
+                                                                    class="form-control border-secondary" value="{{estimate.tax_amount}}"/>
+                                                            </div>
+                                                            <div class="col-sm-4 m-0 p-0"></div>
+
+                                                        </div>
+
+
+                                                        <div class="row container-fluid p-2 m-0">
+                                                            <div class="col-sm-4 mt-2"><label for="a"
+                                                                    class="text-center">Adjustment</label></div>
+                                                            <div class="col-sm-1 mt-2">:</div>
+                                                            <div class="col-sm-7 mt-2"><input type="number" step="any"
+                                                                    name='adj' id="adj" placeholder='0.00'
+                                                                    class="form-control border-secondary" value="{{estimate.adjustment}}"/>
+                                                            </div>
+                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        </div>
+                                                        <div class="row container-fluid p-2 m-0">
+                                                            <div class="col-sm-4 mt-2"><label for="a"
+                                                                    class="text-center">Grand Total</label></div>
+                                                            <div class="col-sm-1 mt-2">:</div>
+                                                            <div class="col-sm-7 mt-2"><input type="number"
+                                                                    name='grandtotal' id="grandtotal" placeholder='0.00'
+                                                                    readonly class="form-control border-secondary"value="{{estimate.total_amount}}" />
+                                                            </div>
+                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="p-3">
+                                                        <div class="row container-fluid p-2 m-0">
+                                                            <div class="col-sm-4 mt-2"><label
+                                                                    class="text-left">Paid</label></div>
+                                                            <div class="col-sm-1 mt-2">:</div>
+                                                            <div class="col-sm-7 mt-2"><input type="number" step="any"
+                                                                    name='paid' placeholder=0
+                                                                    class="form-control border-secondary" id="paid" value="0">
+                                                            </div>
+                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        </div>
+                                                        <div class="row container-fluid p-2 m-0">
+                                                            <div class="col-sm-4 mt-2"><label
+                                                                    class="text-left">Balance</label></div>
+                                                            <div class="col-sm-1 mt-2">:</div>
+                                                            <div class="col-sm-7 mt-2"><input type="number" step="any"
+                                                                    name='baldue' placeholder=0
+                                                                    class="form-control border-secondary" id="baldue" value="{{estimate.balance}}">
+                                                            </div>
+                                                            <div class="col-sm-4 m-0 p-0"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                            </div>
+                                            <div class="text-start mt-5 px-5">
+                                                <button
+                                                    style="background-color: rgba(38, 76, 146, 0.842);border:rgba(38, 76, 146, 0.842) ;"
+                                                    id="" class="btn btn-primary bg-gradient  me-3" type="submit"
+                                                    name="save" value="save">SAVE</button>
+                                                <button
+                                                    style="background-color: rgba(3, 161, 252, 0.7);border:rgba(3, 161, 252, 0.7) ;"
+                                                    id="" class="btn btn-primary bg-gradient" type="reset" name="prev" onclick="window.location.href=`{% url 'estimate_quotation' %}`"
+                                                    value="prev">CANCEL</button>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 col-md-1">
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <!-- stock template end -->
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </form>
+
+                <!-- modal start -->
+                <div class="modal fade" id="exampleModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content" style="height: 110vh;">
+                            <div class="modal-header">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body mb-1 pb-1">
+                                <form method="POST" action="{% url 'add_party' %}" 
+                                    enctype="multipart/form-data" novalidate id="forms">
+                                    {% csrf_token %}
+                                    <div>
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <a class="text-dark" style="font-size: 1.5rem;">Add Party</a>
+                                            </div>
+                                            <div class=" row" style="margin-top: 3vw;">
+                                                <div class="col-4">
+                                                    <input type="text" style="background-color: white;"
+                                                        class="form-control" id="partyname" name="partyname"
+                                                        placeholder="Party Name" required>
+                                                </div>
+                                                <div class="col-4" style="position: relative;">
+                                                    <input type="text" style="background-color: white;"
+                                                        class="form-control" id="gstno" name="gstno" placeholder="GSTIN"
+                                                        oninput="validateGSTIN(this)">
+                                                    <span id="gstno-validation"
+                                                        style="position: absolute; right: 14px; top: 8px;"></span>
+                                                    <label style="color: rgb(36, 206, 248);">* 32AAQFR1222B1ZS</label>
+                                                </div>
+
+                                                <div class="col-4" style="position: relative;">
+                                                    <input type="number" style="background-color: white;"
+                                                        class="form-control" id="contact" name="contact"
+                                                        placeholder="Phone Number" oninput="validatePhoneNumber(this)">
+                                                    <span id="contact-validation"
+                                                        style="position: absolute; right: 15px; top: 8px;"></span>
+                                                </div>
+
+
+                                                <div class="options" style="margin-top: 5vw;">
+                                                    <a href="javascript:void(0);" onclick="toggleSection('GST')"
+                                                        style="color: black;"><b>GST &
+                                                            Address<b></a>
+                                                    <a href="javascript:void(0);" onclick="toggleSection('Credit')"
+                                                        style="color: black; margin-left: 3vw;"><b>Credit &
+                                                            Balances<b></a>
+                                                    <a href="javascript:void(0);"
+                                                        onclick="toggleSection('additionalfield')"
+                                                        style="color: black; margin-left: 3vw;">Aditional Field</a>
+                                                </div>
+                                            </div>
+                                            <fieldset id="GST" class="GST">
+                                                <div style="background-color: white;" class="col-sm-5"><select
+                                                        class="form-control mt-4 " id="gst" name="gst">
+                                                        <option>Select GST Type</option>
+                                                        <option>Registered Party</option>
+                                                        <option>UnRegistered or Consumer</option>
+                                                        <option>Registered Business or Combosision</option>
+                                                    </select>
+                                                </div>
+                                                <div style="background-color: white;" class="col-sm-5"> <select
+                                                        type="text" class="form-control mt-4" id="state" name="state">
+                                                </div>
+                                                <option value="" selected>Choose State</option>
+                                                <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads
+                                                </option>
+                                                <option value="Andhra Predhesh">Andhra Predhesh</option>
+                                                <option value="Arunachal Predesh">Arunachal Predesh</option>
+                                                <option value="Assam">Assam</option>
+                                                <option value="Bihar">Bihar</option>
+                                                <option value="Chandigarh">Chandigarh</option>
+                                                <option value="Chhattisgarh">Chhattisgarh</option>
+                                                <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
+                                                <option value="Damn anad Diu">Damn anad Diu</option>
+                                                <option value="Delhi">Delhi</option>
+                                                <option value="Goa">Goa</option>
+                                                <option value="Gujarat">Gujarat</option>
+                                                <option value="Haryana">Haryana</option>
+                                                <option value="Himachal Predesh">Himachal Predesh</option>
+                                                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                                <option value="Jharkhand">Jharkhand</option>
+                                                <option value="Karnataka">Karnataka</option>
+                                                <option value="Kerala">Kerala</option>
+                                                <option value="Ladakh">Ladakh</option>
+                                                <option value="Lakshadweep">Lakshadweep</option>
+                                                <option value="Madhya Predesh">Madhya Predesh</option>
+                                                <option value="Maharashtra">Maharashtra</option>
+                                                <option value="Manipur">Manipur</option>
+                                                <option value="Meghalaya">Meghalaya</option>
+                                                <option value="Mizoram">Mizoram</option>
+                                                <option value="Nagaland">Nagaland</option>
+                                                <option value="Odisha">Odisha</option>
+                                                <option value="Puducherry">Puducherry</option>
+                                                <option value="Punjab">Punjab</option>
+                                                <option value="Rajasthan">Rajasthan</option>
+                                                <option value="Sikkim">Sikkim</option>
+                                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                                <option value="Telangana">Telangana</option>
+                                                <option value="Tripura">Tripura</option>
+                                                <option value="Uttar Predesh">Uttar Predesh</option>
+                                                <option value="Uttarakhand">Uttarakhand</option>
+                                                <option value="West Bengal">West Bengal</option>
+                                                <option value="Other Territory">Other Territory</option>
+                                                </select>
+                                        </div>
+
+                                        <div class="col-sm-5 ">
+                                            <textarea style="background-color: white;" class="form-control mt-4"
+                                                name="address" id="" cols="56" rows="3"
+                                                placeholder="&nbsp;Address"></textarea>
+                                        </div>
+
+                                        <div class="col-sm-5 ">
+                                            <input style="background-color: white;" type="email"
+                                                class="form-control mt-4" id="email" name="email" placeholder="Email">
+                                        </div>
+                                        </fieldset>
+
+                                        <fieldset id="Credit" class="Credit" style="display:none;">
+                                            <div class="col-sm-5">
+                                                <input style="background-color: white;" type="number"
+                                                    class="form-control mt-4" id="balance" name="balance"
+                                                    placeholder="Opening Balance">
+                                            </div>
+
+                                            <div class="col-sm-7 mt-4">
+                                                <label class="radio-label">To Pay</label>
+                                                <input type="radio" class="radio-input" id="toPayRadio"
+                                                    name="paymentType" value="To Pay"
+                                                    style="margin-right: 2vw; margin-left: 5px;">
+                                                <label class="radio-label">To Receive</label>
+                                                <input type="radio" class="radio-input" id="toReceiveRadio"
+                                                    name="paymentType" value="To Receive"
+                                                    style="margin-right: 2vw; margin-left: 5px;">
+                                            </div>
+
+                                            <label class="switchbox mt-4" style="margin-right: 1vw;">Credit
+                                                Limit</label>
+                                            <label class="switch">
+                                                <input type="checkbox" id="toggle">
+                                                <span class="slider round"></span>
+                                            </label>
+                                            <div class="col-md-5 mt-4" id="text-box" style="display: none;">
+                                                <input style="background-color: white;" type="number"
+                                                    class="form-control" name="creditlimit" placeholder="Credit Limit">
+                                            </div>
+
+                                            <script>
+                                                const toggleButton = document.getElementById("toggle");
+                                                const textBox = document.getElementById("text-box");
+
+                                                toggleButton.addEventListener("change", function () {
+                                                    if (toggleButton.checked) {
+                                                        textBox.style.display = "block";
+                                                    } else {
+                                                        textBox.style.display = "none";
+                                                    }
+                                                });
+                                            </script>
+
+                                            <div class="col-md-5 mt-4">
+                                                <input type="date" class="form-control" id="current-date"
+                                                    name="currentdate" placeholder="Current Date"
+                                                    style="background-color: white;">
+                                            </div>
+
+
+                                        </fieldset>
+
+                                        <fieldset id="additionalfield" class="additionalfield" style="display:none;">
+                                            <div class="col-md-5 mt-4">
+                                                <input type="text" class="form-control" name="additionalfield1"
+                                                    id="additionalfield1" placeholder="Additional Field"
+                                                    style="background-color: white;">
+                                            </div>
+
+                                            <div class="col-md-5 mt-4">
+                                                <input type="text" class="form-control" name="additionalfield2"
+                                                    id="additionalfield2" placeholder="Additional Field"
+                                                    style="background-color: white;">
+                                            </div>
+
+                                            <div class="col-md-5 mt-4">
+                                                <input type="text" class="form-control" name="additionalfield3"
+                                                    id="additionalfield3" placeholder="Additional Field"
+                                                    style="background-color: white;">
+                                            </div>
+                                        </fieldset>
+
+
+                                        <div class="modal-footer d-flex justify-content-center my-4">
+                                            <input type="submit" class="btn btn-primary save-button" name="save_and_new"
+                                                value="Save">
+                                            <input type="reset" class="btn btn-primary save-button" name="save"
+                                                value="Cancel"  data-bs-dismiss="modal">
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- <div class="modal-footer d-flex justify-content-center mt-1">
+                                <button id="modal_cls_btn" type="reset" class="btn btn-secondary ps-5 pe-5"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button id="add_btn_" type="submit" class="btn btn-primary ps-5 pe-5"
+                                            onclick="submit_unit_creation_fn()">ADD</button>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+                <!-- modal end -->
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+      $("#forms").on("submit", function (e) {
+        e.preventDefault(); // Prevent the default form submission
+  
+        $.ajax({
+          type: "POST",
+          url: $(this).attr("action"), // Get the URL from the form's action attribute
+          data: $(this).serialize(), // Serialize the form data
+  
+          success: function (data) {
+            document.getElementById("forms").reset();
+            // reloadCustomer();
+  
+            var dropdown = $('#party');
+            dropdown.empty();
+            $.each(data, function (key, value) {
+              console.log(value)
+
+              dropdown.append($('<option></option>').attr('value', value[0]));
+            });
+            $("#example-Modal").modal("hide");
+            // var modal1 = document.getElementById("myMod");
+            // modal1.style.display = "none";
+  
+          },
+          error: function (xhr, textStatus, errorThrown) {
+            console.error("Error:", textStatus, errorThrown);
+          }
+        });
+      });
+    });
+  </script>
+
+<!-- modal item -->
+
+
+<div class="modal fade" id="newitem" aria-labelledby="newitemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg custom-modal-dialog" style="max-width: 100%;">
+        <div class="modal-content" style="height: 110vh;">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body mb-1 pb-1">
+                
+                      
+                          
+                  
+                  
+                  
+                          <form action="{% url 'add_item' %}" method="post" id="itemform">
+                            {% csrf_token %}
+                                    <div class="mb-5">
+                                        <div class="d-md-flex d-sm-block">
+                                          <h5><strong class="fw-bolder">ADD ITEM</strong></h5>
+                                          <div class="form-check form-switch d-flex">
+                                            <label id="lbl1" class="form-check-label fw-bolder" for="flexSwitchCheckChecked">PRODUCTS</label>
+                                            <input class="form-check-input fs-5 ms-2 me-2" type="checkbox" role="switch" id="flexSwitchCheckChecked"
+                                              >
+                                            <label id="lbl2" class="form-check-label fw-bolder" for="flexSwitchCheckChecked">SERVICES</label>
+                                          </div>
+                                        </div>
+                                      <br>
+                                      <div id="main_form_div">
+                                        
+                                        <div class="d-flex">
+                                          <input style="color: black;" class="form-control border-dark fw-bolder" type="text" placeholder="ITEM NAME" autocomplete="off" name="item_name" required>
+                                          <input style="color: black;" class="form-control border-dark ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" required>
+                                          <select style="color: black;" class="form-control ms-2 border-dark bg-light me-2" id="" name="item_unit" required>
+                                            <option value="">Select a unit</option>
+                                            <option value="NOS">NOS</option>
+                                            <option value="BOX">BOX</option>
+                                            <option value="PACKET">PACKET</option>
+                                            {% if item_units %}
+                                              {% for i in item_units %}
+                                              <option value="{{ i.unit_name|upper }}">{{ i.unit_name|upper }}</option>
+                                              {% endfor %}
+                                            {% endif %}
+                                            <option id="load_new_unit" hidden value=""></option>
+                                          </select>
+                                          <!-- <button class="btn bg-warning"><span class="fa fa-plus"></span></button> -->
+                                          
+                                          <button id="modal_closing" type="button" class="btn bg-warning" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo"><span class="fa fa-plus"></span></button>
+                                          
+                                        </div>
+                                      
+                                        <div>
+                                            <p></p>
+                                            <hr class="p-0 m-0">
+                                            <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
+                                              <div class="">
+                                                <div class="row pb-0 mb-0">
+                                                  <div id="prc_" class="col text-center pb-2" ><a class="fw-bolder fs-4"
+                                                      style="color: gray;" >PRICING</a></div>
+                                                  <div id="stk_" class="col text-center pb-2" ><a class="fw-bolder fs-4"
+                                                      style="color: gray;" >STOCKS</a></div>
+                                                  <!-- <div id="" class="col text-center pb-2"><a class="fw-bolder fs-4"
+                                                      style="color: gray;" >FIELD3</a></div>
+                                                  <div id="" class="col text-center pb-2"><a class="fw-bolder fs-4"
+                                                      style="color: gray;" >FIELD4</a></div> -->
+                                                </div>
+                                              </div>
+                                            </div>
+                  
+                                            <!-- pricing template start -->
+                                            <div id="pricing_template" style="background-color: rgba(144, 211, 117, 0.098);">
+                                              <div class="row">
+                                                <div  class="col-sm-12 col-md-1">
+                  
+                                                </div>
+                                                <div class="col-sm-12 col-md-10 pb-4">
+                                                    <div class="text- pt-5">
+                                                      <label style="user-select: none;" class="fs-4 tb" for="item_tax_1">Taxable</label>
+                                                      <input id="item_tax_1" class="me-3" type="radio" name="item_tax_result" required>
+                                                      <label style="user-select: none;" class="fs-4 tb" for="item_tax_2">Non Taxable</label>
+                                                      <input id="item_tax_2" type="radio" name="item_tax_result" required>
+                                                      <input id="taxable_result" type="text" name="item_taxable" hidden>
+                                                    </div>
+                                                    <br>
+                                                    <div hidden id="taxable_hide" class="mb-3">
+                                                      <div class="d-flex">
+                                                        <div class="w-50 me-3">
+                                                          <label class="fw-bold tb fs-3" for="">GST</label><br>
+                                                          <select style="color: black;background-color: white;" class="form-control fw- border-secondary fs-3" id="" placeholder="GST" name="item_gst" >
+                                                            <option value="GST0[0%]" selected>GST0[0%]</option>
+                                                            <option value="GST3[3%]">GST3[3%]</option>
+                                                            <option value="GST5[5%]">GST5[5%]</option>
+                                                            <option value="GST12[12%]">GST12[12%]</option>
+                                                            <option value="GST18[18%]">GST18[18%]</option>
+                                                            <option value="GST28[28%]">GST28[28%]</option>
+                                                          </select>
+                                                        </div>
+                                                        <div class="w-50">
+                                                          <label class="fw-bold tb fs-3" for="">IGST</label><br>
+                                                          <select style="color: black;background-color: white;" class="form-control fw- border-secondary tb fs-3" id="" placeholder="GST" name="item_igst" >
+                                                            <option value="IGST0[0%]" selected>IGST0[0%]</option>
+                                                            <option value="IGST3[3%]">IGST3[3%]</option>
+                                                            <option value="IGST5[5%]">IGST5[5%]</option>
+                                                            <option value="IGST12[12%]">IGST12[12%]</option>
+                                                            <option value="IGST18[18%]">IGST18[18%]</option>
+                                                            <option value="IGST28[28%]">IGST28[28%]</option>
+                                                          </select>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                  
+                                                    <div class="d-flex">
+                                                      <div class="w-50 me-3">
+                                                        <label class="tb fw-bold" for="pur_price">SALES PRICE</label><br>
+                                                        <input style="color: black;background-color: white;" id="sal_price" class="form-control fw-normal border-secondary  fs-3" type="number" placeholder="Sales Price here" name="item_sale_price" required>
+                                                      </div>
+                                                      <div class="w-50">
+                                                        <label class="tb fw-bold" for="">PURCHASE PRICE</label><br>
+                                                        <input style="color: black;background-color: white;" id="pur_price" class="form-control fw-normal border-secondary  fs-3" type="number" placeholder="Purchase Price here" name="item_purchase_price" required>
+                                                      </div>
+                                                    </div>
+                                                    <div class="text-start mt-5">
+                                                      <button id="next_btn" class="btn btn-primary bg-gradient me-3" type="button">Next</button>
+                                                      <button id="" class="btn btn-primary bg-gradient " data-bs-dismiss="modal" type="reset">CANCEL</button>
+                                                    </div>
+                                                </div>
+                                                <div  class="col-sm-12 col-md-1">
+                  
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <!-- pricing template end -->
+                  
+                  
+                                            <!-- stock template start -->
+                                            <div hidden id="stock_template"style="background-color: rgba(144, 211, 117, 0.098);">
+                                              <div class="row">
+                                                <div  class="col-sm-12 col-md-1">
+                  
+                                                </div>
+                                                <div class="col-sm-12 col-md-10 pb-4">
+                                                  <br><br>
+                                                    <div class="d-flex">
+                                                      <div class="w-50 me-3">
+                                                        <label class="tb fw-bold" for="opn_stock_">OPENING STOCK</label><br>
+                                                        <input style="color: black;background-color: white;" id="opn_stock_" class="form-control fw-normal border-secondary  fs-3" type="number" placeholder="Opening Stock here" name="item_opening_stock">
+                                                      </div>
+                                                      <div id="at_price_div" style="visibility: hidden;" class="w-50">
+                                                        <label class="tb fw-bold" for="at_price">AT PRICE</label><br>
+                                                        <input style="color: black;background-color: white" id="at_price" class="form-control fw-normal border-secondary  fs-3" type="number" placeholder="At Price here" name="item_at_price">
+                                                      </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class="d-flex">
+                                                      <div class="w-50 me-3">
+                                                        <label class="tb fw-bold" for="date_">DATE</label><br>
+                                                        <input style="color: black;background-color: white" id="date_" class="form-control fw-normal border-secondary  fs-3" type="date" placeholder=""required name="item_date">
+                                                      </div>
+                                                      <div class="w-50">
+                                                        <label class="tb fw-bold" for="at_price">MINIMUM STOCK TO MAINTAIN</label><br>
+                                                        <input style="color: black;background-color: white" id="at_price" class="form-control fw-normal border-secondary  fs-3" type="number" placeholder="Purchase Price here" name="item_min_stock_maintain">
+                                                      </div>
+                                                    </div>
+                                                    <div class="text-start mt-5">
+                                                      <button id="prev_btn" class="btn btn-primary bg-gradient  me-3" type="button">PREVIOUS</button>
+                                                      <button id="" class="btn btn-primary bg-gradient  me-3" data-bs-dismiss="modal" type="reset">CANCEL</button>
+                                                      <button id="" class="btn btn-primary bg-gradient" type="submit"name="save" value="save">SAVE</button>
+                                                    </div>
+                                                </div>
+                                                <div  class="col-sm-12 col-md-1">
+                  
+                                                </div>
+                                                
+                                              </div>
+                                            </div>
+                                            <!-- stock template end -->
+                                             
+                                        </div>
+                  
+                  
+                                      </div>
+                                    
+                          </form>
+                  
+                         
+                          
+                          
+                        
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+<script>
+    $(document).ready(function () {
+      $("#itemform").on("submit", function (e) {
+        e.preventDefault(); // Prevent the default form submission
+  
+        $.ajax({
+          type: "POST",
+          url: $(this).attr("action"), // Get the URL from the form's action attribute
+          data: $(this).serialize(), // Serialize the form data
+  
+          success: function (data) {
+            document.getElementById("itemform").reset();
+            // reloadCustomer();
+  
+            var dropdown = $('#product1');
+            dropdown.empty();
+            dropdown.append($('<option></option>'));
+            $.each(data, function (key, value) {
+              console.log(value)
+
+              dropdown.append($('<option></option>').attr('value', key).text(value[0]));
+            });
+            $("#newitem").modal("hide");
+            // var modal1 = document.getElementById("myMod");
+            // modal1.style.display = "none";
+  
+          },
+          error: function (xhr, textStatus, errorThrown) {
+            console.error("Error:", textStatus, errorThrown);
+          }
+        });
+      });
+    });
+  </script>
+<script>
+    $(document).on("submit","#unit_form",function(e){
+      e.preventDefault();
+    $.ajax({
+      
+      type : 'POST',
+      url:"{% url 'item_unit_create' %}",
+  
+      data:{
+        item_unit_name : $("#item_unit_name_id").val(),
+          
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+          
+        },
+      
+        success: function() {
+          
+        },
+        
+    });  
+    $('#modal_cls_btn').click()
+    var a = ''+$('#item_unit_name_id').val()
+    a.toUpperCase()
+    $('#load_new_unit').val(a)
+    $('#load_new_unit').text(a) 
+    $('#load_new_unit').prop('selected',true) 
+    $('#load_new_unit').attr('hidden',false)
+  });
+    $(document).ready(function () {
+      if ($('#flexSwitchCheckChecked').prop('checked')) {
+        $('#lbl2').css({ 'color': 'blue' })
+      }
+      else{
+        $('#lbl1').css({ 'color': 'blue' })
+      }
+      $('#flexSwitchCheckChecked').on('change load', function () {
+        if ($('#flexSwitchCheckChecked').prop('checked')) {
+          $('#lbl2').css({ 'color': 'blue' })
+          $('#lbl1').css({ 'color': 'inherit' })
+        }
+        else {
+          $('#lbl1').css({ 'color': 'blue' })
+          $('#lbl2').css({ 'color': 'inherit' })
+        }
+      })
+    })
+    $(document).ready(function(){
+      $('#item_tax_1').on('click',function(){
+        if($(this).prop('checked'))
+        {
+          $('#taxable_hide').attr('hidden',false)
+        }
+      })
+    })
+    // page loading start
+    $(document).ready(function(){
+      $('#item_tax_2').on('click',function(){
+        if($(this).prop('checked'))
+        {
+          $('#taxable_hide').attr('hidden',true)
+        }
+      })
+    })
+    $(document).ready(function(){
+      $('#prc_').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+      $('#stk_ a').removeClass('text-dark')
+      $('#prc_ a').addClass('text-dark')
+      $('#stk_').css({'border-bottom': 'none'})
+      $('#pricing_template').attr('hidden',false)
+  
+  
+      $('#prc_').on('click',function(){
+        $(this).css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+        $('#stk_ a').removeClass('text-dark')
+        $('#prc_ a').addClass('text-dark')
+        $('#stk_').css({'border-bottom': 'none'})
+        $('#pricing_template').attr('hidden',false)
+        $('#stock_template').attr('hidden',true)
+      })
+    })
+    $(document).ready(function(){
+      $('#stk_').on('click',function(){
+        $('#stk_').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+        $('#prc_ a').removeClass('text-dark')
+        $('#stk_ a').addClass('text-dark')
+        $('#prc_').css({'border-bottom': 'none'})
+        $('#pricing_template').attr('hidden',true)
+        $('#stock_template').attr('hidden',false)
+      })
+    })
+    $(document).ready(function(){
+      $('#next_btn').on('click',function(){
+        $('#stk_').click()
+      })
+    })
+    $(document).ready(function(){
+      $('#prev_btn').on('click',function(){
+        $('#prc_').click()
+      })
+    })
+    // $(document).ready(function(){
+    //   $('#prc_').on('click',function(){
+    //     alert('asdsad')
+    //   })
+    // })
+    // $(document).ready(function(){
+    //   $('#prc_').on('click',function(){
+    //     alert('asdsad')
+    //   })
+    // })
+    // page loading end
+    $('#opn_stock_').on('keyup click',function(){
+      if($(this).val()>'0')
+      {
+        $('#at_price_div').css({'visibility':'visible',
+                                'transition':'all 0.2s linear'})
+      }
+      else{
+        $('#at_price_div').css({'visibility':'hidden',
+                                'transition':'all 0.2s linear'})
+        $('#at_price').val('')
+      }
+    })
+    $(document).ready(function(){
+      $('#item_tax_1').on('click',function(){
+        $('#taxable_result').val('Taxable')
+      })
+    })
+    $(document).ready(function(){
+      $('#item_tax_2').on('click',function(){
+        $('#taxable_result').val('Non Taxable')
+      })
+    })
+    function submit_unit_creation_fn()
+    {
+      $('#submit_unit_creation').click()
+    }
+    // set today start
+    $(document).ready(function(){
+          var currentDate = new Date();
+          var year = currentDate.getFullYear();
+          var month = String(currentDate.getMonth() + 1).padStart(2, "0");
+          var day = String(currentDate.getDate()).padStart(2, "0");
+          var formattedDate = year + "-" + month + "-" + day;
+          $("#date_").val(formattedDate);
+      })
+      // set today end
+  
+  </script>
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#add').click(function () {
+            var roinc = $("#items-table-body tr").length;
+            roinc++;
+            $('#items-table-body').append(
+
+
+                `
+            <tr id='addr0${roinc}'>
+              <td class = 'nnum'>${roinc}</td>
+                        <td style="width: 20%;">
+                          <div class="d-flex">
+                          <select name='product[]' id="product${roinc}" class="form-control product border-secondary" style="margin-right: 0.5em;">
+                                <option value=" " selected>Select Product</option>
+                            
+                                        {% for i in item %}
+                                         <option value="{{i.id}}">{{i.item_name}}</option>
+                                         {% endfor %}
+                            </select>
+    
+                                <a href="#">
+                                    <button type="button" class="btn btn-outline-secondary ml-1"
+                                    data-bs-toggle="modal" data-bs-target="#newitem">+</button>
+                                </a>
+                            </div>
+                        </td>
+                        <td><input type="text" name='hsn[]' id="hsn${roinc}" placeholder='HSN Code' class="form-control border-secondary" readonly /></td>
+                        <td><input type="number" name='qty[]' onchange="qtychange1(this)" placeholder='Enter Qty' id="qty${roinc}" class="form-control  border-secondary qty" step=0 min=0 >
+                          
+                        </td>
+                        <td><input type="number" name='price[]' id="unit${roinc}" placeholder='Price' class="form-control border-secondary price" step="0.00" min="0"  /></td>
+                        
+                        <td>
+                          <input type="text"name='tax1[]'   id="select_tax${roinc}" placeholder="Tax Rate" class="form-control border-secondary seltax d-flex"  style="width: 8vw;">
+    
+                          
+                          
+                        </td>  
+                        <td>
+                            <input type="number" name='discount[]' placeholder='Enter Discount' value=0 id="disc${roinc}" class="form-control border-secondary disc" step=0 min=0>
+                        </td>
+                        <td><input type="number" name='total[]' id="total${roinc}" placeholder=0 class="form-control border-secondary total" value=0 step="any" readonly /></td>
+                        <td style="display: none;"><input type="number" step="any" name='taxamount1' id="taxamount${roinc}" class="form-control border-secondary taxamount" />
+                        </td>
+                        <td class="d-flex">
+                            <button type="button" id="${roinc}" class="btn btn-primary font-weight-bold clone_row px-2 my-1 py-1"
+                                                                        title="Clone Row"><i class="fas fa-clone"></i></button><br>
+                            <button type="button" id="${roinc}" class="btn btn-danger remove_row px-2 my-1 py-1 mx-1"
+                                                                        title="Remove Row"><i class="fas fa-times    "></i> </button>
+                            
+                        </td>
+                </tr>
+      
+      `
+
+
+            );
+
+        });
+        
+        $(document).on('change', '.product', function () {
+
+            var n = $(this).attr("id").slice(7);
+            // console.log('item changed')
+            console.log(n)
+            $.ajax({
+                url: "{% url 'getproduct' %}",
+                type: 'GET',
+                data: {
+                    id: $(this).val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+
+                success: function (response) {
+                    data = response.hsn
+                    // data2 = response.qty
+                    dataprice = response.price
+                    datagst = response.gst
+                    dataigst = response.igst
+
+
+                    document.getElementById('hsn' + n).value = data;
+                    // document.getElementById('qtyspan'+n).innerHTML = data2;
+                    document.getElementById('unit' + n).value = dataprice;
+                    // document.getElementById('select_tax'+n).value = datagst;
+                    if (document.getElementById('stateofsply').value == 'state') {
+                        document.getElementById('select_tax' + n).value = datagst;
+                    }
+                    else if (document.getElementById('stateofsply').value == 'other state') {
+                        document.getElementById('select_tax' + n).value = dataigst;
+                    }
+
+                },
+            });
+
+            // $(document).on('input', '#tab_logic tbody tr .qty, #tab_logic tbody tr .price, #tab_logic tbody tr .disc', function () {
+            //     calc();
+            // });
+        });
+
+        $(document).on('click', '.remove_row', function () {
+            var row_id = $(this).attr("id");
+            console.log(row_id);
+            $('#addr0' + row_id + '').remove();
+
+            calc_total();
+        });
+        $(document).on('click', '.clone_row', function () {
+            var roinc = $("#items-table-body tr").length;
+            var originalRow = $(this).closest('#items-table-body tr');
+            var clonedRow = originalRow.clone();
+
+            clonedRow.attr('id', 'addr0' + (roinc + 1));
+
+            clonedRow.find('.nnum').text(roinc + 1);
+
+            clonedRow.find('[id]').each(function () {
+                var oldId = $(this).attr('id');
+                var newId = oldId.replace(/\d+/, roinc + 1);
+                console.log(newId)
+                $(this).attr('id', newId);
+            });
+
+            clonedRow.find('.product').each(function () {
+                $(this).val(originalRow.find('.product').val());
+            });
+            clonedRow.find('.intra_tax').each(function () {
+                $(this).val(originalRow.find('.intra_tax').val());
+            });
+            clonedRow.find('.inter_tax').each(function () {
+                $(this).val(originalRow.find('.inter_tax').val());
+            });
+            originalRow.after(clonedRow);
+
+            calc_total();
+
+        });
+
+        //        
+        // }
+
+
+        $(document).ready(function () {
+            $(document).on('input', '#tab_logic tbody tr .qty, #tab_logic tbody tr .price, #tab_logic tbody tr .disc, #tab_logic tbody tr .seltax', function () {
+                var row = $(this).closest('tr');
+                var qty = row.find('.qty').val();
+                var price = row.find('.price').val();
+                var dis = row.find('.disc').val();
+                var taxlabel = row.find('.seltax').val();
+                var tax = extractTaxRate(taxlabel);
+
+                console.log(qty);
+                console.log(price);
+                console.log("====================");
+                console.log(tax);
+                row.find('.total').val((parseFloat(qty) * parseFloat(price)) - parseFloat(dis));
+                row.find('.taxamount').val(((qty * price) - dis) * (tax / 100));
+                // Your calculations here
+                calc_total();
+            });
+
+            // ... (similarly for other input fields)
+
+
+        });
+        $(document).ready(function () {
+            $('.taxamount').each(function () {
+                    var row = $(this).closest('tr');
+                    var qty = row.find('.qty').val();
+                    var price = row.find('.price').val();
+                    var dis = row.find('.disc').val();
+                    var taxlabel = row.find('.seltax').val();
+                    var tax = extractTaxRate(taxlabel);
+                    $(this).val(((qty * price) - dis) * (tax / 100))
+                })
+                // Your calculations here
+                calc_total();
+        });
+        function extractTaxRate(label) {
+            var match = label.match(/\[(\d+)%\]/);
+            if (match && match[1]) {
+                return parseFloat(match[1]);
+            } else {
+                return 0;
+            }
+        }
+        function calc_total() {
+
+            var sos = $('#stateofsply').val();
+            console.log(sos);
+            var total = 0;
+            $('.total').each(function () {
+                total += parseFloat($(this).val());
+            });
+            var taxamount = 0;
+            $('.taxamount').each(function () {
+                taxamount += parseFloat($(this).val());
+            });
+            console.log('totall===',total);
+            console.log('tax===',taxamount);
+            $('#sub_total').val(total.toFixed(2));
+            $('#tax_amount').val(taxamount.toFixed(2));
+
+            if (sos === 'other state') {
+                $('#igst').val(taxamount.toFixed(2));
+            }
+            else if (sos === 'state') {
+                gst = taxamount / 2
+                d = 0
+                $('#igst').val(d.toFixed(2));
+                $('#cgst').val(gst.toFixed(2));
+                $('#sgst').val(gst.toFixed(2));
+            }
+            var gtot = parseFloat(taxamount + total);
+            $('#grandtotal').val(parseFloat(gtot.toFixed(2)));
+            $('#baldue').val(parseFloat(gtot.toFixed(2)));
+
+
+        }
+
+        $(document).on("input", "#adj", function () {
+            calc_total();
+            if ($(this).val() != '') {
+                // alert($(this).val())
+                var tot = parseFloat($("#grandtotal").val())
+                var adj = parseFloat($(this).val());
+
+                var round = tot+adj
+                $("#grandtotal").val(round.toFixed(2));
+                $('#baldue').val(parseFloat($("#grandtotal").val()) - parseFloat($("#paid").val()));
+            }
+        });
+        $(document).on("input", "#paid", function () {
+
+            if ($(this).val() != '') {
+                var bal = parseFloat($("#grandtotal").val()) - parseFloat($("#paid").val())
+                $('#baldue').val(bal.toFixed(2));
+            }
+            else {
+                var bal = parseFloat($("#grandtotal").val()) - 0
+                $('#baldue').val(bal.toFixed(2));
+            }
+
+        });
+    });
+
+</script>
+
+<script>
+    function toggleSection(sectionId) {
+        // Get all the fieldsets
+        const fieldsets = document.querySelectorAll('fieldset');
+
+        // Hide all fieldsets
+        fieldsets.forEach(fieldset => {
+            fieldset.style.display = 'none';
+        });
+
+        // Show the selected fieldset
+        const section = document.getElementById(sectionId);
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+        } else {
+            section.style.display = 'none';
+        }
+    }
+
+
+// Function to format the date as "YYYY-MM-DD"
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Get the current date
+const currentDateInput = document.getElementById("current-date");
+const currentDate = new Date();
+
+// Format the date as "YYYY-MM-DD" and set it in the input field
+currentDateInput.value = formatDate(currentDate);
+
+
+function validatePhoneNumber(inputElement) {
+const phoneNumber = inputElement.value;
+const validationSpan = document.getElementById("contact-validation");
+
+// Regular expression to check for a 10-digit number
+const regex = /^[0-9]{10}$/;
+
+if (regex.test(phoneNumber)) {
+    // Valid 10-digit number, display a checkmark
+    validationSpan.innerHTML = "&#10004;"; // Checkmark symbol
+    validationSpan.style.color = "green";
+} else {
+    // Not a valid 10-digit number, display a cross mark
+    validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
+    validationSpan.style.color = "red";
+}
+}
+
+function validateGSTIN(inputElement) {
+const gstin = inputElement.value;
+const validationSpan = document.getElementById("gstno-validation");
+
+// Regular expression to check for a valid GSTIN pattern
+const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][A-Z][A-Z0-9]$/;
+
+if (regex.test(gstin)) {
+    // Valid GSTIN format, display a checkmark
+    validationSpan.innerHTML = "&#10004;"; // Checkmark symbol
+    validationSpan.style.color = "green";
+} else {
+    // Not a valid GSTIN format, display a cross mark
+    validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
+    validationSpan.style.color = "red";
+}
+}
+
+</script>
+
+
+
+
+
+{% endblock %}

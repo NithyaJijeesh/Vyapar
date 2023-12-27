@@ -1,0 +1,1008 @@
+<!-- create by shemeem -->
+{% extends 'company/src/html/base.html' %}
+{% block content %}
+{% load static %}
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" /> -->
+<style>
+    /* ::-webkit-scrollbar{
+        display: none
+    } */
+    .bs{
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+    }
+    .amount_summary{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        margin-bottom: 1rem;
+    }
+    .amt_head_label label{
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    .table>:not(caption)>*>* {
+        padding: 16px 2px !important;
+    }
+    .form-control{
+        padding: 8px 7px;
+    }
+
+    /* New Party Modal */
+    .new_party_form .form-control {
+        border: 2px solid #6c757d;
+        transition: border-color 0.3s;
+    }
+
+    .new_party_form .form-control:focus {
+        border-color: #007bff;
+    }
+
+    #toPayRadio {
+        accent-color: red;
+    }
+
+    #toReceiveRadio {
+        accent-color: green;
+    }
+
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 38px;
+        height: 22px;
+    }
+
+  
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 13px;
+        width: 13px;
+        left: 3px;
+        bottom: 5px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    input:checked+.slider {
+        background-color: #2196F3;
+    }
+
+    input:focus+.slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked+.slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(18px);
+    }
+
+
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .save-button {
+        background-color: #007bff;
+        border-color: #007bff; 
+        color: #fff; 
+        margin-right: 1rem;
+    }
+
+   
+    .save-button:hover {
+        background-color: #fff;
+        color: #007bff;
+    }
+
+</style>
+<div class="body-wrapper">
+    <div class="container-fluid">
+        <div class="row mb-4 mt-3">
+            <div class="col-md-3"></div>
+            <div class="col-md-6 d-flex justify-content-center">
+                <a href="#" id="b1" class="btn text-white mx-2" style="background-color: rgb(252, 3, 3,0.7); border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">Add Sale  <i class="fa fa-plus"></i></a>
+                <a href="#" id="b2" class="btn text-white mx-2" style="background-color: rgba(3, 161, 252, 0.7); border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">Add Purchase  <i class="fa fa-plus"></i></a>
+                <a href="#" id="b3" class="btn text-primary mx-2" style="border-radius: 20px; border: 1px solid rgb(40, 12, 222);background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">Add More  <i class="fa fa-plus"></i></a>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+        <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
+            <div class="row pb-0 mb-0">
+                <div class="col text-center pb-2" style="border-bottom: 3px solid rgba(0, 0, 0, 0.548);"><a class="fw-bolder fs-4 text-dark" href="#">NEW PAYMENT IN</a></div>
+            </div>
+        </div>
+
+        <div class="row pt-0 m-0 mt-3">
+            <div class="card p-0 bg-light bs">
+                <form action="{% url 'createNewPaymentIn' %}" method="post" class="form">
+                    {% csrf_token %}
+                    <div class="row m-0 p-0 pt-3">
+                        <div class="col-md-4">
+                            <label for="party" class="text-dark fw-bolder">Party</label>
+                            <div class="d-flex py-2">
+                                <select name="party_name" id="party" class="form-control fw-bolder" required>
+                                    <option value="">Select Party</option>
+                                    {% for p in parties %}
+                                    <option value="{{p.id}}">{{p.party_name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-outline-primary ms-1" data-bs-target="#customercreation" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
+                            </div>
+                            <div class="party_balance mt-3 d-none" id="party_balance">
+                                <label for="p_bal" class="text-dark fw-bolder">Balance: </label>
+                                <span id="p_bal" class="fs-5 fw-bold">0</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-none" id="party_address">
+                            <div class="form-group mt-1">
+                                <label for="bill_address" class="text-dark fw-bolder">Billing Address</label>
+                                <textarea name="address" id="bill_address" rows="4" class="form-control border-dark text-dark"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-none" id="party_contact">
+                            <div class="form-group mt-1">
+                                <label for="p_contact" class="text-dark fw-bolder">Contact</label>
+                                <input class="form-control border-dark fw-bolder text-dark" id="p_contact" type="text" autocomplete="off" name="contact" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3 px-2">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="receipt_number" class="text-dark fw-bolder">Receipt No.</label>
+                                <input class="form-control border-dark fw-bolder text-dark" id="receipt_number" type="text" autocomplete="off" name="receipt_no" value="{{rec_no}}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="payment_date" class="text-dark fw-bolder">Date</label>
+                                <input class="form-control border-dark fw-bolder text-dark" id="payment_date" type="date" name="date" value="{% now 'Y-m-d' %}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3 px-2">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="payment_received" class="text-dark fw-bolder">Payment Received</label>
+                                <input class="form-control border-dark fw-bolder text-dark" id="payment_received" type="number" min="0" step="any" autocomplete="off" name="payment_amount" onkeyup="displayAmount()" required>
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-2"></div> -->
+                        <div class="col-md-6 d-flex align-items-center">
+                            <label class="fs-5 fw-bold">Payment Amount:</label>
+                            <span class="fw-bolder text-info ms-3" style="font-size: 2.5rem;" id="paid_amount">0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3 px-2">
+                        <div class="col-md-4">
+                            <div class="from-group">
+                                <label for="" class="text-dark fw-bolder">Payment Method</label>
+                                <select class="form-control border-dark fw-bolder text-dark" name="payment_method" id="paymentMethod">
+                                    <option value="Cash">Cash</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="UPI">UPI</option>
+                                    {% for i in banks %}
+                                    <option value="{{i.bank_name}}" text="{{i.id}}">{{i.bank_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="from-group paymentMethodInputs" id="paymentAccNum" style="display: none;">
+                                <label for="" class="text-dark fw-bolder">Account #</label>
+                                <input class="form-control border-dark fw-bolder text-dark" type="number" name="payment_acc_num" id="payment_acc_num" readonly>
+                            </div>
+                            <div class="from-group paymentMethodInputs" id="paymentUPI" style="display: none;">
+                                <label for="" class="text-dark fw-bolder">UPI ID</label>
+                                <input class="form-control border-dark fw-bolder text-dark" type="text" name="payment_upi_id">
+                            </div>
+                            <div class="from-group paymentMethodInputs" id="paymentChequeID" style="display: none;">
+                                <label for="" class="text-dark fw-bolder">Cheque ID</label>
+                                <input class="form-control border-dark fw-bolder text-dark" type="text" name="payment_cheque_id">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3 px-2">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="description" class="text-dark fw-bolder">Description</label>
+                                <textarea name="description" id="description" class="form-control border-dark fw-bolder text-dark" rows="5" placeholder="Description.."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4 mb-5">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4 d-flex justify-content-center">
+                            <button id="save_and_next_btn" class="btn btn-primary bg-gradient me-1" type="submit" name="save_and_next">SAVE & NEXT</button>
+                            <button id="save_btn" class="btn btn-primary bg-gradient" type="submit">SAVE</button>
+                        </div>
+                        <div class="col-md-4"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div> 
+
+
+
+
+<!-- New Party modal -->
+<!-- <div class="modal fade" id="newParty">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="background-color: rgb(213 229 233);">
+            <div class="modal-header">
+                <h3 class="m-3">ADD PARTY</h3>
+                <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
+            </div>
+            <div class="modal-body">
+                <form autocomplete="off" id="newPartyForm" class="new_party_form"> 
+                    {% csrf_token %}
+                    <div class="container-fluid">
+                        <div class="col-md-9 row">
+                            <div class="col-md-4">
+                                <input type="text" style="background-color: white;" class="form-control" id="partyname" name="partyname" placeholder="Party Name" required>
+                            </div>                
+                            <div class="col-md-4" style="position: relative;">
+                                <input type="text" style="background-color: white;" class="form-control" id="gstno" name="gstno" placeholder="GSTIN" oninput="validateGSTIN(this)">
+                                <span id="gstno-validation" style="position: absolute; right: 14px; top: 8px;"></span>
+                                <label style="color: rgb(36, 206, 248);">* 32AAQFR1222B1ZS</label>
+                            </div>
+                            
+                            <div class="col-md-4" style="position: relative;">
+                                <input type="number" style="background-color: white;" class="form-control" id="contact" name="contact" placeholder="Phone Number" oninput="validatePhoneNumber(this)">
+                                <span id="contact-validation" style="position: absolute; right: 15px; top: 8px;"></span>
+                            </div>  
+                            
+                            
+                            <div class="options mt-2">
+                                <a href="javascript:void(0);" onclick="toggleSection('GST')" style="color: black;"><b>GST &
+                                        Address<b></a>
+                                <a href="javascript:void(0);" onclick="toggleSection('Credit')"
+                                    style="color: black; margin-left: 3vw;"><b>Credit & Balances<b></a>
+                                <a href="javascript:void(0);" onclick="toggleSection('additionalfield')"
+                                    style="color: black; margin-left: 3vw;">Aditional Field</a>
+                            </div>
+                        </div>
+                        <fieldset id="GST" class="GST">
+                            <div style="background-color: white;" class="col-sm-5"><select class="form-control mt-4 " id="gst" name="gst">
+                                    <option >Select GST Type</option>
+                                    <option >Registered Party</option>
+                                    <option>UnRegistered or Consumer</option>
+                                    <option>Registered Business or Combosision</option>
+                                </select>
+                            </div>
+                            <div style="background-color: white;" class="col-sm-5"> <select type="text" class="form-control mt-4" id="state" name="state"></div>
+                            <option value="" selected>Choose State</option>
+                            <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads</option>
+                            <option value="Andhra Predhesh">Andhra Predhesh</option>
+                            <option value="Arunachal Predesh">Arunachal Predesh</option>
+                            <option value="Assam">Assam</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chandigarh">Chandigarh</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
+                            <option value="Damn anad Diu">Damn anad Diu</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Himachal Predesh">Himachal Predesh</option>
+                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Ladakh">Ladakh</option>
+                            <option value="Lakshadweep">Lakshadweep</option>
+                            <option value="Madhya Predesh">Madhya Predesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Manipur">Manipur</option>
+                            <option value="Meghalaya">Meghalaya</option>
+                            <option value="Mizoram">Mizoram</option>
+                            <option value="Nagaland">Nagaland</option>
+                            <option value="Odisha">Odisha</option>
+                            <option value="Puducherry">Puducherry</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Sikkim">Sikkim</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Tripura">Tripura</option>
+                            <option value="Uttar Predesh">Uttar Predesh</option>
+                            <option value="Uttarakhand">Uttarakhand</option>
+                            <option value="West Bengal">West Bengal</option>
+                            <option value="Other Territory">Other Territory</option>
+                            </select>
+                    </div>
+            
+                    <div class="col-sm-5 ">
+                        <textarea style="background-color: white;" class="form-control mt-4" name="address" id="partyAddress" cols="56" rows="3"
+                            placeholder="&nbsp;Address"></textarea>
+                    </div>
+            
+                    <div class="col-sm-5 ">
+                        <input style="background-color: white;" type="email" class="form-control mt-4" id="email" name="email" placeholder="Email">
+                    </div>
+                    </fieldset>
+            
+                    <fieldset id="Credit" class="Credit" style="display:none;">
+                        <div class="col-sm-5">
+                            <input style="background-color: white;" type="number" class="form-control mt-4" id="balance" name="balance" placeholder="Opening Balance">
+                        </div>
+                    
+                        <div  class="col-sm-7 mt-4">
+                            <label class="radio-label">To Pay</label>
+                            <input type="radio" class="radio-input" id="toPayRadio" name="paymentType" value="To Pay" style="margin-right: 2vw; margin-left: 5px;">
+                            <label class="radio-label">To Receive</label>
+                            <input type="radio" class="radio-input" id="toReceiveRadio" name="paymentType" value="To Receive" style="margin-right: 2vw; margin-left: 5px;">
+                        </div>
+                    
+                        <label class="switchbox mt-4" style="margin-right: 1vw;">Credit Limit</label>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle">
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="col-md-5 mt-4" id="text-box" style="display: none;">
+                            <input style="background-color: white;" type="number" class="form-control" name="creditlimit" placeholder="Credit Limit" id="credit_limit">
+                        </div>
+                    
+                        <div class="col-md-5 mt-4">
+                            <input  type="date" class="form-control" id="current-date" name="currentdate" placeholder="Current Date" style="background-color: white;" >
+                        </div>
+                    
+            
+                    </fieldset>
+                    
+                    <fieldset id="additionalfield" class="additionalfield" style="display:none;">
+                        <div class="col-md-5 mt-4">
+                            <input type="text" class="form-control" name="additionalfield1" id="additionalfield1" placeholder="Additional Field" style="background-color: white;">
+                        </div>
+                
+                        <div class="col-md-5 mt-4">
+                            <input type="text" class="form-control" name="additionalfield2" id="additionalfield2" placeholder="Additional Field" style="background-color: white;">
+                        </div>
+                
+                        <div class="col-md-5 mt-4">
+                            <input type="text" class="form-control" name="additionalfield3" id="additionalfield3" placeholder="Additional Field" style="background-color: white;">
+                        </div>
+                    </fieldset>
+            
+                    
+                    <div class="col-md-5 mt-4">
+                        <input type="button" id="saveParty" class="btn btn-primary save-button" data-bs-dismiss="modal" name="save" value="Save">
+                    </div>
+                
+                </form>
+            </div>
+        </div>
+    </div>
+  </div> -->
+
+
+  <!-- New Customer -->
+  <div class="modal fade" id="customercreation">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: rgba(144, 211, 117, 0.098);">
+                <h3 class="m-3 text-secondary">ADD PARTY</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="background-color: rgba(144, 211, 117, 0.098);">
+                <form action="" method="POST" autocomplete="off" id="modalCustomer"> 
+                    {% csrf_token %}
+                    <div class="bg-light p-4 rounded mb-5">
+                        <div id="main_form_div">
+                            <div class="row" style="margin-left: -1vh;">
+                                <div class="col-md-4">
+                                    <label class="col-form-label" for="partyname" style="color: black;">Party Name</label>
+                                    <input type="text" class="form-control border-secondary" id="partyname" name="partyname" style="color: black;" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="col-form-label" style="color: black;">GSTIN</label>
+                                    <input type="text" class="form-control border-secondary" onchange="checkgst(this)" id="gstin" name="gstin" style="color: black;" placeholder="29APPCK7465F1Z1">
+                                    <div class="text-danger m-2" id="warngst"></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="col-form-label" for="partyphno" style="color: black;">Mobile</label>
+                                    <input type="number" class="form-control border-secondary" id="partyphno" name="partyphno" style="color: black;" onchange="checkphone(this)" required>
+                                    <div class="text-danger m-2" id="warnphone"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p></p>
+                                <hr class="p-0 m-0">
+                                <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
+                                    <div class="">
+                                        <div class="row pb-0 mb-0">
+                                            <div id="gsthead" class="col text-center pb-2" >
+                                                <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >GST & ADDRESS</a>
+                                            </div>
+                                            <div id="credithead" class="col text-center pb-2" >
+                                                <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >CREDIT & BALANCES</a>
+                                            </div>
+                                            <div id="fieldhead" class="col text-center pb-2" >
+                                                <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >ADDITIONAL FIELD</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="gsttemp" style="background-color: rgba(144, 211, 117, 0.098);">
+                                    <div class="row">
+                                        <div class="col-sm-12  col-md-1"></div>
+                                        <div class="col-sm-12 col-md-10 pb-4">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="col-form-label mt-4" style="color: black;">GST Type</label>
+                                                    <select class="form-control border-secondary" id="modalgsttype" name="modalgsttype" style="color: black; background-color: white;">
+                                                        <option selected value="" hidden>Select</option>
+                                                        <option value="Registered Party">Registered Party</option>
+                                                        <option value="Unregistered or Consumer">Unregistered or Consumer</option>
+                                                        <option value="Registered Business or Combosision">Registered Business or Combosision</option>
+                                                    </select>
+
+                                                    <label class="col-form-label mt-4" for="company" style="color: black;">Supply State</label>
+                                                    <select class="form-control border-secondary" name="splystate" id="splystate" style="color: black; background-color: white;">
+                                                        <option value="" selected hidden>Select</option>
+                                                        <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islands</option>
+                                                        <option value="Andhra Pradhesh">Andhra Pradhesh</option>
+                                                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                                        <option value="Assam">Assam</option>
+                                                        <option value="Bihar">Bihar</option>
+                                                        <option value="Chandigarh">Chandigarh</option>
+                                                        <option value="Chhattisgarh">Chhattisgarh</option>
+                                                        <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
+                                                        <option value="Daman anad Diu">Daman anad Diu</option>
+                                                        <option value="Delhi">Delhi</option>
+                                                        <option value="Goa">Goa</option>
+                                                        <option value="Gujarat">Gujarat</option>
+                                                        <option value="Haryana">Haryana</option>
+                                                        <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                                        <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                                        <option value="Jharkhand">Jharkhand</option>
+                                                        <option value="Karnataka">Karnataka</option>
+                                                        <option value="Kerala">Kerala</option>
+                                                        <option value="Ladakh">Ladakh</option>
+                                                        <option value="Lakshadweep">Lakshadweep</option>
+                                                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                                        <option value="Maharashtra">Maharashtra</option>
+                                                        <option value="Manipur">Manipur</option>
+                                                        <option value="Meghalaya">Meghalaya</option>
+                                                        <option value="Mizoram">Mizoram</option>
+                                                        <option value="Nagaland">Nagaland</option>
+                                                        <option value="Odisha">Odisha</option>
+                                                        <option value="Pondicherry">Pondicherry</option>
+                                                        <option value="Punjab">Punjab</option>
+                                                        <option value="Rajasthan">Rajasthan</option>
+                                                        <option value="Sikkim">Sikkim</option>
+                                                        <option value="Tamil Nadu">Tamil Nadu</option>
+                                                        <option value="Telangana">Telangana</option>
+                                                        <option value="Tripura">Tripura</option>
+                                                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                                        <option value="Uttarakhand">Uttarakhand</option>
+                                                        <option value="West Bengal">West Bengal</option>
+                                                        <option value="Other Territory">Other Territory</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="col-form-label mt-4" style="color: black;">Billing Address</label>
+                                                    <textarea class="form-control border-secondary" name="baddress" id="baddress" rows="6" type="text" style="color: black; background-color: white;"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="col-form-label mt-4" for="partyemail" style="color: black;">Email</label>
+                                                    <input type="email" class="form-control border-secondary" id="partyemail" name="partyemail" style="color: black; background-color: white;" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-start mt-5">
+                                                <button id="gstnxt" class="btn btn-primary bg-gradient" type="button">NEXT</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="credittemp"style="background-color: rgba(144, 211, 117, 0.098);" hidden>
+                                    <div class="row">
+                                        <div class="col-sm-12  col-md-1"></div>
+                                        <div class="col-sm-12 col-md-10 pb-4">
+                                            <div class="row mt-4">
+                                                <div class="col-md-6">
+                                                    <label class="col-form-label" style="color: black;" for="openbalance">Opening Balance  &nbsp; &nbsp; - </label>   &nbsp;&nbsp;&nbsp;
+                                                    <label class="col-form-label" style="color: black;">To Pay</label> &nbsp; &nbsp; 
+                                                    <input type="radio" class="radio-input border-secondary" id="toPayRadio" name="paymentType" value="To Pay"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                                    <label class="col-form-label" style="color: black;">To Receive</label> &nbsp; &nbsp;
+                                                    <input type="radio" class="radio-input border-secondary" id="toReceiveRadio" name="paymentType" value="To Receive">
+                                                    <input type="number" class="form-control border-secondary" id="openbalance"  name="openbalance" style="color: black; background-color: white;" value="0">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="col-form-label" style="color: black;" for="openbalance">Credit Limit</label>
+                                                    <input type="number" class="form-control border-secondary" id="crd_lmt"  name="crd_lmt" style="color: black; background-color: white;" value="0">
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="col-form-label mt-4" style="color: black;">Date</label>
+                                                    <input type="date" class="form-control border-secondary" id="partydate" name="partydate" style="color: black; background-color: white;"  value="{% now 'Y-m-d' %}">
+                                                </div>
+                                            </div>
+
+                                            <div class="text-start mt-5">
+                                                <button id="creditnxt" class="btn btn-primary bg-gradient me-3" type="button">NEXT</button>
+                                                <button id="creditprev" class="btn btn-primary bg-gradient" type="button">PREVIOUS</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="fieldtemp"style="background-color: rgba(144, 211, 117, 0.098);" hidden>
+                                    <div class="row">
+                                        <div class="col-sm-12  col-md-1"></div>
+                                        <div class="col-sm-12 col-md-10 pb-4">
+                                            <div class="row mt-4">
+                                                <div class="col-md-4">
+                                                    <label class="col-form-label" style="color: black;">Additional Field 1</label>
+                                                    <input type="text" class="form-control border-secondary" id="additional1" name="additional1" style="color: black; background-color: white;">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="col-form-label" style="color: black;">Additional Field 2</label>
+                                                    <input type="text" class="form-control border-secondary" id="additional2" name="additional2" style="color: black; background-color: white;">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="col-form-label" style="color: black;">Additional Field 3</label>
+                                                    <input type="text" class="form-control border-secondary" id="additional3" name="additional3" style="color: black; background-color: white;">
+                                                </div>
+                                            </div>
+                                            <div class="text-start mt-5">
+                                                <button id="fieldprev" class="btn btn-primary bg-gradient  me-3" type="button">PREVIOUS</button>
+                                                <button class="btn btn-primary bg-gradient" data-bs-dismiss="modal" type="button" id="saveParty">SAVE</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script>
+    $(document).ready(function(){
+        $('#gsthead').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+        $('#gsthead a').addClass('text-dark')
+        $('#gsttemp').attr('hidden',false)
+        $('#credithead').css({'border-bottom': 'none'})
+        $('#credithead a').removeClass('text-dark')
+        $('#fieldhead').css({'border-bottom': 'none'})
+        $('#fieldhead a').removeClass('text-dark')
+
+        $('#gsthead').on('click',function(){
+            $(this).css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+            $('#gsthead a').addClass('text-dark')
+            $('#gsttemp').attr('hidden',false)
+            $('#credithead').css({'border-bottom': 'none'})
+            $('#credithead a').removeClass('text-dark')
+            $('#credittemp').attr('hidden',true)
+            $('#fieldhead').css({'border-bottom': 'none'})
+            $('#fieldtemp a').removeClass('text-dark')
+            $('#fieldtemp').attr('hidden',true)
+        })
+
+        $('#credithead').on('click',function(){
+            $('#credithead').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+            $('#credithead a').addClass('text-dark')
+            $('#credittemp').attr('hidden',false)
+            $('#gsthead').css({'border-bottom': 'none'})
+            $('#gsthead a').removeClass('text-dark')
+            $('#gsttemp').attr('hidden',true)
+            $('#fieldhead').css({'border-bottom': 'none'})
+            $('#fieldhead a').removeClass('text-dark')
+            $('#fieldtemp').attr('hidden',true)
+        })
+
+        $('#fieldhead').on('click',function(){
+            $('#fieldhead').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+            $('#fieldhead a').addClass('text-dark')
+            $('#fieldtemp').attr('hidden',false)
+            $('#gsthead').css({'border-bottom': 'none'})
+            $('#gsthead a').removeClass('text-dark')
+            $('#gsttemp').attr('hidden',true)
+            $('#credithead').css({'border-bottom': 'none'})
+            $('#credithead a').removeClass('text-dark')
+            $('#credittemp').attr('hidden',true)
+        })
+    })
+
+    $(document).ready(function(){
+        $('#gstnxt').on('click',function(){
+            $('#credithead').click()
+        })
+
+        $('#creditnxt').on('click',function(){
+            $('#fieldhead').click()
+        })
+    })
+
+    $(document).ready(function(){
+        $('#fieldprev').on('click',function(){
+            $('#credithead').click()
+        })
+        $('#creditprev').on('click',function(){
+            $('#gsthead').click()
+        })
+    })
+
+    function checkgst(element) {
+        var gstinput = element.value;
+        var gstregexp = "[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[1-9A-Za-z]{1}[Z]{1}[0-9a-zA-Z]{1}";
+        if (gstinput.match(gstregexp)) {
+            document.getElementById('warngst').innerHTML = '';
+        } else {
+            document.getElementById('warngst').innerHTML = 'Please provide a valid GST Number';
+            alert('Please provide a valid GST Number');
+        }
+    }
+
+    function checkphone(element) {
+        var phoneinput = element.value;
+        var phoneregexp = "[0-9]{10}";
+        if (phoneinput.match(phoneregexp)) {
+            document.getElementById('warnphone').innerHTML = '';
+        } else {
+            document.getElementById('warnphone').innerHTML = 'Please provide a valid Phone Number';
+            alert('Please provide a valid Phone Number')
+        }
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        $('#party').selectize({
+            sortField: 'value'
+        });
+    });
+
+    $(document).ready(function() {
+        $('#party').change(function() {
+            if($('#party').val() == ""){
+                $("#party_address").addClass('d-none');
+                $("#party_contact").addClass('d-none');
+                $("#party_balance").addClass('d-none');
+                $("#party_address").removeClass('d-block');
+                $("#party_contact").removeClass('d-block');
+                $("#party_balance").removeClass('d-block');
+                // alert('Choose a Party')
+            }
+            $.ajax({
+                url: "{% url 'getPartyDetails' %}", 
+                data: { 
+                
+                    id: $('#party').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                type : 'POST',
+                success: function(data) {
+                    $("#party_address").addClass('d-block');
+                    $("#party_contact").addClass('d-block');
+                    $("#party_balance").addClass('d-block');
+                    $("#party_address").removeClass('d-none');
+                    $("#party_contact").removeClass('d-none');
+                    $("#party_balance").removeClass('d-none');
+
+                    var json_data = JSON.parse(data);
+                    for (key in json_data) {
+                        document.getElementById('bill_address').value = json_data[key]['address'];
+                        if (json_data[key]['address'] == ""){
+                            $("#party_address").addClass('d-none');
+                        }
+                        $('#p_contact').val(json_data[key]['contact']);
+                        $('#p_state').val(json_data[key]['state']);
+                        if (json_data[key]['payment'] == 'To Pay'){
+                            $('#p_bal').css('color','red');
+                            $('#p_bal').text(json_data[key]['balance']);
+                        }else if (json_data[key]['payment'] == 'To Receive'){
+                            $('#p_bal').css('color','green');
+                            $('#p_bal').text(json_data[key]['balance']);
+                        }
+                        else{
+                            $('#p_bal').css('color','black');
+                            $('#p_bal').text(json_data[key]['balance']);
+                        }
+                    }
+                }
+            });
+        });
+    });
+
+    function refreshPartyDetails(){
+        $.ajax({
+            url: "{% url 'getPartyDetails' %}", 
+            data: { 
+                id: $('#party').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            type : 'POST',
+            success: function(data) {
+                // $("#party_address").addClass('d-block');
+                // $("#party_contact").addClass('d-block');
+                // $("#party_balance").addClass('d-block');
+                // $("#party_address").removeClass('d-none');
+                // $("#party_contact").removeClass('d-none');
+                // $("#party_balance").removeClass('d-none');
+
+                var json_data = JSON.parse(data);
+                for (key in json_data) {
+                    document.getElementById('bill_address').value = json_data[key]['address'];
+                    if (json_data[key]['address'] == ""){
+                        $("#party_address").addClass('d-none');
+                    }
+                    if (json_data[key]['contact'] == ""){
+                        $("#party_contact").addClass('d-none');
+                    }
+                    $('#p_contact').val(json_data[key]['contact']);
+                    $('#p_state').val(json_data[key]['state']);
+                    if (json_data[key]['payment'] == 'To Pay'){
+                        $('#p_bal').css('color','red');
+                        $('#p_bal').text(json_data[key]['balance']);
+                    }else if (json_data[key]['payment'] == 'To Receive'){
+                        $('#p_bal').css('color','green');
+                        $('#p_bal').text(json_data[key]['balance']);
+                    }
+                    else{
+                        $('#p_bal').css('color','black');
+                        $('#p_bal').text(json_data[key]['balance']);
+                    }
+                }
+            }
+        });
+    }
+
+    $(document).ready(function(){
+        $('#paymentMethod').on('change', function(){
+            var type = $(this).val();
+            var bnkId = $(this).find(":selected").attr('text');
+            if(bnkId != undefined){
+                $('.paymentMethodInputs').css('display','none');
+                $.ajax({
+                    url: "{% url 'getBankDetails' %}",
+                    type: "POST",
+                    data: {
+                        id : bnkId,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                    },
+
+                    success: function(data) {
+                        if(data.status){
+                            $('#paymentAccNum').css('display','block');
+                            $('#payment_acc_num').val(data.acc_number);
+                        }
+                        else{
+                            alert('Something went wrong.!')
+                        }
+                    }
+                });
+            }
+            else{
+                if(type === 'Cash'){
+                    $('.paymentMethodInputs').css('display','none');
+                
+                }else if(type === 'Cheque'){
+                    $('.paymentMethodInputs').css('display','none');
+
+                    $('#paymentChequeID').css('display','block');
+                }else if(type === 'UPI'){
+                    $('.paymentMethodInputs').css('display','none');
+
+                    $('#paymentUPI').css('display','block');
+                }else{
+                    $('.paymentMethodInputs').css('display','none');
+                }   
+            }
+        })
+    });
+
+
+    $(document).on("click", "#saveParty", function(){
+        $.ajax({
+            type : 'POST',
+            url:"{% url 'addNewParty' %}",
+            data:{
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                partyname : $('#partyname').val(),
+                gstno : $('#gstin').val(),
+                contact : $('#partyphno').val(),
+                gst : $('#modalgsttype').text(),
+                state : $('#splystate').val(),
+                address : $('#baddress').val(),
+                email : $('#partyemail').val(),
+                balance : $('#openbalance').val(),
+                paymentType : $("input[name='paymentType']:checked").val(),
+                creditlimit : $('#crd_lmt').val(),
+                currentdate : $('#partydate').val(),
+                enddate : $('#partydate').val(),
+                additionalfield1 : $('#additional1').val(),
+                additionalfield2 : $('#additional2').val(),
+                additionalfield3 : $('#additional3').val(),
+                
+            },
+            
+            success: function(response) {
+                console.log("success")
+                document.getElementById("modalCustomer").reset();
+                // $('#newParty').modal('toggle');
+                reloadParties();
+            },
+        });        
+    });
+
+
+    function reloadParties() {
+
+        $.ajax({
+            url: "{% url 'getPartyList' %}",
+            type: "GET",
+            dataType: "json",
+            data: $(this).serialize(),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+
+            success: function(data) {
+                var $select = $(document.getElementById('party'));
+                // dropdown.empty();
+                // dropdown.append(`<option value="">Select Party</option>`);
+                var selectize = $select[0].selectize;
+                $.each(data, function(key, value) {
+                    selectize.addOption({value:value[0],text:value[1]});
+                    selectize.addItem(value[0]); 
+                    // dropdown.append($('<option></option>').attr('value', key).text(value[1]).val(value[0]));
+                });
+
+                // selectize.setValue("");
+            },
+            error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+            }
+
+        });
+        refreshPartyDetails();
+    }
+
+
+    function toggleSection(sectionId) {
+        // Get all the fieldsets
+        const fieldsets = document.querySelectorAll('fieldset');
+
+        // Hide all fieldsets
+        fieldsets.forEach(fieldset => {
+            fieldset.style.display = 'none';
+        });
+
+        // Show the selected fieldset
+        const section = document.getElementById(sectionId);
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+        } else {
+            section.style.display = 'none';
+        }
+    }
+
+
+    // Function to format the date as "YYYY-MM-DD"
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // Get the current date
+    const currentDateInput = document.getElementById("current-date");
+    const currentDate = new Date();
+
+    // Format the date as "YYYY-MM-DD" and set it in the input field
+    currentDateInput.value = formatDate(currentDate);
+
+
+    function validatePhoneNumber(inputElement) {
+        const phoneNumber = inputElement.value;
+        const validationSpan = document.getElementById("contact-validation");
+
+        // Regular expression to check for a 10-digit number
+        const regex = /^[0-9]{10}$/;
+
+        if (regex.test(phoneNumber)) {
+            // Valid 10-digit number, display a checkmark
+            validationSpan.innerHTML = "&#10004;"; // Checkmark symbol
+            validationSpan.style.color = "green";
+        } else {
+            // Not a valid 10-digit number, display a cross mark
+            validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
+            validationSpan.style.color = "red";
+        }
+    }
+
+    function validateGSTIN(inputElement) {
+        const gstin = inputElement.value;
+        const validationSpan = document.getElementById("gstno-validation");
+
+        // Regular expression to check for a valid GSTIN pattern
+        const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][A-Z][A-Z0-9]$/;
+
+        if (regex.test(gstin)) {
+            // Valid GSTIN format, display a checkmark
+            validationSpan.innerHTML = "&#10004;"; // Checkmark symbol
+            validationSpan.style.color = "green";
+        } else {
+            // Not a valid GSTIN format, display a cross mark
+            validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
+            validationSpan.style.color = "red";
+        }
+    }
+     
+    const toggleButton = document.getElementById("toggle");
+    const textBox = document.getElementById("text-box");
+
+    toggleButton.addEventListener("change", function () {
+        if (toggleButton.checked) {
+            textBox.style.display = "block";
+        } else {
+            textBox.style.display = "none";
+        }
+    });
+
+
+    function displayAmount(){
+        var amt = parseFloat($('#payment_received').val());
+        if(isNaN(amt)){
+            $('#paid_amount').text('0.00');
+            return
+        }else{
+            $('#paid_amount').text(amt);
+        }
+        
+    }
+</script>
+{% endblock  %}

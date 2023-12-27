@@ -1,0 +1,630 @@
+<!-- create by nasneen -->
+
+{% extends 'company/src/html/base.html' %}
+{% block content %}
+{% load static %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+
+<style>
+   @media print{
+        body{
+            visibility: hidden !important; /* hide everything in body when in print mode*/
+        }
+
+        .printContainer {
+            visibility: visible !important; /* Override the rule above to only show the printables*/
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+        } 
+
+        #calcdiv{
+            visibility: visible;
+            margin-top: -30vh;
+            margin-left: -9vh;
+            margin-bottom: 30vh;
+        }
+
+        #billtable{
+            margin-top: 20vh;
+            margin-bottom: 20vh;
+        }
+
+        #billtable th{
+            font-size: medium;
+        }
+
+        .extra{
+            display: none;
+        }
+    }
+    
+
+    table tr td:hover {
+        cursor: pointer;
+    }
+
+
+
+    .bar .left {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .form-control {
+        background-color: white;
+    }
+</style>
+
+<div style="background-color: rgba(176, 199, 205, 0.4);">
+
+    <!-- <div class="d-flex justify-content-between">
+        <p class="tb fw-bolder fs-2"><span class="fa fa-share ps-1 tb"></span></p>
+        <button class="btn btn-sm btn-primary fs-2" data-bs-toggle="modal"
+            data-bs-target="#myModal1" data-bs-whatever="@getbootstrap" hx-get=""
+            hx-trigger="click delay:0s" hx-target="#item_get_details_for_modal_target"><span
+                class="fa fa-sliders-h pe-1"></span> ADJUSTMENT ITEM</button>
+    </div> -->
+
+    <div class="body-wrapper">
+        <div class="container-fluid">
+
+
+            {% if sale %}
+            <div class="col-sm-12 col-lg-12 ">
+                <div id="item_get_detail_target">
+                    <div class="row m-0" style="height:20%">
+                        <div class="card bg-light bs p-3 mb-3">
+                            <!-- <center class="mt-3">
+                                <h2 class="text-center"><b
+                                        style="color: rgb(255, 255, 255);text-shadow: 2px 2px 4px #000000; margin-bottom: 40px;">SALE
+                                        ORDER</b></h2>
+
+                            </center> -->
+                            <div class="bar d-flex justify-content-between">
+                                <div class=" left">
+                                    <div class="px-2">
+                                        <label style="text-align:left ">From</label><br>
+                                        <input name="FromDate" class="inputdate form-control" type="date" id="in1">
+                                    </div>
+
+                                    <div class="px-2">
+                                        <label style="text-align:left ">To</label><br>
+                                        <input name="ToDate" type="date" class="inputdate form-control" id="in2">
+                                    </div>
+
+
+                                </div>
+                                <div class="right mt-3">
+                                    <a class="btn p-0 ps-2 pe-2 ms-2" title="export to excel"
+                                        onclick="exportAsExcel()"><span><img width="25px"
+                                                src="{% static 'assets/excel2.png' %}" alt="no img"></span></a>
+
+                                    <label for="file-input" title="impot excel" class="btn p-0 ps-2 pe-2 ms-2"
+                                        type="button"><span><img width="25px" src="{% static 'assets/import.png' %}"
+                                                alt="no img"></span></label>
+                                    <input id="file-input" type="file" name="file" style="display:none;"
+                                        onchange="uploadFile()">
+
+                                    <a class="btn btn_print p-0 ps-2 pe-2 ms-2" title="print"><span><img width="25px"
+                                                src="{% static 'assets/printer1.png' %}" alt="no img"></span></a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = cookies[i].trim();
+                            // Check if the cookie name matches the CSRF cookie name
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                function uploadFile() {
+                    const fileInput = document.getElementById("file-input");
+                    const file = fileInput.files[0];
+                    const csrfToken = getCookie('csrftoken')
+
+                    const formData = new FormData();
+                    formData.append("file", file);
+
+                    fetch("/import_excel", {
+                        method: "POST",
+                        headers: { 'X-CSRFToken': csrfToken },
+                        body: formData
+                    })
+                    window.location.href = '/sale_order';
+
+
+                }
+            </script>
+<script>
+    jQuery(document).ready(function($) {
+        $(".clickable-row").click(function() {
+            window.location = $(this).data("href");
+        });
+    });
+</script>
+            <div class="row pt-0 m-0">
+                <div class="card p-0 bg-light" >
+                    <div class="row m-0 p-0 pt-3">
+                        <div class="col-sm-12 col-lg-3">
+                            <p class="tb fs-5 fw-bolder pt-2">SALE ORDER</p>
+                            <div class="pt-2">
+                                <div class="position-relative">
+                                    <div class="position-absolute" style="margin-top:0.4rem;margin-left: 0.5rem;">
+                                        <span class="fa fa-search fs-5 text-info"></span>
+                                    </div>
+                                </div>
+                                <input id="search_input1" style="padding-inline-start: 2rem;"
+                                    class="w-100 border-secondary text-dark pt-1 pb-1 rounded" type="text"
+                                    placeholder=" search here..">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-6">
+
+                        </div>
+
+                        <div class="col-sm-12 col-lg-3 pt-1 ">
+
+                            <div class="d-flex mt-5 ms-5">
+                                <a class="btn btn-secondary fs-2" href="{% url 'saleorder_create' %}"><i class="fa fa-plus"
+                                        aria-hidden="true"></i> CREATE SALE ORDER</a>
+
+                            </div>
+                        </div>
+                        <div class="mt-3" id="content-div"  style="overflow-x: scroll;overflow-y: hidden;min-height: 50vh;">
+                            <table class="table table-bordered table-info table-striped fs-3 tb table-responsive w-100" id="myTable">
+                                <thead >
+                            <!-- <table id="myTable"
+                                class="table table-bordered table-light table-hover  tb table-responsive w-100"> -->
+                                <thead>
+                                    <tr class="fs-2 tb">
+                                    <th class="bg-secondary text-white">#</th>
+                                    <th class="bg-secondary text-white">
+                                        
+                                        PARTY NAME
+                                        <a class="text-white text-right hideon-print" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                     </th>
+                                     <th class="bg-secondary text-white" >
+                                        NUMBER
+                                        <a class="text-white text-right hideon-print" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th class="bg-secondary text-white">DATE 
+                                        <a class="text-white text-right hideon-print" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th class="bg-secondary text-white">DUE DATE 
+                                        <a class="text-white text-right hideon-print" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th class="bg-secondary text-white">TOTAL
+                                        <a class="text-white text-right hideon-print" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th class="bg-secondary text-white">BALANCE
+                                        <a class="text-white text-right hideon-print" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                        
+                                    </th>
+                                    <th class="bg-secondary text-white">TYPE
+                                        <a class="text-white text-right hideon-print" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th class="bg-secondary text-white">STATUS
+                                        <a class="text-white text-right hideon-print" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th class="bg-secondary text-white">ACTION
+                                        <a class="text-white text-right hideon-print" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th class="bg-secondary text-white hideon-print">TRANSACTION
+                                        <a class="text-white text-right" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th class="bg-secondary text-white hideon-print">BY
+                                        <a class="text-white text-right " data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-filter filter-button"></i>
+                                        </a> 
+                                        <div class="dropdown-menu" style="box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);">
+                                            <div class="p-2 filter-dropdown">
+                                                <label for="" style="color: black; text-align: left;">Equel to:</label>
+                                                <input type="text" class="form-control filter-value border-info">
+                                                <button class="btn apply-filter btn-sm btn-info mt-2 ms-4">Apply</button>
+                                                <button class="btn clear-filter btn-sm btn-info mt-2 ms-2">Clear</button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th class="bg-secondary text-white hideon-print"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in sale %}
+                                    <tr>
+
+                                        <td class="clickable-row" data-href="saleorder_view/{{ i.id }}">{{forloop.counter }}</td>
+                                        <td class="clickable-row" data-href="saleorder_view/{{ i.id }}">{{i.partyname}}</td>
+                                        <td  class="clickable-row" data-href="saleorder_view/{{ i.id }}">{{i.orderno}}</td>
+                                        <td  class="clickable-row" data-href="saleorder_view/{{ i.id }}">{{i.orderdate}}</td>
+                                        <td  class="clickable-row" data-href="saleorder_view/{{ i.id }}">{{i.duedate}}</td>
+                                        <td  class="clickable-row" data-href="saleorder_view/{{ i.id }}">{{i.grandtotal}}</td>
+                                        <td  class="clickable-row" data-href="saleorder_view/{{ i.id }}">{{i.balance}}</td>
+                                        <td  class="clickable-row" data-href="saleorder_view/{{ i.id }}">sale order</td>
+                                        <td
+                                            class="{% if i.status == 'open' %}text-primary{% else %}text-success{% endif %} text-center clickable-row"
+                                            data-href="saleorder_view/{{ i.id }}">
+                                            {{i.status}}</td>
+                                        <td><a href="{% url 'saleorderto_invoice' i.id %}">{{i.action}}</a> </td>
+                                        <td class="{% if i.last == 'Created' %}text-danger{% else %}text-success{% endif %} w-5 clickable-row hideon-print" 
+                                            data-href="saleorder_view/{{ i.id }}">{{i.last}}</td>
+                                        <td  class="clickable-row hideon-print" data-href="saleorder_view/{{ i.id }}">{{i.by.first_name}} {{i.by.last_name}}</td>
+                                        <td class="hideon-print">
+                                            <div class="btn-group mb-1">
+                                                <button style="border: none;background: none;" type="button"
+                                                    class="ropdown-toggle dropdown-toggle-split"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <span class="fa fa-ellipsis-v text-dark fs-1 ps-2"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" style="z-index: 1111;">
+                                                    <li><a class="dropdown-item fw-bold tb"
+                                                            href="{% url 'saleorder_view' i.id %}"><span
+                                                                class="fa fa-eye pe-2 tg text-primary"></span> View</a>
+                                                    </li>
+                                                    <li><a class="dropdown-item fw-bold tb"
+                                                            href="{% url 'saleorder_edit' i.id %}"><span
+                                                                class="fa fa-edit pe-2 tg text-secondary"></span>
+                                                            Edit</a></li>
+
+                                                    <li><a class="dropdown-item fw-bold tb" type="button"
+                                                            href="{% url 'delete_saleorder' i.id %}"><span
+                                                                class="fa fa-trash-alt tr text-danger"
+                                                                style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span>
+                                                            Delete</a></li>
+                                                    <li><a class="dropdown-item fw-bold tb"
+                                                            href="{% url 'sales_transaction' i.id %}"><span
+                                                                class="fa fa-history pe-2 tg text-success"></span>History</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <table class="table" id="myTable1" style="display: none;">
+                                <thead>
+                                    <th>#</th>
+                                    <th>PARTY NAME</th>
+                                    <th>NUMBER</th>
+                                    <th>DATE</th>
+                                    <th>DUE DATE</th>
+                                    <th>TOTAL</th>
+                                    <th>BALANCE</th>
+                                    <th>TYPE</th>
+                                    <th>STATUS</th>
+                                    <th>ACTION</th>
+                                </thead>
+                                <tbody>
+                                    {% for i in sale %}
+                                    <tr>
+                                        <td>{{forloop.counter }}</td>
+                                        <td>{{i.partyname}}</td>
+                                        <td>{{i.orderno}}</td>
+                                        <td>{{i.orderdate}}</td>
+                                        <td>{{i.duedate}}</td>
+                                        <td>{{i.grandtotal}}</td>
+                                        <td>{{i.balance}}</td>
+                                        <td>sale order</td>
+                                        <td>{{i.status}}</td>
+                                        <td>{{i.action}}</td>
+                                    </tr>
+                                        {% endfor %}
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $('.apply-filter').on('click', function () {
+                        const $table = $('#myTable');
+                        const columnIndex = $(this).closest('th').index();
+                        const filterValue = $(this).siblings('.filter-value').val().trim();
+                        console.log("=============================+++++++++++++++");
+                        console.log(filterValue)
+
+                        $table.find('tbody tr').hide(); // Hide all rows
+                        console.log("hide");
+                        applyEqualToFilter($table, columnIndex, filterValue);
+
+                        // Close the filter dropdown
+                        // $(this).closest('.filter-dropdown').hide();
+                    });
+
+                    function applyEqualToFilter($table, columnIndex, filterValue) {
+                        console.log("filter");
+                        $table.find(`tbody tr td:nth-child(${columnIndex + 1})`).each(function () {
+                            const cellValue = $(this).text().trim();
+                            if (cellValue === filterValue) {
+                                $(this).parent().show();
+                            }
+                        });
+                    }
+
+                    $('.clear-filter').on('click', function () {
+                        $('#myTable tbody tr').show();
+                        $(this).siblings('.filter-value').val('');
+
+                        // Close the filter dropdown
+                        // $(this).closest('.filter-dropdown').hide();
+                    });
+                });
+            </script>
+
+            {% else %}
+            <div class="row empty mx-2 text-center" style="display: flex;justify-content: center;">
+               
+                <div class="card " style="background-color: white;width:50rem;box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.249);">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 p-0">
+                            <img height="500vw" src="{% static 'images/saleorder.png' %}" class="card-img" alt="no img">
+                            <!-- <div class="card-img-overlay">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                <p class="card-text"><small>Last updated 3 mins ago</small></p>
+                            </div> -->
+                        </div>
+                        <div class="col-sm-12 col-md-6 ps-4 pe-4">
+                            <div class="p-1 rounded" style="border: 1px solid rgba(0, 0, 0, 0);border-bottom: none;">
+                                <p style="margin-bottom: 4rem;"></p>
+                                <img width="100vw" src="{% static 'images/fav.png' %}" alt="no img">
+                                <p></p>
+                                <h1 style="font-weight:900;color:rgba(0, 0, 0, 0.644);font-size: 1.5rem;">VYAPAR</h1>
+                                <!-- <h5 class="card-title">Card title</h5> -->
+                                <p style="margin-bottom: 1.5rem;"></p>
+                                <p class="card-text">Welcome to vyapar, We're committed to providing a seamless and secure online marketplace for buyers and sellers. Our platform offers a range of features.</p>
+                                <p style="color: rgb(0, 89, 10);font-weight: light;" class="card-text">Create sale orders & convert them to sale invoice instantly.</p>
+                                <p class="mt-4"></p>
+                                <a class="btn btn-info fs-2 mt-3" href="{% url 'saleorder_create' %}"><i class="fa fa-plus"
+                                    aria-hidden="true"></i> ADD FIRST SALE ORDER</a>
+                                                                    <p style="margin-bottom: 4rem;"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+    // jQuery(document).ready(function ($) {
+    //     $(".clickable-row").click(function () {
+    //         window.location = $(this).data("href");
+    //     });
+    // });
+    jQuery(document).ready(function ($) {
+        $("#search_input1").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+        $(document).on('click', '.btn_print', function (event) {
+    var printContents = $("#content-div").clone(); // Clone the content-div to avoid modifying the original content
+    printContents.find('.hideon-print').remove(); // Remove columns by class name
+
+    var $printerDiv = $('<div class="printContainer" id=printContainer></div>');
+    $printerDiv.html(printContents.html());
+    $('body').append($printerDiv).addClass("printingContent");
+
+    var h1Element = document.createElement("h1");
+    h1Element.textContent = "Sales Order";
+    var head = document.getElementById("printContainer");
+    head.insertBefore(h1Element, head.firstChild);
+    window.print();
+    $printerDiv.remove();
+    $('body').removeClass("printingContent");
+});
+
+    });
+
+    var table = document.getElementById("myTable");
+
+    var fromDate;
+    $('#in1').on('change', function () {
+        fromDate = $(this).val();
+        $('#in2').prop('min', function () {
+            return fromDate
+        });
+        var startDate = new Date(fromDate);
+         startDate.setHours(0, 0, 0, 0);
+        var endDate = new Date(document.getElementById("in2").value);
+        endDate.setHours(23, 59, 59, 999);
+        var rows = table.getElementsByTagName("tr")
+
+        console.log(startDate);
+        for (var i = 1; i < rows.length; i++) {
+            var row = rows[i];
+            var dateCell = row.cells[3];
+            var rowDate = new Date(dateCell.textContent);
+            rowDate.setHours(0, 0, 0, 0);
+            
+
+            if ((rowDate >= startDate) || (rowDate < endDate && rowDate >= startDate)) {
+                row.style.display = "";
+
+            } else {
+                row.style.display = "none";
+                console.log("skip");
+                
+
+            }
+        }
+
+
+
+        // var tdate = new Date(fromDate)
+        // var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        // document.getElementById("d1").innerHTML = tdate.toLocaleDateString(undefined, options);
+
+    });
+    var toDate;
+    $('#in2').on('change', function () {
+        toDate = $(this).val();
+        $('#in1').prop('max', function () {
+            return toDate
+        })
+        var startDate = new Date(document.getElementById("in1").value);
+        // var startDate = new Date(fromDate);
+        var endDate = new Date(document.getElementById("in2").value);
+        endDate.setHours(23, 59, 59, 999);
+        var rows = table.getElementsByTagName("tr");
+
+        for (var i = 1; i < rows.length; i++) {
+            var row = rows[i];
+            var dateCell = row.cells[3];
+            var rowDate = new Date(dateCell.textContent);
+            rowDate.setHours(23, 59, 59, 999);
+            console.log('end'+endDate);
+            console.log('row'+rowDate);
+
+            if (rowDate <= endDate && rowDate >= startDate) {
+                row.style.display = "";
+
+            } else {
+                row.style.display = "none";
+                console.log("=============skip");
+
+            }
+        }
+        // var tdate = new Date(toDate)
+        // var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        // document.getElementById("d2").innerHTML = "  To  " + tdate.toLocaleDateString(undefined, options);
+
+    })
+    function exportAsExcel() {
+        console.log("myTable1");
+        $('in1').prop
+        const table = document.getElementById('myTable1'); // Replace 'myTable' with your table's ID
+        const wb = XLSX.utils.table_to_book(table);
+
+        XLSX.writeFile(wb, 'saleorder.xlsx');
+    }
+</script>
+
+{% endblock content %}

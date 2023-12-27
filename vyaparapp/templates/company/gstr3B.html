@@ -1,0 +1,791 @@
+{% extends 'company/src/html/base.html' %}
+{% block content %}
+{% load social_share %}
+{% load static %}
+
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.6"
+    integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
+<!-- Include html2pdf library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+<script src="https://unpkg.com/htmx.org@1.9.6"
+    integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+    crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+    .modal {
+        z-index: 9999;
+        overflow: scroll;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .card-body {
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+        border-radius: 1vh;
+    }
+
+
+    #tab_logic {
+        margin-left: 10px;
+        width: 98%;
+    }
+
+    #tab_logic thead th {
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        background-color: rgba(0, 195, 255, 0.205);
+    }
+
+    #tab_logic tbody td {
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+    }
+
+    
+
+
+
+    .addnewrow:hover {
+        background-color: violet;
+    }
+
+    #modal_closing {
+        height: 5vh;
+    }
+
+    #customer {
+        background-color: white;
+        color: black;
+    }
+
+    .selectize-input {
+        height: 5vh;
+        border-color: #54B4D3;
+        border-radius: 5px;
+    }
+
+    .option:hover {
+        background-color: #3B71CA;
+        color: white;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    input {
+        border: 1px solid gray;
+        border-radius: 6px;
+        position: relative;
+        width: 170px;
+        height: 40px;
+        margin: 10px;
+        line-height: 6ex;
+        background-color: rgba(246, 249, 252, 255);
+        color: #888;
+        padding-left: 10px;
+        font-size: small;
+    }
+
+    label {
+        position: absolute;
+        top: 0.2ex;
+        z-index: 1;
+        left: 2em;
+        background-color: rgba(246, 249, 252, 255);
+        padding: 0 5px;
+        color: black;
+        font-size: small;
+    }
+            /* Define styles for the responsive table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Apply responsive styles for smaller screens */
+        @media screen and(max-width:600px) {
+            input {
+        position: relative;
+    }
+
+    label {
+        position: absolute;
+      
+    }
+            /* Define styles for the responsive table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            display: inline;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+            
+        }
+   
+
+</style>
+
+<div class="equal-length-container">
+<div class="body-wrapper scrollable-div">
+    <br><br><br>
+
+    <div class="row p-0 m-0">
+        <div class="col-12  p-0 m-0">
+            <div class=" bg-light bg-light pb-0 mb-0 p-2" style="height:100%;width:100%;">
+                <div class="d-flex  pt-4">
+
+                
+
+
+                </div>
+
+
+
+                <div>
+                    <div class="container">
+                     
+
+                    
+                           
+                            <div class="filtr_with_date_between d-flex d-inline" style="margin-right: 30px;">
+                                <!-- <form action="#" method="get" class="d-flex d-inline" onsubmit="return validateDates()"> -->
+            
+                                    <div class="form-group input-wrapper">
+                                    <label for="fromDate">From Date:</label>
+                                    <input type="date" title="from date" id="fromDate" name="fromDate"> </div>&nbsp;&nbsp;&nbsp;
+                               
+                                <div class="form-group input-wrapper">
+                                    <label for="toDate">To Date:</label>
+                                    <input type="date" title="to date" id="toDate" name="toDate" min="" required>
+        
+                                </div>
+        
+                      
+                                <!-- <button style="margin-left: 775px;" title="close" class="btn btn-close"
+                                    id="closeButton" onclick="javascript:history.go(-1)"></button> -->
+                                    <a href="{% url 'companyreport' %}" class="close-button"><button style="margin-left: 775px;" title="close" class="btn btn-close"
+                                        id="closeButton"></button></a>
+                                    <!-- </form> -->
+                            </div>
+                    
+                            <form action="#" method="post" enctype="multipart/form-data" novalidate id="gstr9">
+                                {% csrf_token %}
+                            <div class="row clearfix">
+                                <div class="col-md-12 table-responsive-md mt-3">
+                                    <form action="" style="background-color: #3B71CA ;">
+                                        <div class="option_btn d-flex align-items-center" style="margin-left: 1050px;">
+                                            <button class="btn btn-sm" type="button" onclick="printSection('pdfdwnld')"
+                                                title="PRINT"><span><img width="22px"
+                                                        src="{% static 'assets/printer1.png' %}"
+                                                        alt="PRINT"></span></button>
+
+                                            <button class="btn btn-sm" type="button" onclick="exportToExcel()"
+                                                title="EXPORT"><span><img width="22px"
+                                                        src="{% static 'assets/excel2.png' %}"
+                                                        alt="EXPORT"></span></button>
+                                            <button class="btn btn-sm" type="button" onclick="exportToPDF()"
+                                                title="PDF"><span><img width="18px"
+                                                        src="{% static 'images/pdfdownload.png' %}"
+                                                        alt="DOWNLOAD"></span></button>
+                                            <!-- <button class="btn" type="button" onclick="printfunction()" style="margin-right: 5vh;">
+                                                            <span><img width="18px" src="{% static 'images/pdfdownload.png' %}" alt="no img"></span>
+                                                            <br><span style="color: black; font-size: small; font-weight: bold;">Print</span>
+                                                        </button> -->
+                                            <a class="text-dark" data-toggle="dropdown">
+                                                <button class="btn  " title="Share"><i
+                                                        class="fas fa-share"></i></button>
+                                            </a>
+                                            <div class="dropdown-menu ">
+                                                <a class="dropdown-item" data-target="#shareBillEmail"
+                                                    data-toggle="modal">GMAIL</a>
+                                                <a class="dropdown-item" href="javascript:void(0);"
+                                                    onclick="shareOnWhatsApp()">WhatsApp</a>
+                                            </div>
+
+                                    </div>
+                                        <!-- < class="col-md-8"> -->
+                                        <DIV id="pdfdwnld">
+
+                                            <div class="row">
+                                                <h1 class="h1 text-center pt-3 pb-2"
+                                                    style="text-transform:uppercase; font-family: 'Times New Roman', Times, serif;padding-left: 5px;">
+                                                    <b>{{staff.company.company_name}}</b>
+                                                </h1>
+
+                                            </div>
+
+                                            <div class="dc_table_exprt " id="print_export_section">
+                                                <H4 style="font-weight: bolder;">GSTR3B REPORT</H4>
+                                                <br>
+                                                <form action="" style="background-color: #3B71CA ;">
+                                                    <p>1. Details of outward supplies and inward supplies liable to
+                                                        reverse
+                                                        charge</p>
+                                                    <table
+                                                        class="table table-bordered table-secondary table-striped table-hover  mt-3"
+                                                        id="tab_logic">
+                                                        <thead>
+                                                            <tr style="color: black;">
+                                                                <th class="text-center">Nature Of Supplies</th>
+                                                                <th class="text-center">Total Taxable Value</th>
+                                                                <th class="text-center">Integrated Tax</th>
+                                                                <th class="text-center">Central Tax</th>
+                                                                <th class="text-center">State/UT tax</th>
+                                                                <th class="text-center">Cess</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="items-table-body">
+                                                            <tr>
+                                                                <td>(a) Outward taxable supplies(other than zero
+                                                                    rated,nil rated and exempted)</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td>(b) Outward taxable supplies(zero
+                                                                    rated)</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td>(c) Other outward supplies(nil rated, exempted)</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td>(d) Inward supplies(liable to reverse charge)</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>(e) Non-GST outward supplies</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Total Value</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+                                                                <td>0</td>
+
+                                                            </tr>
+                                                        </tbody>
+
+                                                    </table>
+                                                    <br>
+                                                    <br>
+                                                    <div class="row clearfix">
+                                                        <div class="col-md-12 table-responsive-md mt-3">
+                                                            <form action="" style="background-color: #3B71CA ;">
+                                                                <p>2. Details of inter-state supplies made to
+                                                                    unregisterd
+                                                                    persons, composition dealer and UIN holders</p>
+                                                                <table
+                                                                    class="table table-bordered table-secondary table-striped table-hover  mt-3"
+                                                                    id="tab_logic">
+                                                                    <thead>
+                                                                        <tr style="color: black;">
+                                                                            <th class="text-center" rowspan="2">Place Of
+                                                                                Supply
+                                                                                <br> (State/UT)
+                                                                            </th>
+                                                                            <th colspan="2"
+                                                                                style="text-align:center; width: 30%;">
+                                                                                Supplies
+                                                                                Made To Unregisterd Persons</th>
+                                                                            <th colspan="2"
+                                                                                style="text-align:center; width: 30%;">
+                                                                                Supplies
+                                                                                Made To Composition Taxable Persons</th>
+                                                                            <th colspan="2"
+                                                                                style="text-align:center; width: 30%;">
+                                                                                Supplies
+                                                                                Made To UIN Holders</th>
+
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th scope="col" class="text-center">Total
+                                                                                Taxable
+                                                                                Value</th>
+                                                                            <th scope="col" class="text-center">Amount
+                                                                                Of
+                                                                                Integrated Tax</th>
+                                                                            <th scope="col" class="text-center">Total
+                                                                                Taxable
+                                                                                Value</th>
+                                                                            <th scope="col" class="text-center">Amount
+                                                                                Of
+                                                                                Integrated Tax</th>
+                                                                            <th scope="col" class="text-center">Total
+                                                                                Taxable
+                                                                                Value</th>
+                                                                            <th scope="col" class="text-center">Amount
+                                                                                Of
+                                                                                Integrated Tax</th>
+
+                                                                        </tr>
+
+                                                                    </thead>
+                                                                    <tbody id="items-table-body">
+                                                                        <tr>
+                                                                            <td class=""></td>
+                                                                            <td></td>
+                                                                            <td>0</td>
+                                                                            <td>0</td>
+                                                                            <td>0</td>
+                                                                            <td>0</td>
+                                                                            <td>0</td>
+
+                                                                        </tr>
+
+                                                                    </tbody>
+
+                                                                </table>
+                                                                <br><br>
+
+                                                                <div class="row clearfix">
+                                                                    <div class="col-md-12 table-responsive-md mt-3">
+                                                                        <form action=""
+                                                                            style="background-color: #3B71CA ;">
+                                                                            <p>3. Details of eligible Input Tax Credit
+                                                                            </p>
+                                                                            <table
+                                                                                class="table table-bordered table-secondary table-striped table-hover  mt-3"
+                                                                                id="tab_logic">
+                                                                                <thead>
+                                                                                    <tr style="color: black;">
+                                                                                        <th class="text-center">Details
+                                                                                        </th>
+                                                                                        <th class="text-center">Total
+                                                                                            Taxable
+                                                                                            Value</th>
+                                                                                        <th class="text-center">
+                                                                                            Integrated Tax
+                                                                                        </th>
+                                                                                        <th class="text-center">Central
+                                                                                            Tax</th>
+                                                                                        <th class="text-center">State/UT
+                                                                                            tax
+                                                                                        </th>
+                                                                                        <th class="text-center">Cess
+                                                                                        </th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody id="items-table-body">
+                                                                                    <tr>
+                                                                                        <td colspan="6"
+                                                                                            style="font-weight: bold;">
+                                                                                            (A)ITC Available(whether
+                                                                                            in full of part)</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(1) Import of goods</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(2) Import of services</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(3) Inward supplies liable
+                                                                                            to
+                                                                                            reverse charge(other tham 1
+                                                                                            & 2
+                                                                                            above)</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(4) Inward supplies from ISD
+                                                                                        </td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(5) All other ITC</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td colspan="6"
+                                                                                            style="font-weight: bold;">
+                                                                                            (D)Inelegible ITC</td>
+
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(1) As per section 17(5)
+                                                                                        </td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td>(2) Others</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                        <td>0</td>
+                                                                                    </tr>
+                                                                                </tbody>
+
+                                                                            </table>
+                                                                            <br><br>
+
+                                                                            <div class="row clearfix">
+                                                                                <div
+                                                                                    class="col-md-12 table-responsive-md mt-3">
+                                                                                    <form action=""
+                                                                                        style="background-color: #3B71CA ;">
+                                                                                        <p>4. Details of exempt,
+                                                                                            nil-rated and
+                                                                                            non-GST inward supplies</p>
+                                                                                        <table
+                                                                                            class="table table-bordered table-secondary table-striped table-hover  mt-3"
+                                                                                            id="tab_logic">
+                                                                                            <thead>
+                                                                                                <tr
+                                                                                                    style="color: black;">
+                                                                                                    <th
+                                                                                                        class="text-center">
+                                                                                                        Nature Of
+                                                                                                        Supplies</th>
+                                                                                                    <th
+                                                                                                        class="text-center">
+                                                                                                        Inter-State
+                                                                                                        Supplies
+                                                                                                    </th>
+                                                                                                    <th
+                                                                                                        class="text-center">
+                                                                                                        Intra-State
+                                                                                                        Supplies
+                                                                                                    </th>
+
+                                                                                                </tr>
+                                                                                            </thead>
+                                                                                            <tbody
+                                                                                                id="items-table-body">
+
+                                                                                                <tr>
+                                                                                                    <td>From a supplier
+                                                                                                        under
+                                                                                                        composition
+                                                                                                        scheme.
+                                                                                                        Exempt and Nil
+                                                                                                        rated
+                                                                                                        supply</td>
+                                                                                                    <td>0</td>
+                                                                                                    <td>0</td>
+
+                                                                                                </tr>
+                                                                                                <tr>
+                                                                                                    <td>Non GST supply
+                                                                                                    </td>
+                                                                                                    <td>0</td>
+                                                                                                    <td>0</td>
+
+
+                                                                                                </tr>
+
+                                                                                            </tbody>
+
+                                                                                        </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </DIV>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div></div>
+</div>
+        <div class="modal fade" id="shareBillEmail">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content" style="background: rgb(136, 160, 175);border-radius: 20px;">
+                    <div class="modal-header" style="background: rgb(136, 160, 175);">
+                        <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Gstr3B Via Email</h5>
+                        <button type="button" class="btn btn-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="background: rgb(136, 160, 175);">
+                        <div class="card p-3 m-3">
+
+                            <form action="{% url 'sharegstr3BToEmail' %}" method="post" class="needs-validation"
+                                id="share_to_email_form" autocomplete="off">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="emailIds">Email IDs</label>
+                                    <textarea class="form-control text-dark" name="email_ids" id="emailIds" rows="5"
+                                        placeholder="Multiple emails can be added by separating with a comma(,)."
+                                        required></textarea>
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label for="item_unitname">Message(optional)</label>
+                                    <textarea name="email_message" id="email_message" class="text-dark form-control"
+                                        cols="" rows="4"
+                                        placeholder="This message will be sent along with Bill details."></textarea>
+                                </div>
+                                <div class="modal-footer d-flex justify-content-center"
+                                    style="border-top: 1px solid #ffff;">
+                                    <button type="submit" id="share_with_email"
+                                        class=" btn btn-outline-dark  submitShareEmailBtn " value="SEND MAIL">SEND
+                                        MAIL</button>
+
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.x.x.min.js"></script>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+
+
+
+        <script>
+
+            $(document).ready(function () {
+                $('#share_with_email').on('click', function () {
+                    var emailsInput = document.getElementById('emailIds');
+                    var emailsString = emailsInput.value.trim();
+
+                    var emails = emailsString.split(',').map(function (email) {
+                        return email.trim();
+                    });
+
+                    var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+                    var invalidEmails = []
+                    if (emailsString == "") {
+                        alert('Enter valid email addresses..')
+                    }
+                    else {
+                        for (var i = 0; i < emails.length; i++) {
+                            var currentEmail = emails[i];
+
+                            if (currentEmail != "" && !emailRegex.test(currentEmail)) {
+                                console.log(currentEmail + ' is invalid!');
+                                invalidEmails.push(currentEmail)
+                            }
+                        }
+
+                        if (invalidEmails.length > 0) {
+                            alert('Invalid emails..Please check!\n' + invalidEmails)
+                            // alert(invalidEmails)
+                        } else {
+                            $('#share_to_email_form').submit();
+                        }
+                    }
+                })
+            });
+
+
+
+            $(document).ready(function () {
+                $('#fromDate').change(function () {
+                    var fromDate = new Date($(this).val());
+                    $('#toDate').attr('min', $(this).val());
+                    var toDate = new Date($('#toDate').val());
+                    if (fromDate > toDate) {
+                        $('#toDate').val($(this).val());
+                    }
+                    $("input[type='date']").each(function () {
+                        if (new Date($(this).val()) < fromDate) {
+                            $(this).css('opacity', '0.5').prop('disabled', true);
+                        } else {
+                            $(this).css('opacity', '1').prop('disabled', false);
+                        }
+                    });
+                });
+
+                $('#toDate').change(function () {
+                    $("input[type='date']").each(function () {
+                        if (new Date($(this).val()) < new Date($('#fromDate').val())) {
+                            $(this).css('opacity', '0.5').prop('disabled', true);
+                        } else {
+                            $(this).css('opacity', '1').prop('disabled', false);
+                        }
+                    });
+                });
+            });
+
+
+        </script>
+
+        <script>
+
+
+
+
+
+
+
+            function shareOnWhatsApp() {
+                var url = window.location.href;
+                var text = url;
+                text = encodeURIComponent(text);
+                var whatsappUrl = "whatsapp://send?text=" + text;
+                window.location.href = whatsappUrl;
+            }
+
+
+            function exportToExcel() {
+                const table = document.getElementById('print_export_section');
+                const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+                XLSX.writeFile(wb, "gstr3B.xlsx");
+            }
+
+
+            function printSection(pdfdwnld) {
+                var printContents = document.getElementById(pdfdwnld).innerHTML;
+                var originalContents = document.body.innerHTML;
+
+                // Create a new temporary div to hold the section content to print
+                var printContainer = document.createElement('div');
+                printContainer.innerHTML = printContents;
+
+                // Append the section content to the body
+                document.body.innerHTML = '';
+                document.body.appendChild(printContainer);
+
+                // Print the contents
+                window.print();
+
+                // Restore the original content
+                document.body.innerHTML = originalContents;
+            }
+
+
+
+
+
+
+            function exportToPDF() {
+                var content = document.getElementById('pdfdwnld');
+
+                var opt = {
+                    margin: 0.1,
+                    filename: 'GSTR3B.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+
+                html2pdf().set(opt).from(content).save();
+            }
+
+
+            // $(document).ready(function () {
+            //     // Add click event listener to the close button
+            //     $('#closeButton').click(function () {
+            //         // Navigate back to the previous page
+            //         window.history.go(-1);
+            //     });
+            // });
+
+
+
+
+        </script>
+
+        {% endblock %}

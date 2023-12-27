@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VYAPAR</title>
+
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <style>
+    .table2 {
+      text-align: center;
+      padding-top: 6px;
+      /* font-size: 1.1em; */
+      background-color: rgb(221, 247, 247);
+      
+    }
+    table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+
+}
+
+    .table-head {
+      color: rgb(52, 49, 58);
+    }
+    .table2 .tbody tr {
+      margin-bottom: 3px;
+    }
+    .table3 {
+      width: 75px;
+      text-align: right;
+      font-size: 14px;
+    }
+    body {
+      font-size: 14px;
+    }
+    .card-body {
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+        border-radius: 1vh;
+    }
+
+
+    #tab_logic {
+        margin-left: 10px;
+        width: 98%;
+    }
+
+    #tab_logic thead th {
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        background-color: rgba(0, 195, 255, 0.205);
+    }
+
+    #tab_logic tbody td {
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+    }
+
+    #toPayRadio {
+        accent-color: red;
+    }
+/* 
+    #toReceiveRadio {
+        accent-color: green;
+    } */
+
+    .addnewrow:hover {
+        background-color: violet;
+    }
+
+    #modal_closing {
+        height: 5vh;
+    }
+
+    #customer {
+        background-color: white;
+        color: black;
+    }
+
+    .selectize-input {
+        height: 5vh;
+        border-color: #54B4D3;
+        border-radius: 5px;
+    }
+
+    .option:hover {
+        background-color: #3B71CA;
+        color: white;
+    }
+    /* th, td {
+  padding-top: 10px;
+  padding-bottom: 20px;
+  padding-left: 30px;
+  padding-right: 120px;
+} */
+th, td {
+        font-size: 8px; /* Adjust the font size as needed */
+        padding-top: 10px;
+        padding-bottom: 20px;
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+  </style>
+
+  <body>
+    <div class="my-5 page" size="A4" style="width: 100px;">
+      <div class="p-5">
+        <div
+          id="ember2512"
+          class="row tooltip-container ember-view ribbon text-ellipsis"
+          style="display: flex; justify-content: space-between;">
+          <div
+            class="col-md-4 ribbon-inner ribbon-open"
+            style="
+              margin-right: 600px;
+              color: white;
+              text-align: center;
+              padding-top: 10px;
+            "
+          >
+          </div>
+          <div class="col-md-4">
+            <h3>
+              <center class="text-black"><b>{{company.company_name }}</b></center>
+            </h3>
+        </div>
+          <div
+              class="col-md-4 graphic-path"
+              style="
+                text-align: right;
+                padding-top: 10px;
+                margin-left: 550px;
+                text-align: center;
+                color: rgb(0, 0, 0);
+              "
+            >
+            <!-- <p>Bill No. <span style="font-weight: bold;">{{bill.challan_no }}</span>
+            <br>
+            Date: <span style="font-weight: bold;">{{bill.date }}</span>
+            <br>
+            Due Date: <span style="font-weight: bold;">{{bill.due_date }}</span>
+            </p> -->
+            
+            </div>
+        </div>
+        <!-- <table class="table1 table-bordered" style="border-color: black;">
+          <tbody>
+            <tr style="font-weight: bolder">
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>
+                <h5 class="text-info" style="font-weight: bold; color: rgb(49, 49, 138);">{{company.company_name }}</h5>
+                <p class="address" style="font-weight: bold;color: #000;"> {{company.address}}<br>
+                    {{company.state}},
+                    {{company.country}}<br>
+                    {{company.user.email}}<br>
+                    {{company.contact}}<br>
+                </p> 
+              </td>
+              <td></td>
+              <td>
+                <h5 class="text-info" style="font-weight: bold;"><span style="color: #000;">Name: </span>{{bill.party_name}}</h5>
+                <p class="address" style="font-weight: bold;color: #000;">
+                    <span>Contact: </span>{{bill.contact}}
+                    <br>
+                    <span>Billing Address: </span>{{bill.address}}
+                </p> 
+              </td>
+            </tr>
+          </tbody>
+        </table> -->
+        <hr />
+        <section class="product-area mt-4">
+
+            <form action="" style="background-color: #3B71CA ;">
+                <ul class="nav nav-tabs row mx-3">
+                    <li class="col-sm-6 text-center" id="sale">
+                        <a href="#1" data-toggle="tab">Bill details</a>
+                    </li>
+                    <!-- <li class="col-6 text-center" id="salereturn"><a href="#2"
+                            data-toggle="tab">Sale Return</a>
+                    </li> -->
+                </ul>
+                <div class="row m-0 p-0 pt-3 table-responsive" id="salediv">
+
+                    <div class="col-sm-12 col-lg-3">
+                        <table id="myTable" 
+                            class="table table-bordered table-info table-striped tb  w-100"
+                            style="text-align: center; width: 1260px;">
+                          
+                            <thead>
+
+                                <tr class="text-center"
+                                    style="background-color: rgba(255, 255, 255, 0.137);">
+
+                                    <th colspan="5" style="text-align: center;">Invoice
+                                        Details</th>
+                                    <th rowspan="2" style="text-align: center;">Tax Rate
+                                    </th>
+                                    <th rowspan="2" style="text-align: center;">Cess Rate
+                                    </th>
+                                    <th rowspan="2" style="text-align: center;">Taxable
+                                        Value</th>
+                                    <th colspan="4" style="text-align: center;">Amount</th>
+                                    <th rowspan="2" style="text-align: center;">Place Of
+                                        Supply(Name Of State)</th>
+                                </tr>
+                                <tr class="text-center"
+                                    style="background-color: rgba(255, 255, 255, 0.137);">
+                                    <th style="text-align: center;">GSTIN/UIN</th>
+                                    <th style="text-align: center;">Party Name</th>
+                                    <th style="text-align: center;">Invoice No</th>
+                                    <th style="text-align: center;">Date</th>
+                                    <th style="text-align: center;">Value</th>
+
+                                    <th style="text-align: center;">Integrated Tax</th>
+                                    <th style="text-align: center;">Central Tax</th>
+                                    <th style="text-align: center;">State/UT Tax</th>
+                                    <th style="text-align: center;">Cess</th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-table-body">
+
+                                {% for i in purchasebill %}
+                                <tr class="text-center">
+                                    <td>{{i.party.gst_no}}</td>
+                                    <td>{{i.party.party_name}}</td>
+                                    <td>{{i.billno}}</td>
+                                    <td>{{i.billdate}}</td>
+                                    <td>{{i.grandtotal}}</td>
+                                    <td>{{i.taxamount}}</td>
+                                    <td>0</td>
+                                    <td>{{i.subtotal}}</td>
+                                    <td>{{i.igst}}</td>
+                                    <td>{{i.cgst}}</td>
+                                    <td>{{i.sgst}}</td>
+                                    <td>0</td>
+                                    <td>{{i.supplyplace}}</td>
+
+                                </tr>
+                                {% endfor %}
+                                <!-- {% for j in ret_invoices %}
+                                <tr class="text-center">
+                                    <td>{{j.gstin}}</td>
+                                    <td>{{j.customer}}</td>
+                                    <td>{{j.invoice_number}}</td>
+                                    <td>{{j.invoice_date}}</td>
+                                    <td>{{j.total_amount}}</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td>{{j.total_amount}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>0</td>
+                                    <td>{{j.place_of_supply}}</td>
+                                </tr>
+                                {% endfor %} -->
+                                <!-- {% for i in rec_invoices %}
+                                <tr class="text-center">
+                                    <td>{{i.gstin}}</td>
+                                    <td>{{i.customername}}</td>
+                                    <td>{{i.recinvoiceno}}</td>
+                                    <td>{{i.startdate}}</td>
+                                    <td>{{i.grandtotal}}</td>
+                                    <td>{{i.IGST}}</td>
+                                    <td>0</td>
+                                    <td>{{i.subtotal}}</td>
+                                    <td>{{i.IGST}}</td>
+                                    <td>{{i.CGST}}</td>
+                                    <td>{{i.SGST}}</td>
+                                    <td>0</td>
+                                    <td>{{i.placosupply}}</td>
+    
+                                </tr>
+                                {% endfor %} -->
+
+
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
+               
+
+        </div>
+    </div>
+</form>
+
+
+
+
+
+         
+        </section>
+        <hr />
+        <!-- <section class="balance-info" style="margin-top: 1rem;">
+          <div class="row my-5">
+            <div class="col-md-6">
+            </div>
+            <div class="col-md-6" style="width: 50% !important;">
+              <table class="table3 border-0 table-hover">
+                <tr>
+                  <th colspan="3">
+                    <span style="float: right; margin-right: 10px"
+                      >Sub Total :</span
+                    >
+                  </th>
+                  <td style="color: black; font-weight: bold;">
+                    {{bill.subtotal}}
+                  </td>
+                </tr>
+                {% if bill.igst != 0.0 %}
+                <tr id="igstrow">
+                  <th colspan="3">
+                    <span style="float: right; margin-right: 10px">IGST:</span>
+                  </th>
+
+                  <td style="font-weight: bold" id="igst">{{bill.igst}}</td>
+                </tr>
+                {% endif %}
+                {% if bill.cgst != 0.0 %}
+                <tr id="cgstrow">
+                    <th colspan="3">
+                        <span style="float: right; margin-right: 10px">CGST:</span>
+                    </th>
+                    <td style="font-weight: bold" id="igst">{{bill.cgst}}</td>
+                </tr>
+                {% endif %}
+                {% if bill.sgst != 0.0 %}
+                <tr id="sgstrow">
+                    <th colspan="3">
+                        <span style="float: right; margin-right: 10px">SGST:</span>
+                    </th>
+
+                    <td style="font-weight: bold" id="igst">{{bill.sgst}}</td>
+                </tr>
+                {% endif %}
+
+                <tr id="tax_amount_row">
+                    <th colspan="3">
+                        <span style="float: right; margin-right: 10px">Tax:</span>
+                    </th>
+
+                    <td style="font-weight: bold" id="igst">{{bill.tax_amount}}</td>
+                </tr>
+
+                {% if bill.adjustment != None and bill.adjustment != 0.0 %}
+                <tr id="adjstrow">
+                  <th colspan="3">
+                    <span style="float: right; margin-right: 10px"
+                      >Adjustment:</span
+                    >
+                  </th>
+
+                  <td style="font-weight: bold" id="sgst">
+                    {{bill.adjustment}}
+                  </td>
+                </tr>
+                {% endif %}
+                <tfoot>
+                  <tr>
+                    <th colspan="3">
+                      <span style="float: right; margin-right: 14px"
+                        >Grand Total:</span
+                      >
+                    </th>
+                    <td style="color: black; font-weight: bold">
+                      {{bill.total_amount}}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section>
+            <div class="row container-fluid  p-2 m-0" style="margin-top: 4rem;">
+                <div class="col-md-6 col-sm-6 m-0 p-0"><label style="color: #000;"><b>Authorized Signature</b></label><span class="text-dark">_____________________</span></div>
+                 <div class="col-sm-4 m-0 p-0 text-dark">________________________</div> -->
+                <!-- <div class="col-md-6 col-sm-6 m-0 p-0"></div>
+            </div>
+        </section>  -->
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+{% extends 'company/src/html/base.html' %}
+
+{% block content %}
+{% load static %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<style>
+    .chart-container {
+        margin: auto; /* Center the container horizontally */
+        width: 80%; /* Adjust the width as needed */
+        padding-top: 100px; /* Add some top padding to move it below the navbar */
+        padding-left: 160px;
+    }
+</style>
+
+<div class="chart-container">
+  <div class="d-flex justify-content-end">
+    <div class="ml-auto">
+        <a href="{% url 'view_salesinvoice' %}" style="font-size: x-large; color: black;" title="Close">
+            <i class="fa fa-times-circle fs-6 tb close_pad mt-4 "  aria-hidden="true" ></i>
+        </a>
+    </div>
+  </div>
+
+  <div>
+    <label for="yearFilter"><b>Select Year:</b></label>
+    <select id="yearFilter" onchange="updateChart()">
+        {% for year in years %}
+            <option value="{{ year }}" {% if year == currentYear %}selected{% endif %}>{{ year }}</option>
+        {% endfor %}
+    </select>
+  </div>
+
+  <!-- Canvas for the chart -->
+  <canvas id="profitLossChart" width="400" height="200"></canvas>
+</div>
+
+<script>
+const fetchData = async (year) => {
+  const response = await fetch(`/api/profit_loss_data/${year}/`);
+  const data = await response.json();
+
+  const ctx = document.getElementById('profitLossChart').getContext('2d');
+  const myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.labels, 
+      datasets: [
+        {
+          label: 'Sales',
+          data: data.sales,
+          fill: false,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 2,
+        },
+      ],
+    },
+  });
+};
+
+// Initial chart rendering for the current year
+const currentYear = new Date().getFullYear();
+fetchData(currentYear);
+
+// Set the default value of the select input to the current year
+document.getElementById('yearFilter').value = currentYear;
+
+// Function to update chart based on filter option
+const updateChart = () => {
+  const yearFilter = document.getElementById('yearFilter');
+  const selectedYear = yearFilter.value;
+  fetchData(selectedYear);
+};
+</script>
+
+{% endblock %}

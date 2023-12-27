@@ -1,0 +1,955 @@
+<!-- create by athul -->
+
+{% extends 'company/src/html/base.html' %}
+{% block content %}
+{% load social_share %}
+{% load static %}
+
+
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
+
+
+
+    .page {
+        background: var(--white);
+        background-color: white;
+        display: block;
+        margin: 0 auto;
+        position: relative;
+        box-shadow: var(--pageShadow);
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+    }
+
+    .page[size="A4"] {
+        width: 21cm;
+        height: 29.7cm;
+        overflow: hidden;
+    }
+
+
+
+    .store-user {
+        padding-bottom: 5px;
+    }
+
+    .store-user p {
+        margin: 0;
+        font-weight: 600;
+        color: #000000;
+    }
+
+    .store-user .address {
+        font-weight: 400;
+    }
+
+    .store-user h5 {
+        color: var(--themeColor);
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    thead {
+        color: var(--white);
+        background: var(--themeColor);
+    }
+
+    .table td,
+    .table th {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    tr th:first-child,
+    tr td:first-child {
+        text-align: left;
+    }
+
+    .balance-info .table td,
+    .balance-info .table th {
+        padding: 0;
+        border: 0;
+    }
+
+    .balance-info tr td:first-child {
+        font-weight: 600;
+    }
+
+    tfoot {
+        border-top: 2px solid var(--darkWhite);
+    }
+
+    tfoot td {
+        font-weight: 600;
+    }
+
+    .print-only {
+        height: auto;
+        width: auto;
+        overflow-y: auto;
+        border: none;
+    }
+
+    @media print {
+        body {
+            visibility: hidden !important;
+            /* hide everything in body when in print mode*/
+        }
+
+        #printslip {
+            margin-left: 2vh;
+            margin-right: 2vh;
+        }
+
+        .printContainer {
+            visibility: visible !important;
+            /* Override the rule above to only show the printables*/
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+        }
+
+    }
+
+    .vl {
+        border-left: 6px solid gray;
+    }
+
+    .equal-length-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+        /* Make the container fill the height of the column */
+        margin-left: 2vh;
+        margin-right: 2vh;
+    }
+
+    .equal-length-item {
+        flex: 1;
+        text-align: center;
+    }
+
+    #templates,
+    #slip {
+        cursor: pointer;
+    }
+
+    #myDropdown {
+
+        display: none;
+        position: absolute;
+        margin-left: 200px;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+    }
+
+    /* Style for the dropdown options (links) */
+    #myDropdown a {
+        display: block;
+        padding: 12px 16px;
+        text-decoration: none;
+        color: #333;
+    }
+
+    /* Style for the dropdown options on hover */
+    #myDropdown a:hover {
+        background-color: #ddd;
+    }
+
+    ::-webkit-scrollbar {
+        display: none
+    }
+</style>
+
+<body>
+
+
+    <div class="body-wrapper" style="background-color: rgba(176, 199, 205, 0.4);">
+        <br><br><br>
+        <div class="row p-0 m-0">
+            <div class="col-12  p-3 m-0">
+                <div class=" pb-0 mb-0 p-2" style="height:100%;width:100%">
+                    <div class="d-flex justify-content-center pt-4">
+                        <a href="" id="b1" class="btn  text-white"
+                            style="margin-right: 10px; background-color: rgb(252, 3, 3,0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                            Add Sale <i class="fa fa-plus"></i>
+                        </a>
+                        <a href="{% url 'add_purchasebill' %}" id="b2" class="btn  text-white"
+                            style="margin-right: 10px;background-color: rgba(3, 161, 252, 0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                            Add Purchase <i class="fa fa-plus"></i>
+                        </a>
+                        <a href="" id="b3" class="btn text-primary"
+                            style="border-radius: 20px;border: 1px solid rgb(40, 12, 222);background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                            Add More <i class="fa fa-plus"></i>
+                        </a>
+                    </div>
+                    <p></p>
+                    <div class="page-content">
+                        <div class="card radius-15">
+                            <div class="card-body bg-light">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h3 class="mb-3">EXPENSE BILL DETAILS</h3>
+                                    </div>
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4">
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <a class="btn ml-5" onclick="printfun()"><img width="30px"
+                                                src="{% static 'images/printer.jpeg' %}" alt="no img"> <br>Print</a>
+                                        <a class="btn ml-4" id="pdflink" onclick="pdf()"><img width="20px"
+                                                src="{% static 'images/pdfdownload.png' %}" alt="no img"><br>Pdf</a>
+
+                                        <a class="btn ml-4" onclick="toggleDropdown()"> <img width="30px"
+                                                src="{% static 'images/shareimg.png' %}" alt="no img"><br>Share</a>
+                                        <div class="dropdown-content" id="myDropdown">
+                                            <ul style="margin-bottom: -1px;">{% post_to_whatsapp object_or_url "WhatsApp" %}</ul>
+                                            <ul style="margin-bottom: -1px;">{% send_email object.title "{{object.title}}" object_or_url "Email" %}</ul>
+                                        </div>
+                                        <a class="ml-5" href="{% url 'expense' %}"
+                                            style="text-align: right; font-size: large; color: black;">
+                                            <i class="fa fa-times mt-2" aria-hidden="true"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <!-- <div class="row pb-0 mb-0 mt-1" style="margin-top:-2vh">
+                                <div id="templates" class="col text-center pb-2 pt-3" style="background-color: rgba(0, 195, 255, 0.205);"  >
+                                    <a class="fw-bolder fs-4" style="color: gray; text-decoration: none; " >TEMPLATE</a>
+                                </div>
+                                <div id="slip" class="col text-center pb-2 pt-3" style="background-color: rgba(0, 195, 255, 0.205);" >
+                                    <a class="fw-bolder fs-4" style="color: gray; text-decoration: none;" >BILL SLIP</a>
+                                </div>
+                            </div> -->
+
+                                <div id="templatediv" style=" border-radius: 2vh;">
+                                    <div id="whatToPrint" class="print-only">
+
+                                        <!-- template1 -->
+                                        <div id="whatToPrint1" class="printTemplates template1">
+                                            <div class="my-5 page" size="A4">
+                                                <div class="p-4" id="printdiv1">
+                                                    <div id="ember2512"
+                                                        class="tooltip-container ember-view ribbon text-ellipsis">
+                                                        <section>
+                                                            <div class="text-center">
+                                                                <h3 class="text-info"><b>EXPENSE BILL</b></h3>
+                                                            </div>
+                                                        </section>
+                                                        <section class="top-content ">
+                                                            <div class="top-left">
+                                                                <div class="position-relative"
+                                                                    style="text-align: left;">
+                                                                    <p> EXP No: &nbsp; <b>EXP_0{{ expnse.EXP_NO }}</b>
+                                                                    </p>
+                                                                    <p>EXP Date: <span><b>{{expnse.expense_date|date:'d-m-Y'}}</b></span></p>
+
+                                                                </div>
+                                                            </div>
+                                                        </section>
+
+                                                        <hr style="color: black;">
+                                                        <br>
+
+                                                        <section class="store-user">
+                                                            <div class="col-12">
+                                                                <h5 class="bg-info" id="t1h"
+                                                                    style="padding: 10px;color: #000;"><b>COMPANY
+                                                                        DETAILS</b></h5>
+                                                                <div class="row">
+                                                                    <div class="col-6 mt-1">
+
+                                                                        <h5 class="text-black pb-2"
+                                                                            style='margin-left: 4vh;'>Company Name</h5>
+                                                                        <h5 class="text-black pb-2"
+                                                                            style='margin-left: 4vh;'>Company Mail</h5>
+                                                                        <h5 class="text-black pb-2"
+                                                                            style='margin-left: 4vh;'>Company Contact
+                                                                        </h5>
+                                                                        <h5 class="text-black pb-2"
+                                                                            style='margin-left: 4vh;'>Company Address
+                                                                        </h5>
+
+                                                                    </div>
+                                                                    <div class="col-6 mt-1">
+                                                                        <h5 class="text-black pb-2">:
+                                                                            {{expnse.staff_id.company.company_name}}
+                                                                        </h5>
+                                                                        <h5 class="text-black pb-2">:
+                                                                            {{expnse.staff_id.company.user.email}}</h5>
+                                                                        <h5 class="text-black pb-2">:
+                                                                            {{expnse.staff_id.company.contact}}</h5>
+                                                                        <h5 class="text-black pb-2">:
+                                                                            {{expnse.staff_id.company.address}},
+                                                                            {{expnse.staff_id.company.state}},{{expnse.staff_id.company.country}}
+                                                                        </h5>
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                        {% if expnse.party_id %}
+                                                        <section class="store-user mt-1" >
+                                                            <div class="col-12">
+                                                                <h5 class="bg-info" id="t1h"
+                                                                    style="padding: 10px;color: #000;"><b>PARTY
+                                                                        DETAILS</b></h5>
+                                                                <div class="row">
+                                                                    <div class="col-6 mt-1">
+
+                                                                        <h5 class="text-black pb-2"
+                                                                            style='margin-left: 4vh;'>Party Name</h5>
+                                                                        <h5 class="text-black pb-2"
+                                                                            style='margin-left: 4vh;'>Party Mail</h5>
+                                                                        <h5 class="text-black pb-2"
+                                                                            style='margin-left: 4vh;'>Party Contact</h5>
+                                                                        <h5 class="text-black pb-2"
+                                                                            style='margin-left: 4vh;'>Party Address</h5>
+                                                                        <h5 class="text-black pb-2"
+                                                                            style='margin-left: 4vh;'>Opening Balance
+                                                                        </h5>
+
+
+                                                                    </div>
+                                                                    <div class="col-6 mt-3">
+                                                                        <h5 class="text-black pb-2">:
+                                                                            {{expnse.party_id.party_name}}</h5>
+                                                                        <h5 class="text-black pb-2">:
+                                                                            {{expnse.party_id.email}}</h5>
+                                                                        <h5 class="text-black pb-2">:
+                                                                            {{expnse.party_id.contact}}</h5>
+                                                                        <h5 class="text-black pb-2">:
+                                                                            {{expnse.party_id.address}}</h5>
+                                                                        {% if expnse.party_id.payment == 'To Pay' %}
+                                                                        <h5 class="pb-2" style="color: red;">:
+                                                                            {{expnse.party_id.openingbalance}}</h5>
+                                                                        {% else %}
+                                                                        <h5 class="text-success pb-2">:
+                                                                            {{expnse.party_id.openingbalance}}</h5>
+                                                                        {% endif %}
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                        {% endif %}
+
+                                                        <hr style="color: black;">
+
+                                                        <section class="product-area mt-1">
+                                                            <table class=" table table-hover table-bordered border-dark"
+                                                                id="table1">
+                                                                <thead class=" bg-info">
+                                                                    <tr>
+                                                                        <td
+                                                                            style="text-align: center; font-weight:bold; color:black ">
+                                                                            Discription</td>
+
+                                                                        {% if expnse.cgst %}
+                                                                        <td style="font-weight:bold; color:black;">Tax
+                                                                        </td>
+                                                                        {% endif %}
+
+                                                                        <td style="font-weight:bold; color:black">Total
+                                                                        </td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {% for i in elist %}
+                                                                    <tr>
+                                                                        <td style="color:black; text-align: center;">
+                                                                            {{i.discription}}</td>
+                                                                        {% if expnse.cgst %}
+                                                                        <td style="color:black;">{{i.tax}}
+                                                                        </td>
+                                                                        {% endif %}
+                                                                        <td style="color:black">{{i.amount}}</td>
+
+                                                                    </tr>
+                                                                    {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </section>
+
+                                                        <section class="balance-info">
+                                                            <div class="row">
+                                                                <div class="col-md-8"></div>
+                                                                <div class="col-md-4">
+                                                                    <table class="table table-borderless">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td style="color: #000;">Sub Total</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">
+                                                                                    {{expnse.Sub_total}}</td>
+                                                                            </tr>
+                                                                            {% if expnse.cgst %}
+                                                                            <tr >
+                                                                                <td style="color: #000;">CGST</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">{{expnse.cgst}}
+                                                                                </td>
+
+                                                                            </tr>
+                                                                            
+                                                                            <tr>
+                                                                                <td style="color: #000;">SGST</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">{{expnse.sgst}}
+                                                                                </td>
+                                                                            </tr>
+
+
+                                                                            <tr>
+                                                                                <td style="color: #000;">Tax Amount</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">
+                                                                                    {{expnse.tax_amount}}</td>
+                                                                            </tr>
+                                                                            {% endif %}
+                                                                            <tr>
+                                                                                <td style="color: #000;">Adjustment</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">
+                                                                                    {{expnse.adjustment}}</td>
+                                                                            </tr>
+
+                                                                        </tbody>
+                                                                    </table>
+                                                                    <hr style="background-color: #000000;">
+                                                                    <table class="table table-borderless">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <th style="color: #000;">Grand Total
+                                                                                    &nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                                                                <th style="color: #000; ">:</th>
+                                                                                <th
+                                                                                    style="color: #000; text-align: center;">
+                                                                                    {{expnse.total}}</th>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- template2 -->
+                                        <div id="whatToPrint2" class="printTemplates template2" style="display: none;">
+                                            <div class="my-5 page" size="A4">
+                                                <div id="printdiv2">
+                                                    <div class="row px-5 py-4" style="background-color:#615dff;">
+                                                        <div class="col-md-4"></div>
+                                                        <div class="col-md-4 d-flex justify-content-center">
+                                                            <center class="h3 text-white"><b>EXPENSE BILL</b></center>
+                                                        </div>
+                                                        <div class="col-md-4 d-flex justify-content-end">
+                                                            <div class="text-white">
+                                                                <p class="mb-0 mt-2">EXP No: <b>EXP_0{{ expnse.EXP_NO}}</b>
+                                                                </p>
+                                                                <p class="mb-0 mt-2">RXP Date: <b>{{expnse.expense_date|date:'d-m-Y'}}</b></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 py-1">
+                                                        <section class="store-user"><br><br>
+                                                            <div class="col-12">
+                                                                <div class="row  pb-2 mt-3">
+                                                                    <div class="col-4 pl-0">
+                                                                        <label class="text-white w-100 p-1 mb-1"
+                                                                            style="background-color: #615dff; border-top-right-radius: 4vh; border-bottom-right-radius: 4vh;"><b>COMPANY
+                                                                                DETAILS</b></label>
+                                                                        <h5 class="text-secondary"
+                                                                            style="font-weight: bold;">
+                                                                            {{expnse.staff_id.company.company_name}}
+                                                                        </h5>
+                                                                        <p class="address"
+                                                                            style="font-weight: bold;color: #000;">
+
+                                                                            {{expnse.staff_id.company.address}}
+                                                                            <br>
+                                                                            {{expnse.staff_id.company.city}}
+                                                                            <br>
+                                                                            {{expnse.staff_id.company.state}} -
+                                                                            {{expnse.staff_id.company.pincode}}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div class="col-4"></div>
+                                                                    {% if expnse.party_id %}
+                                                                    <div class="col-4 pr-0" >
+                                                                        <label class="text-white w-100 p-1 mb-1"
+                                                                            style="border-top-right-radius: 4vh; border-bottom-right-radius: 4vh; background-color: #615dff;"><b>PARTY
+                                                                                DETAILS</b></label>
+                                                                        <h5 class="text-secondary"
+                                                                            style="font-weight: bold;">
+                                                                            {{expnse.party_id.party_name}}</h5>
+                                                                        <p class="email"
+                                                                            style="font-weight: bold;color: #000;">
+                                                                            {{expnse.party_id.email| linebreaksbr}} </p>
+                                                                        <p class="address"
+                                                                            style="font-weight: bold;color: #000;">
+                                                                            {{expnse.party_id.address | linebreaksbr}}
+                                                                        </p>
+                                                                    </div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </section>
+
+                                                        <section class="product-area mt-2">
+                                                            <table class="table table-hover table-bordered "
+                                                                id="table2">
+                                                                <thead style="background-color: #615dff ;">
+                                                                    <tr>
+                                                                        <td
+                                                                            style="text-align: center; font-weight:bold; color:black ">
+                                                                            Discription</td>
+
+                                                                            {% if expnse.cgst %}
+                                                                        <td style="font-weight:bold; color:black;">Tax
+                                                                        </td>
+                                                                        {% endif %}
+
+                                                                        <td style="font-weight:bold; color:black">Total
+                                                                        </td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody style="border: 1px solid #615dff;">
+                                                                    {% for i in elist %}
+                                                                    <tr>
+                                                                        <td style="color:black; text-align: center;">
+                                                                            {{i.discription}}</td>
+                                                                        {% if expnse.cgst %}
+                                                                        <td style="color:black;">{{i.tax}}
+                                                                        </td>
+                                                                        {% endif %}
+                                                                        <td style="color:black">{{i.amount}}</td>
+
+                                                                    </tr>
+                                                                    {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </section>
+
+                                                        <section class="balance-info">
+                                                            <div class="row mt-3">
+                                                                <div class="col-4"></div>
+                                                                <div class="col-4"></div>
+                                                                <div class="col-4"><br><br>
+                                                                    <table class="table table-borderless">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td style="color: #000;">Sub Total</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">
+                                                                                    {{expnse.Sub_total}}</td>
+                                                                            </tr>
+
+                                                                            {% if expnse.cgst %}
+                                                                            <tr >
+                                                                                <td style="color: #000;">CGST</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">{{expnse.cgst}}
+                                                                                </td>
+
+                                                                            </tr>
+                                                                            
+                                                                            <tr>
+                                                                                <td style="color: #000;">SGST</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">{{expnse.sgst}}
+                                                                                </td>
+                                                                            </tr>
+
+
+                                                                            <tr>
+                                                                                <td style="color: #000;">Tax Amount</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">
+                                                                                    {{expnse.tax_amount}}</td>
+                                                                            </tr>
+                                                                            {% endif %}
+                                                                            <tr>
+                                                                                <td style="color: #000;">Adjustment</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">
+                                                                                    {{expnse.adjustment}}</td>
+                                                                            </tr>
+
+                                                                        </tbody>
+                                                                    </table>
+                                                                    <hr style="background-color: #000000;">
+                                                                    <table class="table table-borderless">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <th style="color: #000;">Grand Total
+                                                                                    &nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                                                                <th style="color: #000; ">:</th>
+                                                                                <th
+                                                                                    style="color: #000; text-align: center;">
+                                                                                    {{expnse.total}}</th>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- template3 -->
+                                        <div id="whatToPrint3" class="printTemplates template3" style="display: none;">
+                                            <div class="my-5 page" size="A4">
+                                                <div class="" id="printdiv3">
+                                                    <div class="row">
+                                                        <div class="col-sm-12"
+                                                            style="background-image: linear-gradient(#3dd9eb, #615dff); color: white;">
+                                                            <br>
+                                                            <p style="font-size: 4vh; text-align: center;">EXPENSE BILL
+                                                            </p>
+                                                            <p style=" text-align: center;">
+                                                                <b>{{expnse.staff_id.company.company_name}}</b><br>
+                                                                <!-- {{expnse.staff_id.company.company_name}} <br> -->
+                                                                {{expnse.staff_id.company.address}} <br>
+                                                                {{expnse.staff_id.company.city}},
+                                                                {{expnse.staff_id.company.state}}<br>
+                                                                {{expnse.staff_id.company.user.email}}
+                                                                <br>
+                                                            </p>
+                                                        </div>
+                                                        <div class="row col-12">
+                                                            <div class="col-md-1"></div>
+                                                            <div class="col-5" >
+                                                                <br><br><br>
+                                                                {% if expnse.party_id %}
+                                                                <p style="color:black;"> <span
+                                                                        style=" font-weight: bold;">PARTY: </span><br>
+                                                                    {{expnse.party_id.party_name}}<br>
+                                                                    {{expnse.party_id.email}}<br>
+                                                                    {{expnse.party_id.address|linebreaksbr }}
+                                                                </p>
+                                                                {% endif %}
+                                                            </div>
+                                                            <div class="col-md-2"></div>
+                                                            <div class="col-4">
+                                                                <br><br>
+                                                                <table class="table table-borderless">
+                                                                    <tbody>
+                                                                        <tr style="font-size: 12px;">
+                                                                            <td style="color: #000; font-weight: bold;">
+                                                                                EXP No : </td>
+                                                                            <td style="color: #000; text-align: left;">
+                                                                                EXP_0{{ expnse.EXP_NO }}</td>
+                                                                        </tr>
+                                                                        <tr style="font-size: 12px;">
+                                                                            <td style="color: #000; font-weight: bold;">
+                                                                                EXP Date : </td>
+                                                                            <td style="color: #000; text-align: left;">
+                                                                                {{expnse.expense_date | date:'d-m-Y'}}
+                                                                            <td>
+                                                                        </tr>
+                                                                    </tbody>
+
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                        <div class="col-md-10"><br>
+                                                            <table
+                                                                class="table table-hover table-bordered  template3table"
+                                                                id="table3" style="border:1px solid black">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <td
+                                                                            style="text-align: center; font-weight:bold; color:black ">
+                                                                            Discription</td>
+
+                                                                        {% if expnse.cgst %}
+                                                                        <td style="font-weight:bold; color:black;">Tax
+                                                                        </td>
+                                                                        {% endif %}
+
+                                                                        <td style="font-weight:bold; color:black">Total
+                                                                        </td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {% for i in elist %}
+                                                                    <tr>
+                                                                        <td style="color:black; text-align: center;">
+                                                                            {{i.discription}}</td>
+                                                                        {% if expnse.cgst %}    
+                                                                        <td style="color:black;">{{i.tax}}
+                                                                        </td>
+                                                                        {% endif %}
+                                                                        <td style="color:black">{{i.amount}}</td>
+
+                                                                    </tr>
+                                                                    {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <section class="balance-info">
+                                                        <div class="row">
+                                                            <div class="col-md-7"></div>
+                                                            <div class="col-md-4">
+                                                                <br>
+                                                                <table class="table table-borderless">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td style="color: #000;">Sub Total</td>
+                                                                            <td style="color: #000;">:</td>
+                                                                            <td class="text-right" style="color: #000;">
+                                                                                {{expnse.Sub_total}}</td>
+                                                                        </tr>
+
+                                                                        {% if expnse.cgst %}
+                                                                            <tr >
+                                                                                <td style="color: #000;">CGST</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">{{expnse.cgst}}
+                                                                                </td>
+
+                                                                            </tr>
+                                                                            
+                                                                            <tr>
+                                                                                <td style="color: #000;">SGST</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">{{expnse.sgst}}
+                                                                                </td>
+                                                                            </tr>
+
+
+                                                                            <tr>
+                                                                                <td style="color: #000;">Tax Amount</td>
+                                                                                <td style="color: #000;">:</td>
+                                                                                <td class="text-right"
+                                                                                    style="color: #000;">
+                                                                                    {{expnse.tax_amount}}</td>
+                                                                            </tr>
+                                                                            {% endif %}
+                                                                        <tr>
+                                                                            <td style="color: #000;">Adjustment</td>
+                                                                            <td style="color: #000;">:</td>
+                                                                            <td class="text-right" style="color: #000;">
+                                                                                {{expnse.adjustment}}</td>
+                                                                        </tr>
+
+                                                                    </tbody>
+                                                                </table>
+                                                                <hr style="background-color: #000000;">
+                                                                <table class="table table-borderless">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <th style="color: #000;">Grand Total
+                                                                                &nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                                                            <th style="color: #000; ">:</th>
+                                                                            <th
+                                                                                style="color: #000; text-align: center;">
+                                                                                {{expnse.total}}</th>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="templateToggle"
+                                        class="templateToggleSegment mt-3 mb-0 w-100 d-flex justify-content-center">
+                                        <button id="toggleTemplate1"
+                                            onclick="toggleTemplate('whatToPrint1','toggleTemplate1')"
+                                            class="btn btn-outline-primary bg-gradientt btn-sm m-2 active templateToggleButtons">1</button>
+                                        <button id="toggleTemplate2"
+                                            onclick="toggleTemplate('whatToPrint2','toggleTemplate2')"
+                                            class="btn btn-outline-primary bg-gradientt btn-sm m-2 templateToggleButtons">2</button>
+                                        <button id="toggleTemplate3"
+                                            onclick="toggleTemplate('whatToPrint3','toggleTemplate3')"
+                                            class="btn btn-outline-primary bg-gradientt btn-sm m-2 templateToggleButtons">3</button>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    function toggleDropdown() {
+        // Toggle the display of the dropdown content
+        // Toggle the display of the dropdown content
+        var dropdownContent = document.getElementById("myDropdown");
+        dropdownContent.style.display = (dropdownContent.style.display === "block") ? "none" : "block";
+    }
+</script>
+
+<script>
+    function updateDateTime() {
+        var currentDate = new Date();
+        var dateTimeString = currentDate.toLocaleString();
+        document.getElementById('datetimedisplay').textContent = dateTimeString;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+</script>
+
+<script>
+    l = parseInt('{{itm_len}}')
+    place = '{{pbill.supplyplace}}'
+    for (var i = 1; i <= l; i++) {
+        val = document.getElementById('tax' + i).innerText
+        tax = val.split('[')[1];
+        tax = tax.split(']')[0]
+        if (place == 'State') {
+
+            document.getElementById('taxval' + i).innerText = 'GST' + tax;
+        } else {
+            document.getElementById('taxval' + i).innerText = 'IGST' + tax;
+
+        }
+        console.log(tax)
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#templates').css({ 'border-bottom': '3px solid rgba(0, 0, 0, 0.548)' })
+        $('#slip a').removeClass('text-dark')
+        $('#templates a').addClass('text-dark')
+        $('#slip').css({ 'border-bottom': 'none' })
+        $('#templatediv').attr('hidden', false)
+        $('#slipdiv').attr('hidden', true)
+
+        $('#templates').on('click', function () {
+            $(this).css({ 'border-bottom': '3px solid rgba(0, 0, 0, 0.548)' })
+            $('#slip a').removeClass('text-dark')
+            $('#templates a').addClass('text-dark')
+            $('#slip').css({ 'border-bottom': 'none' })
+            $('#templatediv').attr('hidden', false)
+            $('#slipdiv').attr('hidden', true)
+            document.getElementById('slipdiv').style.display = 'none';
+        })
+    })
+
+    $(document).ready(function () {
+        $('#slip').on('click', function () {
+            $('#slip').css({ 'border-bottom': '3px solid rgba(0, 0, 0, 0.548)' })
+            $('#templates a').removeClass('text-dark')
+            $('#slip a').addClass('text-dark')
+            $('#templates').css({ 'border-bottom': 'none' })
+            $('#templatediv').attr('hidden', true)
+            $('#slipdiv').attr('hidden', false)
+            document.getElementById('slipdiv').style.display = 'block';
+        })
+    })
+
+    function toggleTemplate(templateId, buttonId) {
+        $('.printTemplates').css('display', 'none');
+        $('#' + templateId).css('display', 'block');
+        $('.templateToggleButtons').removeClass('active');
+        $('#' + buttonId).addClass('active');
+        scrollToTop();
+
+    }
+
+    function scrollToTop() {
+        // Scroll to the top of the page with smooth scrolling
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+</script>
+
+<!-- Include jQuery first -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include html2pdf library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<!-- Then add another script tag for your JavaScript code -->
+<script>
+    function pdf() {
+        event.preventDefault();
+
+        var print1 = document.getElementById('whatToPrint1');
+        var print2 = document.getElementById('whatToPrint2');
+        var print3 = document.getElementById('whatToPrint3');
+        var print4 = document.getElementById('slipdiv');
+        var element;
+
+        if (window.getComputedStyle(print1).display !== 'none') {
+            element = document.getElementById('printdiv1');
+        } else if (window.getComputedStyle(print2).display !== 'none') {
+            element = document.getElementById('printdiv2');
+        } else if (window.getComputedStyle(print3).display !== 'none') {
+            element = document.getElementById('printdiv3');
+        } else if (window.getComputedStyle(print4).display !== 'none') {
+            element = document.getElementById('printslip');
+        }
+
+        var opt = {
+            margin: 1,
+            filename: 'ExpenseBill.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        try {
+            html2pdf().set(opt).from(element).save();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+</script>
+
+
+<script>
+    function printfun() {
+        print4 = document.getElementById('slipdiv')
+        if (print4.style.display !== 'none') {
+            var printContents = document.getElementById("slipdiv").innerHTML;
+        } else {
+            var printContents = document.getElementById("whatToPrint").innerHTML;
+        }
+        var $printerDiv = $('<div class="printContainer"></div>');
+        $printerDiv.html(printContents);
+        $('body').append($printerDiv).addClass("printingContent");
+        window.print();
+        $printerDiv.remove();
+        $('body').removeClass("printingContent");
+    }
+</script>
+
+{% endblock %}

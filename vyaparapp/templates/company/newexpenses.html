@@ -1,0 +1,1460 @@
+<!-- create by athul -->
+
+{% extends 'company/src/html/base.html' %}
+
+{% block content %}
+{% load static %}
+
+
+
+
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 70px;
+        height: 27px;
+        margin: 0 10px;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+
+    }
+
+    .switch input {
+        display: none;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 23px;
+        width: 23px;
+        top: 2px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50px;
+    }
+
+    input:checked+.slider {
+        background-color: rgb(84, 196, 240);
+
+    }
+
+    input:checked+.slider:before {
+        transform: translateX(44px);
+
+    }
+
+    @media (max-width:768px) {
+
+        .table {
+            width: 250% !important;
+        }
+
+        #pt {
+            padding-bottom: 3px !important;
+            margin-bottom: 10px !important;
+        }
+
+
+    }
+</style>
+
+<body style="background-color: rgba(176, 199, 205, 0.4);">
+
+    <div class="body-wrapper">
+        <div class="container-fluid">
+            <div class="container-fluid mt-4 pb-2"
+                style="background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                <center>
+                    <h1 class="h1 pt-3" style="text-transform:uppercase;font-family: 'Times New Roman', Times, serif;">
+                        <b>ADD
+                            EXPENSES</b>
+                    </h1>
+                </center>
+                <hr>
+            </div>
+            <div class="container-fluid mt-4 pb-2 p-3"
+                style="background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                <form action="{% url 'create_expense' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row p-2">
+                        <div class="col-md-9"></div>
+                        <div class="col-md-3"><input type="text" class="form-control"
+                                style="border: none; border-bottom: 2px solid skyblue;" placeholder="EXP NO"
+                                value="NO : 0{{enpno}}" readonly></div>
+                    </div>
+                    <div class="row pb-1 ps-4 p-3">
+                        <div class="col-md-1">
+                            <h5 class="h5" style="font-family: 'Times New Roman', Times, serif;"><b>PARTY</b></h5>
+
+                        </div>
+                        <div class="col-md-1">
+                            <label class="switch">
+                                <input type="checkbox" id="mycheckbox" onclick="switchon()">
+                                <span class="slider"></span>
+
+                            </label>
+                        </div>
+
+
+                    </div>
+                    <div class="row pb-3 p-3" id="pr1" >
+
+                        <div class="col-md-4 mb-3" id="party1" style="display: none;">
+                            <div class="row">
+                                <label for=""><b>Party</b></label>
+                                <div class="d-flex">
+                                    <select name="party" id="party" class="form-control"
+                                        style="border: 2px solid skyblue;border-radius: 10px 0px 0px 10px;">
+                                        <option value="" selected>Choose Party</option>
+
+                                        {% for p in parties %}
+
+                                        <option value="{{p.id}}" data-terms="">{{p.party_name}}</option>
+                                        {% endfor %}
+                                        <option id="load_new_party" hidden value=""></option>
+
+                                    </select>
+
+
+
+                                    <button id="modal_closing" style="border-radius: 0px 10px 10px 0px;"
+                                        title="Add Party" type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                                        data-bs-target="#partycreation" data-bs-whatever="@mdo"><i class="ti ti-plus"
+                                            style="font-weight: bold;"></i></button>
+                                </div>
+
+                            </div>
+
+
+                            <div class="row mt-3 " id="ob" style="display: none;">
+
+                                <label>Opening Balance : <span id="myLabel" style="font-weight: bold;"></span></label>
+                                <!-- <input type="text" class="form-control" style="border: none; border-bottom: 2px solid red;"
+                            placeholder="Balance" id="party_balance"> -->
+
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="party3">
+                            <div class="row ps-3 pt-0 pb-0 p-3" id="pe" style="display: none;">
+                                <label for=""><b>Email</b></label>
+                                <input type="text" id="party_email" class="form-control"
+                                    style="border: 2px solid skyblue;" placeholder="Party email" readonly>
+                            </div>
+                            <div class="row mt-4 mb-3 ps-3 pt-0 pb-0 p-3" id="pc" style="display: none;">
+                                <label for=""><b>Contact</b></label>
+                                <input type="text" id="party_contact" class="form-control"
+                                    style="border: 2px solid skyblue;" placeholder="Party contact" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4  mb-5" style="display: none;" id="party2">
+                            <label for=""><b>Address</b></label>
+                            <textarea name="" cols="30" rows="5" class="form-control" id="party_address"
+                                style="border: 2px solid skyblue;" placeholder="Party  Address" readonly></textarea>
+
+                        </div>
+
+
+
+                    </div>
+                    <div class="row pt-2 p-3 ">
+                        <div class="col-md-4 d-flex mb-3">
+                            <select name="ex_category" id="ex_category" class="form-control"
+                                style="border: 2px solid skyblue;border-radius: 10px 0px 0px 10px;" required>
+                                <option value="">Choose Expense Category</option>
+
+
+                                {% for c in Category %}
+                                <option value="{{c.id}}" data-terms="">{{c.expense_category}}
+                                </option>
+                                {% endfor %}
+
+                                <option id="load_new_unit" hidden value=""></option>
+
+                            </select>
+                            <a class="btn btn-secondary ml-1" role="button" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal" data-bs-whatever="@mdo"
+                                style="border-radius: 0px 10px 10px 0px;" title="Add Category"><i class="ti ti-plus"
+                                    style="font-weight: bold;"></i></a>
+                        </div>
+                        <div class="col-md-5"></div>
+                        <div class="col-md-3">
+                            <input type="date" name="ex_date" class="form-control" id="dateInput"
+                                style="border: 2px solid skyblue;" required>
+                            <script>
+                                // currentDate script
+                                const dateInput = document.getElementById("dateInput");
+            
+                                const current_Date = new Date();
+                                const formattedDate = current_Date.toISOString().split('T')[0];
+                                dateInput.value = formattedDate;
+                                
+                            </script>
+                        </div>
+                    </div>
+                    <div class="row pt-4 ps-4 p-3">
+                        <div class="col-md-1 d-flex">
+                            <h5 class="h5" style="font-family: 'Times New Roman', Times, serif;"><b>GST</b></h5>
+
+                        </div>
+                        <div class="col-md-1">
+                            <label class="switch">
+                                <input type="checkbox" id="mycheckbox1" onclick="switchon1()">
+                                <span class="slider"></span>
+
+                            </label>
+                        </div>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table id="table" class="table table-responsive  table-bordered mt-3" id="items_table"
+                            style="background-color: rgba(0, 195, 255, 0.205);border: 1px solid rgb(181, 181, 181);"
+                            onchange="calc()">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th scope="col" class="text-center col-3">Discription</th>
+
+
+                                    <th scope="col" class="text-center" id="tax" style="display: none;">Tax</th>
+
+                                    <th scope="col" class="text-center">Amount</th>
+                                    <th></th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="dc-items-table-body">
+                                <tr id='addr01'>
+                                    <td>1</td>
+                                    <td style="width: 40%;" id="td"><input type="text" class="form-control"
+                                            style="background-color: white;border: 2px solid skyblue;" name="dis[]">
+                                    </td>
+                                    <td id="select_tax1" style="display: none;" name="">
+                                        <select name="tax[]" id="tax" class="tax form-control"
+                                            style="border-bottom: 2px solid skyblue;background-color: white;"
+                                            vale="0.0">
+                                            <option value="0.0">Choose tax</option>
+
+
+                                            <option value=0 data-terms="">GST 0%</option>
+                                            <option value=3>GST 3%</option>
+                                            <option value=5>GST 5%</option>
+                                            <option value=12>GST 12%</option>
+                                            <option value=18>GST 18%</option>
+                                            <option value=28>GST 28%</option>
+                                            <option value=0>IGST 0%</option>
+                                            <option value=3>IGST 3%</option>
+                                            <option value=5>IGST 5%</option>
+                                            <option value=12>IGST 12%</option>
+                                            <option value=18>IGST 18%</option>
+                                            <option value=28>IGST 28%</option>
+
+                                        </select>
+
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <input type="text" id="amount1" class="amount form-control" name="amount[]"
+                                                style="background-color: white;border: 2px solid skyblue;"
+                                                oninput="calc()">
+                                            <!-- <a class="btn btn-light ml-1" role="button" 
+                                 style="border-radius: 0px 10px 10px 0px;border: 1px solid skyblue;"><b>/-</b></a> -->
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <center><button type="button" id="1" class="btn remove_row btn-danger"
+                                                title="Remove Row"><i class="fa fa-times"></i></button></center>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+
+                        </table>
+                        <button type="button" id="add_row_btn" class="btn btn-outline-secondary" title="Add Row"><i
+                                class="fa fa-plus"></i></button>
+                    </div>
+
+                    <div class="row p-3 mb-5">
+                        <div class="col-md-5 p-5" id="pt">
+                            <!-- <div class="d-flex"> -->
+                            <select name="pay_method" id="pay_method" class="form-control mt-5 mb-5"
+                                style="border-radius: 10px;border-bottom: 2px solid skyblue;">
+                                <option value="">Choose Payment type.......</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Cheque">Cheque</option>
+                                <option value="UPI">UPI</option>
+                                {% for b in bank %}
+                                <option value="{{b.id}}">{{b.bank_name}}</option>
+                                {% endfor %}
+                            </select>
+                            <!-- <a class="btn btn-secondary mt-5 mb-5" role="button" data-target="#employeecreation"
+                                data-toggle="modal" style="border-radius: 0px 10px 10px 0px;"
+                                title="Add Payment Type"><i class="ti ti-plus" style="font-weight: bold;"></i></a> -->
+                            <!-- </div> -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div style="display:none;" id="chequediv">
+                                        <label class="col-form-label">Cheque ID</label>
+                                        <input type="text" class="form-control border-secondary" name="cheque_id"
+                                            id="cheque_id" placeholder="Enter Cheque ID"
+                                            style="color: black;background-color: white;">
+                                    </div>
+
+                                    <div style="display:none;" id="upidiv">
+                                        <label class="col-form-label">UPI ID</label>
+                                        <input type="text" class="form-control border-secondary" name="upi_id"
+                                            id="upi_id" placeholder="Enter UPI ID"
+                                            style="color: black;background-color: white;">
+                                    </div>
+
+                                    <div style="display:none;" id="bnkdiv">
+                                        <label class="col-form-label">Bank Account</label>
+                                        <input type="text" class="form-control border-secondary" name="bnk_id"
+                                            id="bnk_id" style="color: black;background-color: white;" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col"></div>
+                        <div class="col-md-6"
+                            style=" background-color: rgba(0, 195, 255, 0.205);">
+                            <div class="row p-2">
+
+                                <div class="col-md-4">Sub Total</div>
+                                <div class="col-md-8"><b style="margin-right: 10px;">:</b> <input type="number"
+                                        value="0.0" class="subtotal" id="sub_total" name="sub_total"
+                                        style="border: skyblue; width: 90%;border-bottom: 3px solid skyblue;border-radius: 10px;padding: 5px; "
+                                        readonly>
+                                </div>
+
+                            </div>
+                            <div class="row p-2" id="tax_cgst" style="display: none;">
+                                <div class="d-flex">
+                                    <div class="col-md-4">CGST</div>
+                                    <div class="col-md-8"><b style="margin-right: 10px;">:</b> <input type="number"
+                                            value="0.0" id="cgst" name="cgst" class="cgst"
+                                            style="border: skyblue; width: 90%;border-bottom: 3px solid skyblue;border-radius: 10px;padding: 5px; "
+                                            readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row p-2" id="tax_sgst" style="display: none;">
+                                <div class="d-flex">
+                                    <div class="col-md-4">SGST</div>
+                                    <div class="col-md-8"><b style="margin-right: 10px;">:</b> <input type="number"
+                                            value="0.0" id="sgst" name="sgst" class="sgst"
+                                            style="border: skyblue; width: 90%;border-bottom: 3px solid skyblue;border-radius: 10px;padding: 5px; "
+                                            readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row p-2" id="tax_taxamount" style="display: none;">
+                                <div class="d-flex">
+                                    <div class="col-md-4">Tax Amount</div>
+                                    <div class="col-md-8"><b style="margin-right: 10px;">:</b> <input type="text"
+                                            value="0.0" class="taxamount" id="tax_amount" name="tax_amount"
+                                            style="border: skyblue; width: 90%;border-bottom: 3px solid skyblue;border-radius: 10px;padding: 5px; "
+                                            readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row p-2">
+                                <div class="col-md-4">Adjustmment</div>
+                                <div class="col-md-8"><b style="margin-right: 10px;">:</b> <input type="number"
+                                        value="0.0" name="adjustment" class="adjustmment" id="adjustmment"
+                                        oninput="adjustment1()"
+                                        style="border: skyblue; width: 90%;border-bottom: 3px solid skyblue;border-radius: 10px;padding: 5px; ">
+                                </div>
+                            </div>
+                            <div class="row p-2">
+                                <div class="col-md-4">Total</div>
+                                <div class="col-md-8"><b style="margin-right: 10px;">:</b> <input type="number"
+                                        value="0.0" class="total" id="total" name="total"
+                                        style="border: skyblue; width: 90%;border-bottom: 3px solid skyblue;border-radius: 10px;padding: 5px; "
+                                        readonly>
+                                </div>
+                            </div>
+                            <div class="row p-2">
+                                <div class="col-md-4">Paid</div>
+                                <div class="col-md-8"><b style="margin-right: 10px;">:</b> <input type="number"
+                                        id="paid" value="0.0" oninput="paid1()" name="paid"
+                                        style="border: skyblue; width: 90%;border-bottom: 3px solid skyblue;border-radius: 10px;padding: 5px; ">
+                                </div>
+                            </div>
+                            <div class="row p-2">
+                                <div class="col-md-4">Balance</div>
+                                <div class="col-md-8"><b style="margin-right: 10px;">:</b> <input type="number"
+                                        value="0.0" id="balance" name="balance"
+                                        style="border: skyblue; width: 90%;border-bottom: 3px solid skyblue;border-radius: 10px;padding: 5px; "
+                                        readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row p-3">
+                        <div class="col-md-2"></div>
+
+                        <div class="col-md-8">
+                            <center>
+                                <input type="submit" class="btn btn-secondary" value="SAVE">
+
+                                <a href="" class="btn btn-secondary">SAVE & NEW</a>
+                            </center>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+
+
+    <script>
+
+        $(document).ready(function () {
+            $("#pay_method").change(function () {
+                var x = $('#pay_method').val();
+                if (x === 'Cash') {
+                    $('#chequediv').hide()
+                    $('#bnkdiv').hide()
+                    $('#upidiv').hide()
+                    document.getElementById('cheque_id').value = null
+                    document.getElementById('upi_id').value = null
+                    document.getElementById('bnk_id').value = null
+                } else if (x === 'Cheque') {
+                    $('#chequediv').show()
+                    $('#bnkdiv').hide()
+                    $('#upidiv').hide()
+                    document.getElementById('upi_id').value = null
+                    document.getElementById('bnk_id').value = null
+                } else if (x === 'UPI') {
+                    $('#upidiv').show()
+                    $('#bnkdiv').hide()
+                    $('#chequediv').hide()
+                    document.getElementById('cheque_id').value = null
+                    document.getElementById('bnk_id').value = null
+                } else {
+                    $('#bnkdiv').show()
+                    $('#chequediv').hide()
+                    $('#upidiv').hide()
+                    document.getElementById('cheque_id').value = null
+                    document.getElementById('upi_id').value = null
+
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'bankdata' %}",
+                        data: {
+                            id: x,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function (response) {
+                            document.getElementById('cheque_id').value = null
+                            document.getElementById('upi_id').value = null
+                            document.getElementById("bnk_id").value = response.bank_no;
+                        }
+                    });
+                }
+            });
+        });
+
+
+
+
+
+
+
+        $(document).on('change', '#party', function () {
+            var party = $('#party').val();
+            $.ajax({
+                type: "GET",
+                url: "{% url 'partydata' %}",
+                data: {
+                    id: party
+                },
+                success: function (response) {
+                    if (response) {
+                        console.log(response);
+                        if (response.contact) {
+                            console.log(response.contact);
+                            document.getElementById('party_contact').value = response.contact;
+                            document.getElementById('pc').style.display = 'block';
+                        } else {
+                            document.getElementById('pc').style.display = 'none';
+                            console.log("contact not found in response.");
+                        }
+                        if (response.email) {
+                            console.log(response.email);
+
+                            document.getElementById('party_email').value = response.email;
+                            document.getElementById('pe').style.display = 'block';
+
+                        } else {
+                            document.getElementById('pe').style.display = 'none';
+                            console.log("email not found in response.");
+                        }
+                        if (response.address) {
+                            console.log(response.address);
+                            document.getElementById('party_address').value = response.address;
+                            document.getElementById('party2').style.display = 'block';
+                        } else {
+                            document.getElementById('party2').style.display = 'none';
+                            console.log("Address not found in response.");
+                        }
+                        if (response.openingbalance) {
+                            console.log(response.openingbalance);
+                            document.getElementById('ob').style.display = 'block';
+
+                            if (response.payment == 'To Pay') {
+
+                                document.getElementById("myLabel").innerHTML = response.openingbalance;
+                                document.getElementById("myLabel").style.color = "red"
+                            }
+                            else {
+
+                                document.getElementById("myLabel").innerHTML = response.openingbalance;
+                                document.getElementById("myLabel").style.color = "green"
+                            }
+                        } else {
+
+                            console.log("Balance not found in response.");
+                            document.getElementById('ob').style.display = 'none';
+                        }
+
+                    } else {
+                        console.log("Empty response or incorrect data format.");
+                    }
+                },
+
+            });
+        });
+
+
+
+
+        function switchon() {
+            var checkbox = document.getElementById('mycheckbox');
+            var party1 = document.getElementById('party1');
+            var party2 = document.getElementById('party2');
+            var party3 = document.getElementById('party3');
+            var hr = document.getElementById('hr');
+            var op = document.getElementById('ob');
+           
+           
+
+            if (checkbox.checked == true) {
+                party1.style.display = 'block';
+               
+
+                hr.style.display = 'block';
+               
+
+            } else {
+                party1.style.display = 'none';
+                party2.style.display = 'none';
+                party3.style.display = 'none';
+                hr.style.display = 'none';
+                op.style.display = 'none'
+            }
+        }
+        function switchon1() {
+            var checkbox = document.getElementById('mycheckbox1');
+            var tax = document.getElementById('tax');
+            var cgst = document.getElementById('tax_cgst')
+            var sgst = document.getElementById('tax_sgst')
+            var taxamount = document.getElementById('tax_taxamount')
+            var roinc = $("#dc-items-table-body tr").length;
+            var i;
+
+            for (i = 1; i <= roinc; i++) {
+                var select_tax = document.getElementById('select_tax' + i);
+
+                if (checkbox.checked == true) {
+                    tax.style.display = 'block';
+
+
+                    if (select_tax + i) {
+                        select_tax.style.display = 'block';
+                    }
+
+                } else {
+                    tax.style.display = 'none';
+
+                    if (select_tax + i) {
+                        select_tax.style.display = 'none';
+                    }
+                }
+            }
+            if (checkbox.checked == true) {
+
+                cgst.style.display = 'block';
+                sgst.style.display = 'block';
+                taxamount.style.display = 'block';
+            } else {
+
+                cgst.style.display = 'none';
+                sgst.style.display = 'none';
+                taxamount.style.display = 'none';
+            }
+
+
+
+        }
+
+
+        $('#table').on('click', '.remove_row', function () {
+            $(this).closest('tr').remove();
+            calc();
+        });
+
+
+
+        $(document).ready(function () {
+            $('#add_row_btn').click(function () {
+                var roinc = $("#dc-items-table-body tr").length;
+                var checkbox = document.getElementById('mycheckbox1');
+                roinc++;
+
+                var html = `<tr id='addr0${roinc}'>
+                        <td class="item_sl_num">${roinc}</td>
+                        <td>
+                            <input type="text" class="form-control" name='dis[]' style="background-color: white;border: 2px solid skyblue;">
+                        </td>`;
+
+                if (checkbox.checked == true) {
+                    html += `<td id="">
+                        <select  id="select_tax${roinc}" name='tax[]' class="tax form-control" style="border-bottom: 2px solid skyblue;background-color: white;" value='0.0' required>
+                            <option value="">Choose tax</option>
+                            <option value="0" data-terms="">GST 0%</option>
+                                        <option value="3" data-terms="">GST 3%</option>
+                                        <option value="5" data-terms="">GST 5%</option>
+                                        <option value="12" data-terms="">GST 12%</option>
+                                        <option value="18" data-terms="">GST 18%</option>
+                                        <option value="28" data-terms="">GST 28%</option>
+                                        <option value="0" data-terms="">IGST 0%</option>
+                                        <option value="3" data-terms="">IGST 3%</option>
+                                        <option value="5" data-terms="">IGST 5%</option>
+                                        <option value="12" data-terms="">IGST 12%</option>
+                                        <option value="18" data-terms="">IGST 18%</option>
+                                        <option value="28" data-terms="">IGST 28%</option>
+                        </select>
+                    </td>`;
+                }
+
+                html += `<td>
+                    <div class="d-flex">
+                        <input type="text" class="amount form-control" id='amount${roinc}' name='amount[]' style="background-color: white;border: 2px solid skyblue;">
+                    </div>
+                </td>
+                <td>
+                    <center><button type="button" id="1" class="btn remove_row btn-danger" title="Remove Row"><i class="fa fa-times"></i></button></center>
+                </td>
+            </tr>`;
+
+                $('#dc-items-table-body').append(html);
+
+            });
+            ;
+        });
+
+
+
+
+
+        $('#dc-items-table-body').on('keyup change', function () {
+            calc();
+        });
+
+        function calc() {
+            var totalSubtotal = 0;
+            var checkbox = document.getElementById('mycheckbox1');
+            if (checkbox.checked == true) {
+                $('#dc-items-table-body tr').each(function () {
+                    var html = $(this).html();
+                    if (html.trim() !== '') {
+                        var price = $(this).find('.amount').val();
+                        // var price = document.getElementById('amount1').value;
+                        console.log(price);
+
+                        var tax = $(this).find('.tax').val();
+                        console.log(tax);
+
+                        if (price !== undefined && tax !== undefined && !isNaN(price) && !isNaN(tax)) {
+
+                            var subtotal = parseFloat(price);
+                            console.log(subtotal); // Ensure subtotal is a valid number
+
+                            // Accumulate subtotals
+                            totalSubtotal += subtotal;
+
+                            // Display the cumulative subtotal in the 'sub_total' field
+                            document.getElementById('sub_total').value = totalSubtotal.toFixed(2);
+
+                            // Calculate tax amount using parseFloat for numeric operations
+                            var taxAmount = parseFloat(price) * (parseFloat(tax) / 100);
+                            console.log(taxAmount); // Ensure taxAmount is a valid number
+                            document.getElementById('tax_amount').value = taxAmount;
+                            // $(this).find('.taxamount').val(taxAmount);
+                            calc_total();
+                        }
+                    }
+                });
+            }
+            else {
+                $('#dc-items-table-body tr').each(function () {
+                    var html = $(this).html();
+                    if (html.trim() !== '') {
+                        var price = $(this).find('.amount').val();
+
+                        console.log(price);
+
+                        // var tax = $(this).find('.tax').val();
+                        // console.log(tax);
+
+                        if (price !== undefined && !isNaN(price)) {
+
+                            var subtotal = parseFloat(price);
+                            console.log(subtotal); // Ensure subtotal is a valid number
+
+                            // Accumulate subtotals
+                            totalSubtotal += subtotal;
+
+                            // Display the cumulative subtotal in the 'sub_total' field
+                            document.getElementById('sub_total').value = totalSubtotal.toFixed(2);
+
+
+                            // var taxAmount = parseFloat(price) * (parseFloat(tax) / 100);
+                            // console.log(taxAmount);
+                            // document.getElementById('tax_amount').value = taxAmount;
+                            // $(this).find('.taxamount').val(taxAmount);
+                            calc_total();
+                        }
+                    }
+                });
+            }
+        }
+
+        function calc_total() {
+            var checkbox = document.getElementById('mycheckbox1');
+            var total = 0; // Declare variables with var, let, or const
+            $('.subtotal').each(function () {
+                total += parseFloat($(this).val());
+            });
+
+
+
+
+            if (checkbox.checked == true) {
+
+                var taxamount = 0; // Declare variables with var, let, or const
+                $('.taxamount').each(function () {
+                    taxamount += parseFloat($(this).val());
+                });
+
+                $('#sub_total').val(total.toFixed(2));
+                $('#cgst').val((taxamount / 2).toFixed(2));
+                $('#sgst').val((taxamount / 2).toFixed(2));
+                $('#tax_amount').val(taxamount.toFixed(2));
+
+                var adj = parseFloat($("#adjustment").val()) || 0;
+                var gtot = taxamount + total + adj;
+                $('#total').val(gtot.toFixed(2));
+                $('#balance').val(gtot.toFixed(2));
+            }
+            else {
+                var adj = parseFloat($("#adjustment").val()) || 0;
+                var gtot = total + adj;
+                $('#total').val(gtot.toFixed(2));
+                $('#balance').val(gtot.toFixed(2));
+            }
+        }
+        function adjustment1() {
+
+            var subtot = parseFloat($('#sub_total').val());
+            if (subtot != 0.0) {
+                var tax = parseFloat($('#tax_amount').val()) || 0;
+                var ad = parseFloat($("#adjustmment").val()) || 0;
+                $('#total').val((subtot + tax + ad).toFixed(2)); // Fixed the calculation
+                $('#balance').val((subtot + tax + ad).toFixed(2));
+            }
+
+        }
+        function paid1() {
+            var tot = parseFloat($('#total').val())
+            var pa = parseFloat($('#paid').val())
+            $('#balance').val((tot - pa).toFixed(2));
+        }
+    </script>
+
+    <!-- category modal start -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel"><b>ADD EXPENSE CATEGORY</b></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <hr>
+                <div class="modal-body mb-1 pb-1">
+                    <!-- <form class="mb-0" action="{% url 'item_unit_create' %}" method="POST"></form> -->
+                    <form class="mb-0" action="" method="POST" id="unit_form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Expense category</label>
+                            <input type="text" class="form-control border-dark" id="item_unit_name_id"
+                                placeholder="ENTER CATEGORY HERE.." name="item_unit_name" required>
+                        </div>
+                        <div class="m-0 text-center">
+                            <!-- <label for="message-text" class="col-form-label  text-secondary fw-lighter">Example : PCS/BOX/LITER</label> -->
+                            <!-- <textarea class="form-control" id="message-text"></textarea> -->
+                        </div>
+                        <input hidden id="submit_unit_creation" type="submit">
+                        <div class="modal-footer d-flex justify-content-center mt-1">
+                            <button id="modal_cls_btn" type="button" class="btn btn-secondary ps-5 pe-5"
+                                data-bs-dismiss="modal">Close</button>
+                            <button id="add_btn" type="button" class="btn btn-primary ps-5 pe-5">ADD</button>
+                        </div>
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <!-- modal end -->
+
+    <script>
+        // $(document).on("submit", "#unit_form", function (e) {
+        //     e.preventDefault();
+        //     $.ajax({
+
+        //         type: 'POST',
+        //         url: "{% url 'create_expense_category' %}",
+
+        //         data: {
+        //             item_unit_name: $("#item_unit_name_id").val(),
+
+        //             csrfmiddlewaretoken: '{{ csrf_token }}'
+
+        //         },
+
+        //         success: function () {
+
+        //         },
+
+        //     });
+        //     $('#modal_cls_btn').click()
+        //     var a = '' + $('#item_unit_name_id').val()
+        //     a.toUpperCase()
+        //     $('#load_new_unit').val(a)
+        //     $('#load_new_unit').text(a)
+        //     $('#load_new_unit').prop('', true)
+        //     $('#load_new_unit').attr('hidden', false)
+        // });
+        // function submit_unit_creation_fn() {
+        //     $('#submit_unit_creation').click()
+        // }
+
+        
+
+
+
+        $(document).on("click", "#add_btn", function (e) {
+            
+            $.ajax({
+
+                type: 'POST',
+                url: "{% url 'create_expense_category' %}",
+                data: {
+                    item_unit_name: $('#item_unit_name_id').val(),
+                    
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function (response) {
+                    document.getElementById("unit_form").reset();
+                    $('#exampleModal').modal('hide');
+                    reloadCustomer1();
+                },
+            });
+        });
+
+
+
+
+
+        function reloadCustomer1() {
+            $.ajax({
+                url: "{% url 'expense_cat_dropdown' %}",
+                type: "GET",
+                dataType: "json",
+                data: $(this).serialize(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+
+                success: function (response) {
+                    id_list = response.id_list
+                    cat_list = response.cat_list
+                    var dropdown = $('#ex_category');
+                    dropdown.empty();
+                    dropdown.append(`<option value=' ' selected hidden>Choose Category</option>`);
+
+                    let select = document.getElementById("ex_category");
+                    for (let i = 0; i < id_list.length; i++) {
+                        let newOption = document.createElement("option");
+                        newOption.text = cat_list[i];
+                        newOption.value = id_list[i];
+                        select.appendChild(newOption);
+                    }
+                },
+            });
+        }
+    </script>
+
+
+
+
+    <!--add party modal start -->
+    <div class="modal fade" id="partycreation">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: rgba(144, 211, 117, 0.098);">
+                    <h3 class="m-3 text-secondary">ADD PARTY</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="background-color: rgba(144, 211, 117, 0.098);">
+                    <form action="" method="POST" autocomplete="off" id="modalCustomer"> 
+                        {% csrf_token %}
+                        <div class="bg-light bs p-4 rounded mb-5">
+                            <div id="main_form_div">
+                                <div class="row" style="margin-left: -1vh;">
+                                    <div class="col-md-4">
+                                        <label class="col-form-label" for="partyname" style="color: black;">Party Name</label>
+                                        <input type="text" class="form-control border-secondary" id="partyname" name="partyname" style="color: black;" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="col-form-label" style="color: black;">GSTIN</label>
+                                        <input type="text" class="form-control border-secondary" onchange="checkgst(this)" id="gstin" name="gstin" style="color: black;" placeholder="29APPCK7465F1Z1">
+                                        <div class="text-danger m-2" id="warngst"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="col-form-label" for="partyphno" style="color: black;">Mobile</label>
+                                        <input type="number" class="form-control border-secondary" id="partyphno" name="partyphno" style="color: black;" onchange="checkphone(this)" required>
+                                        <div class="text-danger m-2" id="warnphone"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p></p>
+                                    <hr class="p-0 m-0">
+                                    <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
+                                        <div class="">
+                                            <div class="row pb-0 mb-0">
+                                                <div id="gsthead" class="col text-center pb-2" >
+                                                    <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >GST & ADDRESS</a>
+                                                </div>
+                                                <div id="credithead" class="col text-center pb-2" >
+                                                    <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >CREDIT & BALANCES</a>
+                                                </div>
+                                                <div id="fieldhead" class="col text-center pb-2" >
+                                                    <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >ADDITIONAL FIELD</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="gsttemp" style="background-color: rgba(144, 211, 117, 0.098);">
+                                        <div class="row">
+                                            <div class="col-sm-12  col-md-1"></div>
+                                            <div class="col-sm-12 col-md-10 pb-4">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="col-form-label mt-4" style="color: black;">GST Type</label>
+                                                        <select class="form-control border-secondary" id="modalgsttype" name="modalgsttype" style="color: black; background-color: white;">
+                                                            <option selected value="" hidden>Select</option>
+                                                            <option value="Registered Party">Registered Party</option>
+                                                            <option value="Unregistered or Consumer">Unregistered or Consumer</option>
+                                                            <option value="Registered Business or Combosision">Registered Business or Combosision</option>
+                                                        </select>
+
+                                                        <label class="col-form-label mt-4" for="company" style="color: black;">Supply State</label>
+                                                        <select class="form-control border-secondary" name="splystate" id="splystate" style="color: black; background-color: white;">
+                                                            <option value="" selected hidden>Select</option>
+                                                            <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islands</option>
+                                                            <option value="Andhra Pradhesh">Andhra Pradhesh</option>
+                                                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                                            <option value="Assam">Assam</option>
+                                                            <option value="Bihar">Bihar</option>
+                                                            <option value="Chandigarh">Chandigarh</option>
+                                                            <option value="Chhattisgarh">Chhattisgarh</option>
+                                                            <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
+                                                            <option value="Daman anad Diu">Daman anad Diu</option>
+                                                            <option value="Delhi">Delhi</option>
+                                                            <option value="Goa">Goa</option>
+                                                            <option value="Gujarat">Gujarat</option>
+                                                            <option value="Haryana">Haryana</option>
+                                                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                                            <option value="Jharkhand">Jharkhand</option>
+                                                            <option value="Karnataka">Karnataka</option>
+                                                            <option value="Kerala">Kerala</option>
+                                                            <option value="Ladakh">Ladakh</option>
+                                                            <option value="Lakshadweep">Lakshadweep</option>
+                                                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                                            <option value="Maharashtra">Maharashtra</option>
+                                                            <option value="Manipur">Manipur</option>
+                                                            <option value="Meghalaya">Meghalaya</option>
+                                                            <option value="Mizoram">Mizoram</option>
+                                                            <option value="Nagaland">Nagaland</option>
+                                                            <option value="Odisha">Odisha</option>
+                                                            <option value="Pondicherry">Pondicherry</option>
+                                                            <option value="Punjab">Punjab</option>
+                                                            <option value="Rajasthan">Rajasthan</option>
+                                                            <option value="Sikkim">Sikkim</option>
+                                                            <option value="Tamil Nadu">Tamil Nadu</option>
+                                                            <option value="Telangana">Telangana</option>
+                                                            <option value="Tripura">Tripura</option>
+                                                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                                            <option value="Uttarakhand">Uttarakhand</option>
+                                                            <option value="West Bengal">West Bengal</option>
+                                                            <option value="Other Territory">Other Territory</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="col-form-label mt-4" style="color: black;">Billing Address</label>
+                                                        <textarea class="form-control border-secondary" name="baddress" id="baddress" rows="6" type="text" style="color: black; background-color: white;"></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="col-form-label mt-4" for="partyemail" style="color: black;">Email</label>
+                                                        <input type="email" class="form-control border-secondary" id="partyemail" name="partyemail" style="color: black; background-color: white;" required>
+                                                    </div>
+                                                </div>
+
+                                                <div class="text-start mt-5">
+                                                    <button id="gstnxt" class="btn btn-primary bg-gradient" type="button">NEXT</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+    
+                                    <div id="credittemp"style="background-color: rgba(144, 211, 117, 0.098);" hidden>
+                                        <div class="row">
+                                            <div class="col-sm-12  col-md-1"></div>
+                                            <div class="col-sm-12 col-md-10 pb-4">
+                                                <div class="row mt-4">
+                                                    <div class="col-md-6">
+                                                        <label class="col-form-label" style="color: black;" for="openbalance">Opening Balance  &nbsp; &nbsp; - </label>   &nbsp;&nbsp;&nbsp;
+                                                        <label class="col-form-label" style="color: black;">To Pay</label> &nbsp; &nbsp; 
+                                                        <input type="radio" class="radio-input border-secondary" id="toPayRadio" name="paymentType" value="To Pay"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                                        <label class="col-form-label" style="color: black;">To Receive</label> &nbsp; &nbsp;
+                                                        <input type="radio" class="radio-input border-secondary" id="toReceiveRadio" name="paymentType" value="To Receive">
+                                                        <input type="number" class="form-control border-secondary" id="openbalance"  name="openbalance" style="color: black; background-color: white;" value="0">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="col-form-label" style="color: black;" for="openbalance">Credit Limit</label>
+                                                        <input type="number" class="form-control border-secondary" id="crd_lmt"  name="crd_lmt" style="color: black; background-color: white;" value="0">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="col-form-label mt-4" style="color: black;">Date</label>
+                                                        <input type="date" class="form-control border-secondary" id="partydate" name="partydate" style="color: black; background-color: white;"  value="{{tod}}">
+                                                    </div>
+                                                </div>
+                                                <script>
+                                                    // currentDate script
+                                                    const dateInput1 = document.getElementById("partydate");
+                                
+                                                    const current_Date1 = new Date();
+                                                    const formattedDate1 = current_Date1.toISOString().split('T')[0];
+                                                    dateInput1.value = formattedDate1;
+                                                    
+                                                </script>
+                                               
+
+                                                <div class="text-start mt-5">
+                                                    <button id="creditnxt" class="btn btn-primary bg-gradient me-3" type="button">NEXT</button>
+                                                    <button id="creditprev" class="btn btn-primary bg-gradient" type="button">PREVIOUS</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="fieldtemp"style="background-color: rgba(144, 211, 117, 0.098);" hidden>
+                                        <div class="row">
+                                            <div class="col-sm-12  col-md-1"></div>
+                                            <div class="col-sm-12 col-md-10 pb-4">
+                                                <div class="row mt-4">
+                                                    <div class="col-md-4">
+                                                        <label class="col-form-label" style="color: black;">Additional Field 1</label>
+                                                        <input type="text" class="form-control border-secondary" id="additional1" name="additional1" style="color: black; background-color: white;">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="col-form-label" style="color: black;">Additional Field 2</label>
+                                                        <input type="text" class="form-control border-secondary" id="additional2" name="additional2" style="color: black; background-color: white;">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="col-form-label" style="color: black;">Additional Field 3</label>
+                                                        <input type="text" class="form-control border-secondary" id="additional3" name="additional3" style="color: black; background-color: white;">
+                                                    </div>
+                                                </div>
+                                                <div class="text-start mt-5">
+                                                    <button id="fieldprev" class="btn btn-primary bg-gradient  me-3" type="button">PREVIOUS</button>
+                                                    <button class="btn btn-primary bg-gradient" type="button" id="customersave">SAVE</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script>
+        $(document).ready(function(){
+            $('#gsthead').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+            $('#gsthead a').addClass('text-dark')
+            $('#gsttemp').attr('hidden',false)
+            $('#credithead').css({'border-bottom': 'none'})
+            $('#credithead a').removeClass('text-dark')
+            $('#fieldhead').css({'border-bottom': 'none'})
+            $('#fieldhead a').removeClass('text-dark')
+    
+            $('#gsthead').on('click',function(){
+                $(this).css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+                $('#gsthead a').addClass('text-dark')
+                $('#gsttemp').attr('hidden',false)
+                $('#credithead').css({'border-bottom': 'none'})
+                $('#credithead a').removeClass('text-dark')
+                $('#credittemp').attr('hidden',true)
+                $('#fieldhead').css({'border-bottom': 'none'})
+                $('#fieldtemp a').removeClass('text-dark')
+                $('#fieldtemp').attr('hidden',true)
+            })
+    
+            $('#credithead').on('click',function(){
+                $('#credithead').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+                $('#credithead a').addClass('text-dark')
+                $('#credittemp').attr('hidden',false)
+                $('#gsthead').css({'border-bottom': 'none'})
+                $('#gsthead a').removeClass('text-dark')
+                $('#gsttemp').attr('hidden',true)
+                $('#fieldhead').css({'border-bottom': 'none'})
+                $('#fieldhead a').removeClass('text-dark')
+                $('#fieldtemp').attr('hidden',true)
+            })
+    
+            $('#fieldhead').on('click',function(){
+                $('#fieldhead').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+                $('#fieldhead a').addClass('text-dark')
+                $('#fieldtemp').attr('hidden',false)
+                $('#gsthead').css({'border-bottom': 'none'})
+                $('#gsthead a').removeClass('text-dark')
+                $('#gsttemp').attr('hidden',true)
+                $('#credithead').css({'border-bottom': 'none'})
+                $('#credithead a').removeClass('text-dark')
+                $('#credittemp').attr('hidden',true)
+            })
+        })
+    
+        $(document).ready(function(){
+            $('#gstnxt').on('click',function(){
+                $('#credithead').click()
+            })
+    
+            $('#creditnxt').on('click',function(){
+                $('#fieldhead').click()
+            })
+        })
+    
+        $(document).ready(function(){
+            $('#fieldprev').on('click',function(){
+                $('#credithead').click()
+            })
+            $('#creditprev').on('click',function(){
+                $('#gsthead').click()
+            })
+        })
+    </script>
+    
+    <script>
+        $(document).ready(function(){
+            $('#prc_').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+            $('#stk_ a').removeClass('text-dark')
+            $('#prc_ a').addClass('text-dark')
+            $('#stk_').css({'border-bottom': 'none'})
+            $('#pricing_template').attr('hidden',false)
+    
+            $('#prc_').on('click',function(){
+                $(this).css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+                $('#stk_ a').removeClass('text-dark')
+                $('#prc_ a').addClass('text-dark')
+                $('#stk_').css({'border-bottom': 'none'})
+                $('#pricing_template').attr('hidden',false)
+                $('#stock_template').attr('hidden',true)
+            })
+        })
+    
+        $(document).ready(function(){
+            $('#stk_').on('click',function(){
+                $('#stk_').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+                $('#prc_ a').removeClass('text-dark')
+                $('#stk_ a').addClass('text-dark')
+                $('#prc_').css({'border-bottom': 'none'})
+                $('#pricing_template').attr('hidden',true)
+                $('#stock_template').attr('hidden',false)
+            })
+        })
+    
+        $(document).ready(function(){
+            $('#next_btn').on('click',function(){
+                $('#stk_').click()
+            })
+        })
+    
+        $(document).ready(function(){
+            $('#prev_btn').on('click',function(){
+                $('#prc_').click()
+            })
+        })
+    </script>
+    
+    <script>
+        function validatepurchasebill() {
+            var customer = document.getElementById('customer').value;
+            var plosu = document.getElementById('plosu').value;
+            var pay_method = document.getElementById('pay_method').value;
+            var cheque_id = document.getElementById('cheque_id').value;
+            var upi_id = document.getElementById('upi_id').value;
+    
+            if (customer === '') {
+                alert('Please select a customer');
+                return false;
+            } else if(plosu === ''){
+                alert('Please select place of supply');
+                return false;
+            }
+            if (pay_method === ''){
+                alert('Please select a Payment Method');
+                return false;
+            }else if(pay_method === 'Cheque'){
+                if (cheque_id === ''){
+                    alert('Add a cheque number');
+                    return false;
+                }
+            }else if(pay_method === 'UPI'){
+                if (upi_id === ''){
+                    alert('Add a UPI number');
+                    return false;
+                }
+            }
+            var table = document.getElementById('tab_logic');
+            var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            for (var i = 1; i <= rows.length; i++) {
+                var product = document.getElementById('product'+i).value;
+                var qty = document.getElementById('qty'+i).value;
+                if(product === ''){
+                    alert('Select a product on row '+ i);
+                    return false;
+                }
+                if(qty === '' || qty =='0'){
+                    alert('Add quantity in row '+ i);
+                    return false;
+                }
+            }
+            return true; 
+        }
+    </script>
+    
+    <script>
+        $(document).ready(function () {
+            $('#customer').selectize({
+                sortField: 'value',
+                items: [''],
+                render: {
+                    item: function (item, escape) {
+                        if (item.value === '') {
+                            return '';
+                        }
+                        return '<div>' + escape(item.text) + '</div>';
+                    }
+                }
+            });
+        });
+    
+        $(document).ready(function () {
+            $('.product').selectize({
+                sortField: 'value',
+                items: [''],
+                render: {
+                    item: function (item, escape) {
+                        if (item.value === '') {
+                            return '';
+                        }
+                        return '<div>' + escape(item.text) + '</div>';
+                    }
+                }
+            });
+        });
+    
+        function productsearch(roinc){
+            $(`#product${roinc}`).selectize({
+                sortField: 'value',
+                render: {
+                    item: function (item, escape) {
+                        if (item.value === '') {
+                            return '';
+                        }
+                        return '<div>' + escape(item.text) + '</div>';
+                    }
+                }
+            });
+        }
+    </script>
+    
+    <script>
+        $(document).ready(function() {
+            $("#pay_method").change(function() {
+                var x=$('#pay_method').val();
+                if(x==='Cash'){
+                    $('#chequediv').hide()
+                    $('#bnkdiv').hide()
+                    $('#upidiv').hide()
+                    document.getElementById('cheque_id').value=null
+                    document.getElementById('upi_id').value=null
+                    document.getElementById('bnk_id').value=null
+                } else if(x==='Cheque') {
+                    $('#chequediv').show()
+                    $('#bnkdiv').hide()
+                    $('#upidiv').hide()
+                    document.getElementById('upi_id').value=null
+                    document.getElementById('bnk_id').value=null
+                } else if(x==='UPI') {
+                    $('#upidiv').show()
+                    $('#bnkdiv').hide()
+                    $('#chequediv').hide()
+                    document.getElementById('cheque_id').value=null
+                    document.getElementById('bnk_id').value=null
+                } else {
+                    $('#bnkdiv').show()
+                    $('#chequediv').hide()
+                    $('#upidiv').hide()
+                    document.getElementById('cheque_id').value=null
+                    document.getElementById('upi_id').value=null
+    
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'bankdata' %}",
+                        data: {
+                            id: x,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function (response) {
+                            document.getElementById('cheque_id').value=null
+                            document.getElementById('upi_id').value=null
+                            document.getElementById("bnk_id").value = response.bank_no;
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    <script>
+
+
+        $(document).on("click", "#customersave", function () {
+            if ($('#toPayRadio').is(':checked')) {
+                pay = $('#toPayRadio').val()
+            } else {
+                pay = $('#toReceiveRadio').val()
+            }
+            $.ajax({
+
+                type: 'POST',
+                url: "{% url 'add_party_in_expense' %}",
+                data: {
+                    name: $('#partyname').val(),
+                    email: $("#partyemail").val(),
+                    mobile: $("#partyphno").val(),
+                    splystate: $("#splystate").val(),
+                    baddress: $("#baddress").val(),
+                    gsttype: $("#modalgsttype").val(),
+                    gstin: $("#gstin").val(),
+                    partydate: $("#partydate").val(),
+                    paytype: pay,
+                    openbalance: $("#openbalance").val(),
+                    credit_limit: $("#crd_lmt").val(),
+                    add1: $("#additional1").val(),
+                    add2: $("#additional2").val(),
+                    add3: $("#additional3").val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function (response) {
+                    document.getElementById("modalCustomer").reset();
+                    $('#partycreation').modal('hide');
+                    reloadCustomer();
+                },
+            });
+        });
+
+
+
+
+
+        function reloadCustomer() {
+            $.ajax({
+                url: "{% url 'cust_dropdown' %}",
+                type: "GET",
+                dataType: "json",
+                data: $(this).serialize(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+
+                success: function (response) {
+                    id_list = response.id_list
+                    party_list = response.party_list
+                    var dropdown = $('#party');
+                    dropdown.empty();
+                    dropdown.append(`<option value=' ' selected hidden>Select</option>`);
+
+                    let select = document.getElementById("party");
+                    for (let i = 0; i < id_list.length; i++) {
+                        let newOption = document.createElement("option");
+                        newOption.text = party_list[i];
+                        newOption.value = id_list[i];
+                        select.appendChild(newOption);
+                    }
+                },
+            });
+        }
+
+    </script>
+
+    <!-- end modal -->
+
+
+
+</body>
+
+
+{% endblock %}

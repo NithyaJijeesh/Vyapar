@@ -1,0 +1,976 @@
+{% extends 'company/src/html/base.html' %}
+{% block content %}
+{% load social_share %}
+{% load static %}
+
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.6"
+    integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
+<!-- Include html2pdf library -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+<script src="https://unpkg.com/htmx.org@1.9.6"
+    integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+    crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<style>
+    .card-body {
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+        border-radius: 1vh;
+    }
+
+
+
+    #tab_logic {
+        margin-left: 10px;
+        width: 98%;
+    }
+
+    #tab_logic thead th {
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        background-color: rgba(0, 195, 255, 0.205);
+    }
+
+    #tab_logic tbody td {
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+    }
+
+    #toPayRadio {
+        accent-color: red;
+    }
+
+    /* 
+    #toReceiveRadio {
+        accent-color: green;
+    } */
+
+    .addnewrow:hover {
+        background-color: violet;
+    }
+
+    #modal_closing {
+        height: 5vh;
+    }
+
+    #customer {
+        background-color: white;
+        color: black;
+    }
+
+    .selectize-input {
+        height: 5vh;
+        border-color: #54B4D3;
+        border-radius: 5px;
+    }
+
+    .option:hover {
+        background-color: #3B71CA;
+        color: white;
+    }
+
+    /* @media print {
+            table, div   {
+                break-inside: avoid;
+            }
+        }
+    
+        thead { display: table-header-group; }
+        tfoot { display: table-row-group;}
+        tr {
+        page-break-after: always!important;
+        page-break-before: always!important;
+        page-break-inside: auto!important;
+
+    } */
+</style>
+
+<div class="body-wrapper">
+
+    <br><br><br>
+    <div class="row p-0 m-0">
+        <div class="row">
+            <h1 class="h1 text-center pt-3 pb-2"
+                style="text-transform:uppercase; font-family: 'Times New Roman', Times, serif;padding-left: 5px;">
+                <b>{{company.company_name}}</b>
+            </h1>
+            <center>
+                <H4 style="font-weight: bolder;">GSTR 1 REPORT</H4>
+
+            </center>
+        </div>
+        <div class="col-sm-12  p-0 m-0">
+            <div class=" bg-light bg-light pb-0 mb-0 p-2" style="height:100%;width: 1250px;">
+                <div class="mr-auto d-flex pt-4">
+
+                    <!-- <div class="filtr_with_date_between d-flex d-inline h-100" style="margin-right: 700px;">
+                        <form action="#" method="get" class="d-flex d-inline" onsubmit="return validateDates()">
+
+                            <label class="mx-1 py-1" for="fromDate">From (Month/Year):</label>
+                            <input type="month" id="fromDate" name="fromDate"
+                                style="width: 100px; border-radius: 10px; background-color: rgba(246,249,252,255);">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <label for="toDate">To (Month/Year):</label>
+                            <input type="month" id="toDate" name="toDate"
+                                style="width: 100px; border-radius: 10px; background-color: rgba(246,249,252,255);">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="submit" value="Submit" style="size: 5px ;">
+
+                    </div> -->
+
+
+
+                    <div class="col-md-3">
+
+                        <div class="form-group px-2">
+                            <label style="text-align:left ">From</label><br>
+                            <input name="FromDate" class="inputdate form-control" id="in1" type="date">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group px-2">
+                            <label style="text-align:left ">To</label><br>
+                            <input name="ToDate" class="inputdate form-control" id="in2" type="date">
+                        </div>
+
+
+                    </div>
+                    <br><br><br>
+                    <a href="{% url 'companyreport' %}" class="close-button"><button style="margin-left: 550px;"
+                            title="close" class="btn btn-close" id="closeButton"></button></a>
+                    <!-- <button style="margin-left: 550px;" title="close" class="btn btn-close" id="closeButton"></button> -->
+
+
+
+
+
+
+                </div>
+                <div class="option_btn d-flex align-items-center" style="margin-left: 1000px;">
+                    <button class="btn btn-sm" type="button" onclick="printSection()" title="PRINT"><span><img
+                                width="22px" src="{% static 'assets/printer1.png' %}" alt="PRINT"></span></button>
+                    <button class="btn btn-sm" type="button" onclick="exportToExcel()" title="EXPORT"><span><img
+                                width="22px" src="{% static 'assets/excel2.png' %}" alt="EXPORT"></span></button>
+                    <button class="btn btn-sm btn_print" type="button" onclick="exportToPDF()"
+                        title="DOWNLOAD"><span><img width="18px" src="{% static 'images/pdfdownload.png' %}"
+                                alt="DOWNLOAD"></span></button>
+
+                    <a class="text-dark" data-toggle="dropdown">
+                        <button class="btn  " title="Share"><i class="fas fa-share"></i></button>
+                    </a>
+
+                    <div class="dropdown-menu ">
+                        <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                        <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+                    </div>
+
+
+                    <!-- <div class="dropdown-content ">
+                        <a class="dropdown-item" data-target="#shareBillEmail"
+                            data-toggle="modal">GMAIL</a>
+                        <a class="dropdown-item" href="javascript:void(0);"
+                            onclick="shareOnWhatsApp()">WhatsApp</a>
+                    </div> -->
+                </div>
+                <div class="dropdown left px-2 mt-3">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="fa fa-filter"></i> Filter By
+                    </button>
+
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" onclick="filterTable('All')">All</a></li>
+                        <li><a class="dropdown-item" onclick="filterTable('With')">With GSTIN</a></li>
+                        <li><a class="dropdown-item" onclick="filterTable('Without')">Without GSTIN</a></li>
+                    </ul>
+                </div>
+
+
+                <!-- <div class="scroll"> -->
+                <form action="#" method="post" enctype="multipart/form-data" novalidate id="gstr1">
+                    {% csrf_token %}
+
+                    <div class="row clearfix">
+                        <div class="col-md-12 table-responsive-md mt-3">
+
+
+
+
+
+                            <div id="print_export_section">
+                                <br>
+
+                                <form action="" style="background-color: #3B71CA ;">
+                                    <ul class="nav nav-tabs row mx-3">
+                                        <li class="col-sm-6 text-center" id="sale">
+                                            <a href="#1" data-toggle="tab">Sale</a>
+                                        </li>
+                                        <li class="col-sm-6 text-center" id="salereturn"><a href="#2"
+                                                data-toggle="tab">Sale Return</a>
+                                        </li>
+                                    </ul>
+
+                                    <div id="pdfdwnld">
+
+
+                                        <div class="row m-0 p-0 pt-3 " id="salediv" data-title="Sale">
+
+                                            <div class="col-sm-12 col-lg-3">
+                                                
+                                                <h4
+                                                    style="color: rgba(var(--bs-light-rgb), var(--bs-bg-opacity)) !important; margin-bottom: 0;">
+                                                    Sale</h4>
+                                                <table id="myTable" id="tablediv"
+                                                    class="table table-bordered table-info table-striped tb  table-responsive"
+                                                    id="billtable" style="text-align: center; max-width: 100%">
+                                                    <!-- <table
+                                                class="table table-bordered table-secondary table-striped table-hover  mt-3"
+                                                id="tab_logic"> -->
+                                                    <thead>
+
+                                                        <tr class="text-center"
+                                                            style="background-color: rgba(255, 255, 255, 0.137);">
+
+                                                            <th colspan="5" style="text-align: center;">Invoice
+                                                                Details</th>
+                                                            <th rowspan="2" style="text-align: center;">Tax Rate
+                                                            </th>
+                                                            <th rowspan="2" style="text-align: center;">Cess Rate
+                                                            </th>
+                                                            <th rowspan="2" style="text-align: center;">Taxable
+                                                                Value</th>
+                                                            <th colspan="4" style="text-align: center;">Amount</th>
+                                                            <th rowspan="2" style="text-align: center;">Place Of
+                                                                Supply(Name Of State)</th>
+                                                        </tr>
+                                                        <tr class="text-center"
+                                                            style="background-color: rgba(255, 255, 255, 0.137);">
+                                                            <th style="text-align: center;">GSTIN/UIN</th>
+                                                            <th style="text-align: center;">Party Name</th>
+                                                            <th style="text-align: center;">Invoice No</th>
+                                                            <th style="text-align: center;">Date</th>
+                                                            <th style="text-align: center;">Value</th>
+
+                                                            <th style="text-align: center;">Integrated Tax</th>
+                                                            <th style="text-align: center;">Central Tax</th>
+                                                            <th style="text-align: center;">State/UT Tax</th>
+                                                            <th style="text-align: center;">Cess</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="items-table-body">
+
+
+
+                                                    </tbody>
+
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="row m-0 p-0 pt-3 " id="salereturndiv" style="display: none;"
+                                            data-title="Sale Return">
+
+                                            <div class="col-sm-12 col-lg-3">
+                                                <h4
+                                                    style="color: rgba(var(--bs-light-rgb), var(--bs-bg-opacity)) !important;;">
+                                                    Sale Return</h4>
+
+                                                <table id="myTable2" id="tablediv"
+                                                    class="table table-bordered table-info table-striped tb  w-100 table-responsive"
+                                                    id="billtable" style="text-align: center;">
+
+
+                                                    <thead>
+
+                                                        <tr class="text-center"
+                                                            style="background-color: rgba(255, 255, 255, 0.137);">
+
+                                                            <th colspan="7" style="text-align: center;">Cr. Note
+                                                                Details</th>
+                                                            <th rowspan="2" style="text-align: center;">Tax Rate
+                                                            </th>
+                                                            <th rowspan="2" style="text-align: center;">Cess Rate
+                                                            </th>
+                                                            <th rowspan="2" style="text-align: center;">Taxable
+                                                                Value</th>
+                                                            <th colspan="4" style="text-align: center;">Amount</th>
+                                                            <th rowspan="2" style="text-align: center;">Place Of
+                                                                Supply(Name Of
+                                                                State)
+                                                            </th>
+                                                        </tr>
+                                                        <tr class="text-center"
+                                                            style="background-color: rgba(255, 255, 255, 0.137);">
+                                                            <th rowspan="2" style="text-align: center;">GSTIN/UIN
+                                                            </th>
+                                                            <th style="text-align: center;">Party Name</th>
+                                                            <th style="text-align: center;">Invoice No</th>
+                                                            <th style="text-align: center;">Invoice Date</th>
+                                                            <th style="text-align: center;">Note No.</th>
+                                                            <th style="text-align: center;">Note Date</th>
+                                                            <th style="text-align: center;">Value</th>
+
+                                                            <th style="text-align: center;">Integrated Tax</th>
+                                                            <th style="text-align: center;">Central Tax</th>
+                                                            <th style="text-align: center;">State/UT Tax</th>
+                                                            <th style="text-align: center;">Cess</th>
+
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            $(document).ready(function () {
+
+
+                                                $("#sale").click(function () {
+                                                    $("#salediv").show();
+                                                    $("#salereturndiv").hide();//: 3px solid rgb(255, 255, 255);
+
+                                                    $("#sale").css("border-bottom", "3px solid rgb(255, 255, 255)");
+                                                    $("#salereturn").css("border-bottom", "none");
+                                                    // $("#t-btn").css("background-color", "rgb(243, 188, 9)").css("color", "white");
+                                                });
+
+                                                $("#salereturn").click(function () {
+                                                    $("#salereturndiv").show();
+                                                    $("#salediv").hide();//: 3p
+                                                    $("#salereturn").css("border-bottom", "3px solid rgb(255, 255, 255)");
+                                                    $("#sale").css("border-bottom", "none");
+                                                });
+                                            });
+                                        </script>
+
+
+
+                                    </div>
+
+
+                                </form>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="modal fade" id="shareBillEmail">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+            <div class="modal-header" style="background: rgb(32, 35, 37);">
+                <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Gstr1 Via Email</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" style="background: rgb(32, 35, 37);">
+                <div class="card p-3 m-3">
+
+                    <form action="#" method="post" class="needs-validation" id="share_to_email_form" autocomplete="off">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="emailIds">Email IDs</label>
+                            <textarea class="form-control text-dark" name="email_ids" id="emailIds" rows="5"
+                                placeholder="Multiple emails can be added by separating with a comma(,)."
+                                required></textarea>
+                        </div>
+                        <div class="form-group mt-2">
+                            <label for="item_unitname">Message(optional)</label>
+                            <textarea name="email_message" id="email_message" class="text-dark form-control" cols=""
+                                rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffff;">
+                    <input type="submit" id="share_with_email"
+                        class="submitShareEmailBtn rounded-pill text-grey w-50 my-4 mx-3" value="SEND MAIL">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div> -->
+
+
+    <!-- Share bill Modal -->
+    <div class="modal fade" id="shareBillEmail">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+                <div class="modal-header" style="background: rgb(32, 35, 37);">
+                    <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share GSTR1 Via Email</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body" style="background: rgb(32, 35, 37);">
+                    <div class="card p-3 m-3">
+                        <form action="{% url 'sharepurchaseBillToEmail' %}" method="post" class="needs-validation"
+                            id="share_to_email_form" autocomplete="off">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="emailIds">Email IDs</label>
+                                <textarea class="form-control text-dark" name="email_ids" id="emailIds" rows="5"
+                                    placeholder="Multiple emails can be added by separating with a comma(,)."
+                                    required></textarea>
+                            </div>
+                            <div class="form-group mt-2">
+                                <label for="item_unitname">Message(optional)</label>
+                                <textarea name="email_message" id="email_message" class="text-dark form-control" cols=""
+                                    rows="4"
+                                    placeholder="This message will be sent along with Bill details."></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffff;">
+                        <input type="submit" id="share_with_email"
+                            class="submitShareEmailBtn rounded-pill text-grey w-50 my-4 mx-3" value="SEND MAIL">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="https://code.jquery.com/jquery-3.x.x.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+{% for message in messages %}
+
+<script>
+    let msg = '{{message}}';
+    alert(msg);
+</script>
+{% endfor %}
+
+
+<script>
+
+
+    // $(document).ready(function () {
+    //     $('#share_with_email').on('click', function () {
+    //         var emailsInput = document.getElementById('emailIds');
+    //         var emailsString = emailsInput.value.trim();
+
+    //         var emails = emailsString.split(',').map(function (email) {
+    //             return email.trim();
+    //         });
+
+    //         var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+    //         var invalidEmails = []
+    //         if (emailsString == "") {
+    //             alert('Enter valid email addresses..')
+    //         }
+    //         else {
+    //             for (var i = 0; i < emails.length; i++) {
+    //                 var currentEmail = emails[i];
+
+    //                 if (currentEmail != "" && !emailRegex.test(currentEmail)) {
+    //                     console.log(currentEmail + ' is invalid!');
+    //                     invalidEmails.push(currentEmail)
+    //                 }
+    //             }
+
+    //             if (invalidEmails.length > 0) {
+    //                 alert('Invalid emails..Please check!\n' + invalidEmails)
+    //                 // alert(invalidEmails)
+    //             } else {
+    //                 $('#share_to_email_form').submit();
+    //             }
+    //         }
+    //     })
+    // });
+
+
+    // function shareOnWhatsApp() {
+    //     var url = window.location.href;
+    //     var text = url;
+    //     text = encodeURIComponent(text);
+    //     var whatsappUrl = "whatsapp://send?text=" + text;
+    //     window.location.href = whatsappUrl;
+    // }
+
+
+    // function exportToExcel() {
+    //     const table = document.getElementById('gstr1');
+    //     const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+    //     XLSX.writeFile(wb, "gstr1.xlsx");
+    // }
+
+    // function printSection(sectionId) {
+    //     var printContents = document.getElementById(sectionId).innerHTML;
+    //     var originalContents = document.body.innerHTML;
+
+    //     document.body.innerHTML = printContents;
+
+    //     window.print();
+
+    //     document.body.innerHTML = originalContents;
+    // }
+
+    // function printSection(pdfdwnld) {
+    //             var printContents = document.getElementById(pdfdwnld).innerHTML;
+    //             var originalContents = document.body.innerHTML;
+
+    //             // Create a new temporary div to hold the section content to print
+    //             var printContainer = document.createElement('div');
+    //             printContainer.innerHTML = printContents;
+
+    //             // Append the section content to the body
+    //             document.body.innerHTML = '';
+    //             document.body.appendChild(printContainer);
+
+    //             // Print the contents
+    //             window.print();
+
+    //             // Restore the original content
+    //             document.body.innerHTML = originalContents;
+    //         }
+
+
+
+
+    // function exportToPDF() {
+    //     var content = document.getElementById('pdfdwnld');
+
+    //     var opt = {
+    //         margin: 0.1,
+    //         filename: 'GSTR1.pdf',
+    //         image: { type: 'jpeg', quality: 0.98 },
+    //         html2canvas: { scale: 10 , scrollX:0 },
+    //         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    //     };
+
+    //     html2pdf().set(opt).from(content).save();
+    //     // html2pdf(content,opt).save();
+    // }
+    function exportToPDF() {
+        var content = document.getElementById('pdfdwnld');
+
+        var opt = {
+            margin: 0.1,
+            filename: 'GSTR1.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(content).save();
+    }
+
+
+    function toggleDropdown() {
+        var dropdownContent = document.getElementById("myDropdown");
+        dropdownContent.style.display = (dropdownContent.style.display === "block") ? "none" : "block";
+    }
+    function exportToExcel() {
+        const table1 = document.getElementById('myTable');
+        const table2 = document.getElementById('myTable2');
+
+        const wb = XLSX.utils.book_new();
+
+        const ws1 = XLSX.utils.table_to_sheet(table1);
+        const ws2 = XLSX.utils.table_to_sheet(table2);
+
+        XLSX.utils.book_append_sheet(wb, ws1, 'Sale'); // Add the first sheet to the workbook
+        XLSX.utils.book_append_sheet(wb, ws2, 'Sale return'); // Add the second sheet to the workbook
+
+        XLSX.writeFile(wb, 'gstr1.xlsx');
+    }
+</script>
+
+<script>
+    var table = document.getElementById("myTable");
+
+    var fromDate;
+    $('#in1').on('change', function () {
+        fromDate = $(this).val();
+        $('#in2').prop('min', function () {
+            return fromDate
+        })
+        var startDate = new Date(document.getElementById("in1").value);
+        // var endDate = new Date(document.getElementById("in2").value);
+        var rows = table.getElementsByTagName("tr");
+
+        for (var i = 2; i < rows.length; i++) {
+            var row = rows[i];
+            var dateCell = row.cells[3];
+            var rowDate = new Date(dateCell.textContent);
+
+            if (rowDate >= startDate) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        }
+        var tdate = new Date(fromDate)
+        var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById("d1").innerHTML = tdate.toLocaleDateString(undefined, options);
+    })
+    var toDate;
+    $('#in2').on('change', function () {
+        toDate = $(this).val();
+        $('#in1').prop('max', function () {
+            return toDate
+        })
+        var startDate = new Date(document.getElementById("in1").value);
+        var endDate = new Date(document.getElementById("in2").value);
+        var rows = table.getElementsByTagName("tr");
+        for (var i = 2; i < rows.length; i++) {
+            var row = rows[i];
+            var dateCell = row.cells[3];
+            var rowDate = new Date(dateCell.textContent);
+
+            if (rowDate <= endDate && rowDate >= startDate) {
+                row.style.display = "";
+                console.log("display");
+            } else {
+                row.style.display = "none";
+
+            }
+        }
+        var tdate = new Date(toDate)
+        var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById("d2").innerHTML = "  To  " + tdate.toLocaleDateString(undefined, options);
+    })
+
+
+</script>
+
+<script>
+    function toggleDropdown() {
+        var dropdownContent = document.getElementById("myDropdown");
+        dropdownContent.style.display = (dropdownContent.style.display === "block") ? "none" : "block";
+    }
+</script>
+<script>
+    function filterTable(filterValue) {
+        $(document).ready(function () {
+            $('ul.nav-tabs a[data-toggle="tab"]').on('shown.bs.tab', function (event) {
+                // Get the ID of the activated tab
+                activatedTabId = $(event.target).attr('href').substring(1);
+                console.log('Activated tab ID:', activatedTabId);
+            });
+        });
+        var id = activatedTabId;
+        const table = document.getElementById(id);
+        const rows = table.getElementsByTagName('tr');
+
+        var startDate = new Date(document.getElementById("in1").value);
+        var endDate = new Date(document.getElementById("in2").value);
+        if (filterValue === 'All') {
+
+
+            for (let i = 2; i < rows.length; i++) {
+                const row = rows[i];
+
+                var dateCell = row.cells[3];
+
+                // Assuming that the date you want to compare is in the first cell of each row
+                // Change this according to your table structure
+                var rowDate = new Date(dateCell.textContent);
+                console.log(rowDate);
+
+                if (rowDate <= endDate && rowDate >= startDate) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+        else {
+            for (let i = 2; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                const gstinCell = cells[0];
+                var dateCell = row.cells[3];
+                var rowDate = new Date(dateCell.textContent);
+                if ((filterValue === 'With' && gstinCell.textContent !== '') || (filterValue === 'Without' && gstinCell.textContent === '')) {
+
+                    if (rowDate <= endDate && rowDate >= startDate) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+    }
+</script>
+
+<script>
+
+    $(document).ready(function () {
+        $('#share_with_email').on('click', function () {
+            var emailsInput = document.getElementById('emailIds');
+            var emailsString = emailsInput.value.trim();
+
+            var emails = emailsString.split(',').map(function (email) {
+                return email.trim();
+            });
+
+            var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+            var invalidEmails = []
+            if (emailsString == "") {
+                alert('Enter valid email addresses..')
+            }
+            else {
+
+                for (var i = 0; i < emails.length; i++) {
+                    var currentEmail = emails[i];
+
+                    if (currentEmail != "" && !emailRegex.test(currentEmail)) {
+                        console.log(currentEmail + ' is invalid!');
+                        invalidEmails.push(currentEmail)
+                    }
+                }
+
+                if (invalidEmails.length > 0) {
+                    alert('Invalid emails..Please check!\n' + invalidEmails)
+                    // alert(invalidEmails)
+                } else {
+                    $('#share_to_email_form').submit();
+                }
+            }
+        })
+    });
+
+
+    function shareOnWhatsApp() {
+        var url = window.location.href;
+        var text = url;
+        text = encodeURIComponent(text);
+        var whatsappUrl = "whatsapp://send?text=" + text;
+        window.location.href = whatsappUrl;
+    }
+
+
+    // $(document).ready(function () {
+    //     // Add click event listener to the close button
+    //     $('#closeButton').click(function () {
+    //         // Navigate back to the previous page
+    //         window.history.back();
+    //     });
+    // });
+</script>
+
+
+
+<!-- <script>
+    var activatedTabId = 1;
+
+    // Document ready function to set up event listeners
+    $(document).ready(function () {
+        // Set up event listener for tab activation
+        $('ul.nav-tabs a[data-toggle="tab"]').on('shown.bs.tab', function (event) {
+            // Get the ID of the activated tab
+            activatedTabId = $(event.target).attr('href').substring(1);
+            console.log('Activated tab ID:', activatedTabId);
+        });
+    });
+
+    // Function to print the selected section
+    function printSection() {
+        // Get the activated tab ID when the print function is called
+        var id = activatedTabId;
+
+        // Clone the specified element
+        const pdfCard = document.getElementById('pdfdwnld').cloneNode(true);
+        pdfCard.style.color = 'black';
+        pdfCard.style.backgroundColor = '#243e54';
+
+        // Create a new window for printing
+        const printWindow = window.open('', '');
+        const pageTitle = printWindow.document.createElement('h1');
+        pageTitle.style.textAlign = "center";
+        pageTitle.style.color = "black";
+        pageTitle.textContent = 'GSTR1';
+
+        const h1Element = printWindow.document.createElement('h2');
+        h1Element.style.color = "black";
+        h1Element.textAlign = "center";
+        // h1Element.textContent = (id === 'salediv') ? 'Sale' : 'Sale Return';
+        // if (id=='salediv') {
+        //     h1Element.textContent = "Sale";
+        // }       
+        // else {
+        //     h1Element.textContent = "Sale Return";
+        // }
+        // Create a style element and set its content
+        var styleElement = printWindow.document.createElement("style");
+        styleElement.textContent = `
+            body {
+                background-color: #333;
+                color : black;
+                font-family: Arial, sans-serif;
+                /* Add more styles as needed */
+            }
+            h2, h1 {
+                color: #333;
+                /* Add more styles as needed */
+            }
+        `;
+
+        // Append elements to the new window
+        printWindow.document.body.appendChild(pageTitle);
+        printWindow.document.body.appendChild(h1Element);
+        printWindow.document.body.appendChild(pdfCard);
+
+        // Copy stylesheets from the original document
+        const stylesheets = document.styleSheets;
+        for (let i = 0; i < stylesheets.length; i++) {
+            const stylesheet = stylesheets[i];
+            if (stylesheet.href) {
+                const link = printWindow.document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = stylesheet.href;
+                printWindow.document.head.appendChild(link);
+            }
+        }
+
+        // Trigger the print dialog for the new window
+        printWindow.print();
+
+        // Close the new window after printing
+        printWindow.close();
+    }
+</script> -->
+
+<script>
+    var activatedTabId = 1;
+
+    // Document ready function to set up event listeners
+    $(document).ready(function () {
+        // Set up event listener for tab activation
+        $('ul.nav-tabs a[data-toggle="tab"]').on('shown.bs.tab', function (event) {
+            // Get the ID of the activated tab
+            activatedTabId = $(event.target).attr('href').substring(1);
+            console.log('Activated tab ID:', activatedTabId);
+        });
+    });
+
+    // Function to print the selected section
+    function printSection() {
+        // Get the activated tab ID when the print function is called
+        var id = activatedTabId;
+
+        // Clone the specified element
+        const pdfCard = document.getElementById('pdfdwnld').cloneNode(true);
+        pdfCard.style.color = 'black';
+        pdfCard.style.backgroundColor = '#243e54';
+
+        // Create a new window for printing
+        const printWindow = window.open('', '');
+        const pageTitle = printWindow.document.createElement('h1');
+        pageTitle.style.textAlign = "center";
+        pageTitle.style.color = "black";
+        pageTitle.textContent = 'GSTR1';
+
+        const h1Element = printWindow.document.createElement('h2');
+        h1Element.style.color = "black";
+        h1Element.textAlign = "center";
+        // h1Element.textContent = (id === 'salediv') ? 'Sale' : 'Sale Return';
+
+        // Create a style element and set its content
+        var styleElement = printWindow.document.createElement("style");
+        styleElement.textContent = `
+            body {
+                background-color: #333;
+                color : black;
+                font-family: Arial, sans-serif;
+                /* Add more styles as needed */
+            }
+            h2, h1 {
+                color: #333;
+                /* Add more styles as needed */
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 6px;
+                text-align: center;
+            }
+        `;
+
+        // Append elements to the new window
+        printWindow.document.body.appendChild(pageTitle);
+        printWindow.document.body.appendChild(h1Element);
+        printWindow.document.body.appendChild(pdfCard);
+        printWindow.document.head.appendChild(styleElement);
+
+        // Trigger the print dialog for the new window
+        printWindow.print();
+
+        // Close the new window after printing
+        printWindow.close();
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<!-- <script type="text/javascript">
+    $(document).ready(function ($) {
+        console.log('print');
+
+        $(document).on('click', '.btn_print', function (event) {
+            console.log('print1');
+            event.preventDefault();
+            var element = document.getElementById('pdfdwnld');
+            var opt =
+            {
+                margin: 0,
+                filename: 'purchase_bill_' + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 1 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+           
+            html2pdf().set(opt).from(element).save();
+
+        });
+
+    });
+</script> -->
+
+
+
+{% endblock %}

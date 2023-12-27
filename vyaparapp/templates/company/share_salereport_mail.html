@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="my-5 page" size="A4">
+        <div class="col-md-4">
+            <h3>
+                <center class="text-black"><b>sales report</b></center>
+            </h3>
+        </div>
+
+        <table class="table1 table-bordered" style="border-color: black;">
+            <tbody>
+                <tr style="font-weight: bolder">
+                    <td></td>
+                    <td></td>
+                   
+                </tr>
+                <tr>
+                    <td>
+                       
+                        <p class="address" style="font-weight: bold;color: #000;"> 
+                            <p class="text-info" style="font-weight: bold; color: rgb(49, 49, 138);">
+                            {{staff.company.company_name}},</p>
+                            {{cmp.address}}<br>
+                            {{ staff.company.address }} <br>
+                            {{staff.company.city}},
+                            {{staff.company.state}}
+                            {{staff.company.pincode}} <br>
+                            {{ staff.company.user.email }} <br>
+                            {{ staff.company.contact }} 
+                        </p>
+                    </td>
+                    <td></td>
+                   
+                </tr>
+            </tbody>
+        </table>
+
+
+
+
+
+
+
+
+    <table class="table" id="myTable1" style="text-align: center;">
+        <thead style="color:blue;">
+            <th>DATE</th>
+            <th>NUMBER</th>
+            <th>PARTY NAME</th>
+            <th>DUE DATE</th>
+            <th>ACTION</th>
+            <th>TOTAL</th>
+            <th>Advance</th>
+            <th>BALANCE</th>
+            
+        </thead>
+        <tbody>
+            {% for i in sale %}
+            <tr>
+                <td>{{i.orderdate}}</td>
+                <td>{{i.orderno}}</td>
+                <td>{{i.partyname}}</td>
+                <td>{{i.duedate}}</td>
+                <td>{{i.action}}</td>
+                <td>{{i.grandtotal}}</td>
+                <td>{{i.paid}}</td>
+                <td>{{i.balance}}</td>
+                
+            </tr>
+                {% endfor %}
+        </tbody>
+        
+        
+    </table>
+    <div>
+        <p>TOTAL Amount:{{s}}</p>
+        <p>TOTAL Order:{{c}}</p>
+    </div>
+    <section>
+        <div class="row container-fluid  p-2 m-0" style="margin-top: 4rem;">
+            <div class="col-md-6 col-sm-6 m-0 p-0"><label style="color: #000;"><b>Authorized
+                        Signature</b></label><span class="text-dark">_____________________</span></div>
+            <!-- <div class="col-sm-4 m-0 p-0 text-dark">________________________</div> -->
+            <div class="col-md-6 col-sm-6 m-0 p-0"></div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

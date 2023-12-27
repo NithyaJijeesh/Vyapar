@@ -1,0 +1,824 @@
+{% extends 'company/src/html/base.html' %}
+{% load static %}
+{% block content %}
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+
+
+{% load my_extras %}
+
+<style>
+    .bs{
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+    }
+
+    .bs_sm{
+        box-shadow: inset 2px 2px 5px 3px rgba(0, 0, 0, 0.199);
+    }
+
+    .paiddiv{
+        color: black;
+        height: 10vh;
+        width: 20vh;
+        padding-left: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        margin-left: 7vh;
+        border-radius: 8px;
+        background-color: lightgray;
+    }
+
+    .unpaiddiv{
+        color: black;
+        height: 10vh;
+        width: 20vh;
+        padding-left: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        margin-left: 7vh;
+        border-radius: 8px;
+        background-color: lightsteelblue;
+    }
+
+    .totaldiv{
+        color: black;
+        height: 10vh;
+        width: 20vh;
+        padding-left: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        margin-left: 7vh;
+        border-radius: 8px;
+        background-color: lightgreen;
+    }
+
+    #paymentouttable tbody{
+        cursor: pointer;
+    }
+
+    #emptyMessage {
+        display: none;
+        font-size: x-large;
+        font-weight: bold;
+        color: red;
+    }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+        padding: 10px;
+        z-index: 1;
+        width: 15%;
+    }
+
+    .dropdown-content label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .dropdown-content input {
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+    .tplus{
+        margin-top: 3vh;
+        margin-left: 5vh;
+        margin-right: -2vh;
+    }
+
+    .tequal{
+        margin-top: 3vh;
+        margin-left: 5vh;
+        margin-right: -2vh;
+    }
+
+    .tg{
+        color: rgb(0, 140, 7);
+    }
+
+    .tr{
+        color: rgb(218, 0, 0);
+    }
+
+    .tj{
+        color:#E4A11B;
+    }
+
+    .th{
+        color: rgb(12, 79, 234);
+    }
+
+    @media print{
+        body{
+            visibility: hidden !important; /* hide everything in body when in print mode*/
+        }
+
+        .printContainer {
+            visibility: visible !important; /* Override the rule above to only show the printables*/
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+        } 
+
+        #calcdiv{
+            visibility: visible;
+            margin-top: -30vh;
+            margin-left: -9vh;
+            margin-bottom: 30vh;
+        }
+
+        #paymentouttable{
+            margin-top: 20vh;
+            margin-bottom: 20vh;
+        }
+
+        #paymentouttable th{
+            font-size: medium;
+        }
+
+        .extra{
+            display: none;
+        }
+        td, th {
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+    }
+    
+    ::-webkit-scrollbar{
+        display: none
+    }
+</style>
+
+
+<div class="body-wrapper">
+    <br><br><br>
+   
+    <p></p>
+    <div class="row ps-3 pe-3 m-0" >
+        <div class="col-sm-12 ps-2 pe-3">
+            <div class="row pt-0 m-0">
+                <div class="card p-0 bg-light bs"><br>
+                    <div class="row">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-3" style="margin-left: 7vh;">
+                                    <div class="form-group">
+                                        <label for="fromDate" style="color: black; margin-bottom: 1vh;">From Date:</label>
+                                        <input type="date" class="form-control h-100 border-secondary" id="fromDate" style="color: black; background-color: white;" onchange="filterDates()"> 
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="toDate" style="color: black; margin-bottom: 1vh;">To Date:</label>
+                                        <input type="date" class="form-control h-100 border-secondary" id="toDate" style="color: black; background-color: white;" onchange="filterDates()">
+                                    </div>
+                                </div>
+                                <div class="col-md-2"></div>
+                                
+                                <div class="col-md-3 text-right" style="margin-left: 6vh;">
+                                    <button class="btn mt-3" type="button" onclick="ExportToExcel()" style="margin-right: 2vh;   height: 80px;">
+                                        <span><img width="22px" src="{% static 'assets/excel2.png' %}" alt="no img"></span>
+                                        <br><span style="color: black; font-size: small; font-weight: bold;">Excel</span>
+                                    </button>
+
+                                    <button class="btn mt-3" type="button" onclick="printfunction()" style="margin-right: 2vh; height: 80px;">
+                                        <span><img width="30px" src="{% static 'images/printer.jpeg' %}" alt="no img"></span>
+                                        <br><span style="color: black; font-size: small; font-weight: bold;">Print</span>
+                                    </button>
+
+                                    <button class="btn mt-3" type="button" data-toggle="modal" data-target="#excelModal" onclick="excelmodel()"style="height: 80px;">
+                                        <span><img width="30px" src="{% static 'images/import.png' %}" alt="no img"></span>
+                                        <br><span style="color: black; font-size: small; font-weight: bold;">Import</span>
+                                    </button>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div><br>
+                    
+                 
+                    <br>
+                </div>
+            </div>
+
+            <div class="row pt-0 m-0">
+
+                <div class="card p-0 bg-light bs" style="height: 36rem;">
+                    <div class="row m-0 p-0 pt-3">
+                        <div class="col-sm-12 col-lg-3">
+                            <h4 class="tb fw-bolder pt-2 text-secondary">PAYMENT OUT</h4>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input id="search_input" style="padding-inline-start: 2rem; margin-left: 1vh; " class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" Search">
+                        </div>
+                        <div class="col-md-6"></div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary bg-gradient" href="{% url 'add_paymentout' %}" style="color: white;"> 
+                                <i class="fa fa-plus border-dark" aria-hidden="true" style="color: white;"></i> &nbsp;Add Paymentout
+                            </a>
+                            
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12" style="margin-left: 2vh;">
+                            <div class="mt-3" style="overflow: scroll;height: 28rem; width: 97%;" id="tablediv">
+                                <table class="table table-bordered table-info table-striped tb table-responsive w-100" id="paymentoutTable"  style="text-align: center;">
+                                    <thead >
+                                        <tr class="fs-2 tb">
+                                            
+                                            <th class="bg-secondary text-white">
+                                                DATE 
+                                                <a class="extra text-white" onclick="toggleDropdown(0)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent0">
+                                                    <label for="filterInput0" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="date" id="filterInput0"  />
+                                                    <a class="btn btn-info" onclick="cleardropdown(0)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(0)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                REF NO 
+                                                <a class="extra text-white" onclick="toggleDropdown(1)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent1">
+                                                    <label for="filterInput1" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput1"  />
+                                                    <a class="btn btn-info" onclick="cleardropdown(1)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(1)">Apply</a>
+                                                </div>
+                                            </th>
+                                           
+                                            <th class="bg-secondary text-white">
+                                                PARTY NAME 
+                                                <a class="extra text-white" onclick="toggleDropdown(2)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent2">
+                                                    <label for="filterInput2" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput2"  />
+                                                    <a class="btn btn-info" onclick="cleardropdown(2)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(2)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                CATEGORY
+                                                <a class="extra text-white" onclick="toggleDropdown(1)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent1">
+                                                    <label for="filterInput1" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput1"  />
+                                                    <a class="btn btn-info" onclick="cleardropdown(1)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(1)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                PARTY TYPE
+                                                <a class="extra text-white" onclick="toggleDropdown(3)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent3">
+                                                    <label for="filterInput3" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput3"  />
+                                                    <a class="btn btn-info" onclick="cleardropdown(3)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(3)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                TOTAL
+                                                <a class="extra text-white" onclick="toggleDropdown(4)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent4">
+                                                    <label for="filterInput4" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput4" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(4)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(4)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                PAID
+                                                <a class="extra text-white" onclick="toggleDropdown(4)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent4">
+                                                    <label for="filterInput4" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput4" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(4)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(4)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white">
+                                                BALANCE
+                                                <a class="extra text-white" onclick="toggleDropdown(5)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent5">
+                                                    <label for="filterInput5" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput5" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(5)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(5)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white extra">
+                                                ACTION
+                                                &nbsp; <a onclick="toggleDropdown(6)"><i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent6">
+                                                    <label for="filterInput6" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput6" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(6)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(6)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white extra">
+                                                BY
+                                                &nbsp; <a onclick="toggleDropdown(7)"><i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent7">
+                                                    <label for="filterInput7" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput7" />
+                                                    <a class="btn btn-info" onclick="cleardropdown(7)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(7)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-white extra"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for paymentout in paymentouts %}
+                                        <tr id="row_{{ paymentout.id }}">
+                                            <td style="color: black; text-align: left;white-space: nowrap;">{{ paymentout.billdate | date:'d-m-Y' }}</td>
+                                            <td class="clickable-row" style="color: black;" data-href="details_paymentout/{{ paymentout.id }}">{{ paymentout.ref_no }}</td>
+                                            
+                                            <td style="color: black;">{{ paymentout.party.party_name }}</td>
+                                            <td></td>
+                                            <td style="color: black;">Payment Out</td>
+                                            {% for paymentout_detail in paymentout.paymentoutdetails_set.all %}
+                                            <td class="clickable-row" style="color: black;" data-href="details_paymentout/{{ paymentout.id }}">
+                                                {{ paymentout_detail.paid }}
+                                            </td>
+                                           
+                                            {% endfor %}
+                                            {% for paymentout_detail in paymentout.paymentoutdetails_set.all %}
+                                            <td class="clickable-row" style="color: black;" data-href="details_paymentout/{{ paymentout.id }}">
+                                                {{ paymentout_detail.paid }}
+                                            </td>
+                                           
+                                            {% endfor %}
+                                            <td class="clickable-row" style="color: black;" data-href="details_paymentout/{{ p.id }}"></td>
+                                            <td class="clickable-row extra" style="color: black;" data-href="details_paymentout/{{ paymentout.id }}">
+                                                {{ paymentout.paymentouthistory_set.last.action }}
+                                            </td>
+                                            
+                                            
+                                            
+                                            <td style="color: black;">{{ paymentout.staff.first_name }} {{ paymentout.staff.last_name }}</td>
+                                            <td class="pt-3 m-0 extra">
+                                                <div class="btn-group">
+                                                    <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                      <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'details_paymentout' id=paymentout.id %}"><span class="fa fa-eye pe-2 tg"></span> View </a></li>
+                                                      <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'edit_paymentout' id=paymentout.id %}"><span class="fa fa-edit pe-2 tj"></span> Edit</a></li>
+
+                                                      <li>
+                                                        <a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'paymentout_history' id=paymentout.id %}">
+                                                            <span class="fa fa-history pe-2 th"></span> History
+                                                        </a>
+                                                    </li>
+                                                    
+                                                    
+                                                      <li>
+                                                        <a class="dropdown-item fw-bold tb hide_table_text_d" href="javascript:void(0);" onclick="deletePaymentOut('{{ paymentout.id }}')">
+                                                           <span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete
+                                                        </a>
+                                                     </li>
+                                                     
+                                                    
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="color: black;" hidden>{{p.advance}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+
+                                <p id="emptyMessage" style="text-align: center;">
+                                    <br><br><br>
+                                    No Transactions to Show
+                                </p>
+
+                               
+                              
+                            </div>
+                        </div>
+                    </div>                        
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    <div class="modal" id="excelModal" tabindex="-1" role="dialog" aria-labelledby="excelModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="excelModalLabel">Upload File
+                    <label for="" style="color: red; font-size: x-small;" >* Refer Downloaded Sheet For Format </label><br></h5>
+                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="excelForm" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="file" style="color: black;">Choose Excel File for Paymentout- </label> <br>
+                            <input type="file" class="form-control-file" id="billfile" name="billfile" accept=".xls, .xlsx"><br><br>
+                            
+
+                            
+                            
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="uploadFile()" data-dismiss="modal">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var table = document.getElementById("paymentouttable");
+        var rows = table.getElementsByTagName("tr");
+        for (var i = 1; i < rows.length; i++) {
+            var bankid = rows[i].getElementsByTagName("td")[3].innerText;
+            if(bankid != 'Cash' && bankid != 'Cheque' && bankid != 'UPI'){
+                changetobankname(i,bankid)
+            }
+        }
+
+        function changetobankname(rowid,bankid){
+            $.ajax({
+                type : 'POST',
+                url: "{% url 'bankdata' %}",
+                data: {
+                    id: bankid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(data){
+                    rows[rowid].getElementsByTagName("td")[3].innerText=data.bank_name
+                }
+            });
+        }
+    });
+
+    $(document).ready(function() {
+        var table = document.getElementById("excelpaymentouttable");
+        var rows = table.getElementsByTagName("tr");
+        for (var i = 1; i < rows.length; i++) {
+            var bankid = rows[i].getElementsByTagName("td")[3].innerText;
+            if(bankid != 'Cash' && bankid != 'Cheque' && bankid != 'UPI'){
+                changetobankname(i,bankid)
+            }
+        }
+
+        function changetobankname(rowid,bankid){
+            $.ajax({
+                type : 'POST',
+                url: "{% url 'bankdata' %}",
+                data: {
+                    id: bankid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(data){
+                    rows[rowid].getElementsByTagName("td")[3].innerText=data.bank_name
+                }
+            });
+        }
+    });
+</script>
+
+
+
+<script>
+    function uploadFile() {
+        const form = document.getElementById('excelForm');
+        const formData = new FormData(form);
+        fetch('import_purchase_bill', {
+            method: 'POST',
+            body: formData
+        })
+        .then(data => {
+            swal({
+                title: "Imported !",
+                text: "Purchase Bill Import Successfull!",
+                icon: "success",
+                buttons: false,
+            })
+        })
+        .then(response => {
+            setTimeout(function () {
+                location.reload();
+            }, 1250);
+        })
+        .catch(error => {
+            swal({
+                title: "Error !",
+                text: "PaymentOut  Import Unuccessfull!",
+                icon: "warning",
+                buttons: false,
+            })
+        });
+    }
+</script>
+
+<script>
+    function printfunction() {
+        // Assuming the index of the "BALANCE" column is 6
+        var balanceIndex = 7;
+
+        var table = document.getElementById("paymentoutTable");
+        var newTable = document.createElement("table");
+        newTable.className = "table table-bordered table-info table-striped tb table-responsive w-100";
+
+       
+
+        // Copy rows up to the balance column
+        for (var i = 0; i < table.rows.length; i++) {
+            var newRow = newTable.insertRow(newTable.rows.length);
+            for (var j = 0; j <= balanceIndex; j++) {
+                var cell = newRow.insertCell(j);
+                cell.innerHTML = table.rows[i].cells[j].innerHTML;
+            }
+        }
+
+        var printContents = newTable.outerHTML;
+        var $printerDiv = $('<div class="printContainer" id="printContainer"></div>');
+        $printerDiv.html(printContents);
+        $('body').append($printerDiv).addClass("printingContent");
+        var h1Element = document.createElement("h1");
+        h1Element.textContent = "Payment Out";
+        var head = document.getElementById("printContainer");
+        head.insertBefore(h1Element, head.firstChild);
+        window.print();
+        $printerDiv.remove();
+        $('body').removeClass("printingContent");
+    }
+</script>
+<script>
+    function cleardropdown(index){
+        if(index == 0){
+            document.getElementById('filterInput'+index).value = '';
+        }else{
+            document.getElementById('filterInput'+index).value = null;
+        }
+    }
+
+    function toggleDropdown(index) {
+        var dropdownContent = document.getElementById('dropdownContent' + index);
+        var isVisible = dropdownContent.style.display === 'block';
+        var allDropdowns = document.querySelectorAll('.dropdown-content');
+        allDropdowns.forEach(function (dropdown) {
+            dropdown.style.display = 'none';
+        });
+        dropdownContent.style.display = isVisible ? 'none' : 'block';
+    }
+
+    function filterTable(index) {
+        var input;
+        document.getElementById('dropdownContent' + index).style.display = 'none';
+        if (index === 0) {
+            input = document.getElementById('filterInput' + index).value;
+        } else {
+            input = document.getElementById('filterInput' + index).value.toUpperCase();
+        }
+        var table = document.getElementById('paymentoutTable');
+        var rows = table.getElementsByTagName('tr');
+        var emptyMessage = document.getElementById('emptyMessage');
+        var isEmpty = true;
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var cell = cells[index];
+            if (cell) {
+                var textValue = cell.textContent || cell.innerText;
+                if (index === 0) {
+                    if (input==''){
+                        rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                    }else{
+                        dateval  = textValue.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                        inputval  = input.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                        const formattedDate = formatDateString(input);
+                        if (dateval === formattedDate) {
+                            rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                        } else {
+                            rows[i].style.display = 'none';
+                        }
+                    }
+                } else {
+                    if (textValue.toUpperCase().includes(input)) {
+                        rows[i].style.display = 'table-row';
+                        isEmpty = false;
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+        emptyMessage.style.display = isEmpty ? 'block' : 'none';
+        
+    }
+
+    function formatDateString(inputDate) {
+        const parsedDate = new Date(inputDate);
+        const day = parsedDate.getDate();
+        const month = parsedDate.getMonth() + 1;
+        const year = parsedDate.getFullYear();
+        const formattedDate = `${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}-${year}`;
+        return formattedDate;
+    }
+</script>
+
+<script>
+    
+    function filterDates() {
+        var fromDateElement = document.getElementById("fromDate");
+        var toDateElement = document.getElementById("toDate");
+        
+        // Set the min attribute of toDate to the selected fromDate
+        toDateElement.min = fromDateElement.value;
+        
+        var fromDate = fromDateElement.value;
+        var selectedDate = new Date(fromDate);
+        selectedDate.setDate(selectedDate.getDate() - 1);
+        var toDate = toDateElement.value;
+        var table = document.getElementById("paymentoutTable");
+        var rows = table.getElementsByTagName("tr");
+        var emptyMessage = document.getElementById('emptyMessage');
+        var isEmpty = true;
+
+        for (var i = 1; i < rows.length; i++) {
+            var currentDate = rows[i].getElementsByTagName("td")[0].innerText;
+            var date = new Date(currentDate.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2/$1/$3"));
+            if ((fromDate && date >= selectedDate) || !fromDate) {
+                if ((toDate && date <= new Date(toDate)) || !toDate) {
+                    rows[i].style.display = "table-row";
+                    isEmpty = false;
+                } else {
+                    rows[i].style.display = "none";
+                }
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+        emptyMessage.style.display = isEmpty ? 'block' : 'none';
+        calculatetotal();
+    }
+    
+    
+</script>
+
+<script>
+    jQuery(document).ready(function($) {
+        $(".clickable-row").click(function() {
+            window.location = $(this).data("href");
+        });
+    });
+</script>
+
+<script>
+    function deletePaymentOut(paymentOutId) {
+        console.log('Deleting Payment Out with ID:', paymentOutId);
+        // Use the paymentOutId to identify the row you want to delete
+        // Make an AJAX request to delete the payment out
+        $.ajax({
+            type: 'POST',
+            // Assuming you are using Django template syntax for the URL
+            url: "/delete_paymentout/",  // Replace with the actual URL
+
+
+            data: {
+                paymentOutId: parseInt(paymentOutId),  // Convert to integer
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            
+            success: function (data) {
+                // Handle success, e.g., remove the row from the table
+                $('#row_' + paymentOutId).remove();
+                // Optionally show a success message
+                alert('Payment Out deleted successfully!');
+            },
+            error: function (xhr, status, error) {
+                // Handle errors, e.g., show an error message
+                alert('Error deleting Payment Out: ' + error);
+            }
+        });
+    }
+    
+</script>
+
+<script>
+    document.getElementById("search_input").addEventListener("input", function() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search_input");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("paymentoutTable");
+        tr = table.getElementsByTagName("tr");
+        var emptyMessage = document.getElementById("emptyMessage");
+        var anyMatch = false;
+        for (i = 1; i < tr.length; i++) {
+            tr[i].style.display = "table-row";
+            var found = false;
+            for (td of tr[i].getElementsByTagName("td")) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().includes(filter)) {
+                    found = true;
+                    anyMatch = true;
+                    break;
+                }
+            }
+            if (!found) {
+                tr[i].style.display = "none";
+            }
+        }
+        emptyMessage.style.display = anyMatch ? "none" : "block";
+        calculatetotal()
+    });
+</script>
+
+
+
+<script>
+    function excelmodel(){
+        const table1 = document.querySelector('#paymentouttablemodel');
+        const ws1 = XLSX.utils.table_to_sheet(table1);
+        const wb1 = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb1, ws1, 'Sheet1');
+        XLSX.writeFile(wb1, 'PaymentOutModel.xlsx');
+
+        const table2 = document.querySelector('#paymentouttableitemmodel');
+        const ws2 = XLSX.utils.table_to_sheet(table2);
+        const wb2 = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb2, ws2, 'Sheet1');
+        XLSX.writeFile(wb2, ' PaymentOutDetailsModel.xlsx');
+    }
+</script>
+<script>
+    function ExportToExcel() {
+        // Get the table
+        var paymentoutTable = document.getElementById("paymentoutTable");
+    
+        // Create a new worksheet
+        var ws = XLSX.utils.aoa_to_sheet([
+            ["DATE", "REF NO", "PARTY NAME", "CATEGORY", "PARTY TYPE", "TOTAL", "RECEIVED/PAID", "BALANCE"]
+        ]);
+    
+        // Loop through each row in the table and extract the specified columns
+        var rows = paymentoutTable.querySelectorAll("tbody tr");
+        rows.forEach(function (row) {
+            var rowData = [];
+            var cells = row.querySelectorAll("td");
+            // Specify the indices of the columns you want to export
+            var columnIndices = [0, 1, 2, 3, 4, 5, 6, 7];
+            columnIndices.forEach(function (index) {
+                rowData.push(cells[index].innerText.trim());
+            });
+            XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: -1 });
+        });
+    
+        // Create a new workbook and add the worksheet
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    
+        // Save the workbook to an Excel file
+        XLSX.writeFile(wb, "PaymentOutExport.xlsx");
+    }
+    
+    
+
+</script>
+
+{% endblock  %}
+
+
+
