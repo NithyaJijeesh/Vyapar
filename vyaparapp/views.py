@@ -4746,23 +4746,20 @@ def save_parties(request):
         party_name = request.POST['partyname']
         gst_no = request.POST['gstno']
         contact = request.POST['contact']
-        gst_type = request.POST['gst']
-        state = request.POST['state']
-        address = request.POST['address']
-        email = request.POST['email']
+        gst_type = request.POST.get('gst')
+        state = request.POST.get('state')
+        address = request.POST.get('address')
+        email = request.POST.get('email')
         openingbalance = request.POST.get('balance', '')
         payment = request.POST.get('paymentType', '')
         creditlimit = request.POST.get('creditlimit', '')
-        current_date = request.POST['currentdate']
+        current_date = request.POST.get('currentdate')
         End_date = request.POST.get('enddate', None)
-        additionalfield1 = request.POST['additionalfield1']
-        additionalfield2 = request.POST['additionalfield2']
-        additionalfield3 = request.POST['additionalfield3']
+        additionalfield1 = request.POST.get('additionalfield1')
+        additionalfield2 = request.POST.get('additionalfield2')
+        additionalfield3 = request.POST.get('additionalfield3')
        
-        if (
-          not party_name
-          
-      ):
+        if ( not party_name ):
           return render(request, 'add_parties.html')
 
         part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
@@ -4781,7 +4778,7 @@ def save_parties(request):
 def view_party(request,id):
   staff_id = request.session['staff_id']
   staff =  staff_details.objects.get(id=staff_id)
-  getparty=party.objects.get(id=id)
+  getparty=party.objects.get(id=id,company=staff.company.id)
   Party=party.objects.filter(company=staff.company.id)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
   return render(request, 'company/view_party.html',{'staff':staff,'allmodules':allmodules,'Party':Party,'getparty':getparty})
