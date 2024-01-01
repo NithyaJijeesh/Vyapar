@@ -4744,7 +4744,7 @@ def save_parties(request):
         staff =  staff_details.objects.get(id=staff_id)
         
         party_name = request.POST['partyname']
-        gst_no = request.POST['gstno']
+        gst_no = request.POST.get('gstno')
         contact = request.POST['contact']
         gst_type = request.POST.get('gst')
         state = request.POST.get('state')
@@ -4764,7 +4764,12 @@ def save_parties(request):
 
         part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
                        creditlimit=creditlimit,current_date=current_date,End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
-        part.save() 
+        # part.save() 
+        if party.objects.filter(party_name=party_name, contact=contact).exists():
+            print("Party with the given name and contact already exists.")
+        else:
+            part.save()
+            print("Party saved successfully.")
 
         if 'save_and_new' in request.POST:
             
