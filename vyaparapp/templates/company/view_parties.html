@@ -59,6 +59,7 @@
             </div>
         </div>
     </div>
+   
     <br>
     <div class="row ps-3 pe-3 m-0">
         <div class="col-sm-12 col-lg-3  ps-2 pe-3 pb-2" style="height: 50rem;">
@@ -148,10 +149,13 @@
             </div>
         </div>
         <div class="col-sm-12 col-lg-9  ps-2 pe-3" style="height: 80%;">
+            
           <div id="item_get_detail_target">
             <div class="row m-0" style="height:20%">
                 <div class="card bg-light bs p-3 mb-3">
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between">{% for message in messages %}
+                        <div class="alert alert-danger" role="alert">{{ message }}</div>
+                    {% endfor %}
                         <p class="tb fw-bolder fs-2">{{ getparty.party_name|upper }} </p>
                         <p class="tb fw-bolder fs-2">{{ getparty.contact }}{{getparty.email}}</p>
                         

@@ -88,17 +88,17 @@
     }
 
     .save-button {
-        background-color: #007bff;
-        border-color: #007bff; 
-        color: #fff; 
+        /* background-color: #007bff; */
+        /* border-color: #007bff;  */
+        /* color: #fff;  */
         margin-right: 1rem;
     }
 
    
-    .save-button:hover {
+    /* .save-button:hover {
         background-color: #fff;
         color: #007bff;
-    }
+    } */
 </style>
 
 <div class="body-wrapper">
@@ -137,6 +137,9 @@
                                         </a>
                                     </div>
                                 </div>
+                                {% for message in messages %}
+                                    <div class="alert alert-danger" role="alert">{{ message }}</div>
+                                {% endfor %}
                                 <div class="bg-light bs p-4 rounded mb-5">
                                     <div id="main_form_div">
                                         <div class="row" style="margin-left: -1vh;">
@@ -320,8 +323,8 @@
                                     <div class="row">
                                         <div class="col-md-1 mt-4"></div>
                                         <div class="col-md-5 mt-3 d-flex" style="margin-left:5vh">
-                                            <input type="submit" class="btn btn-primary bg-gradient me-3" name="Next" value="SAVE & NEXT"></input> 
-                                            <input type="submit" class="btn btn-primary bg-gradient" name="Save" value="SAVE"></input>
+                                            <input type="submit" class="btn btn-primary bg-gradient save-button" name="save_and_new" value="Save & New">
+                                            <input type="submit" class="btn btn-primary bg-gradient save-button" name="save" value="Save">
                                         </div>
                                     </div>
                                 </div>
