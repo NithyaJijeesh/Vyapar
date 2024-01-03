@@ -886,22 +886,23 @@ def edit_saveparty(request, id):
     user_id = cmp.user.id
     getparty = party.objects.get(id=id)
     Company = cmp
+    #updated by Nithya
 
     if request.method == 'POST':
         getparty.party_name = request.POST.get('partyname')
         getparty.gst_no = request.POST.get('gstno')
-        getparty.contact = request.POST['contact']
-        getparty.gst_type = request.POST['gst']
-        getparty.state = request.POST['state']
-        getparty.address = request.POST['address']
-        getparty.email = request.POST['email']
-        getparty.openingbalance = request.POST['balance']
+        getparty.contact = request.POST.get('contact')
+        getparty.gst_type = request.POST.get('gsttype')
+        getparty.state = request.POST.get('splystate')
+        getparty.address = request.POST.get('baddress')
+        getparty.email = request.POST.get('partyemail')
+        getparty.openingbalance = request.POST.get('openbalance')
         getparty.payment = request.POST.get('paymentType')
-        getparty.creditlimit = request.POST['creditlimit']
-        getparty.current_date = request.POST['currentdate']
-        getparty.additionalfield1 = request.POST['additionalfield1']
-        getparty.additionalfield2 = request.POST['additionalfield2']
-        getparty.additionalfield3 = request.POST['additionalfield3']
+        getparty.creditlimit = request.POST.get('crd_lmt')
+        getparty.current_date = request.POST.get('partydate')
+        getparty.additionalfield1 = request.POST.get('additional1')
+        getparty.additionalfield2 = request.POST.get('additional2')
+        getparty.additionalfield3 = request.POST.get('additional3')
 
         getparty.save()
 
@@ -4742,22 +4743,23 @@ def save_parties(request):
     if request.method == 'POST':
         staff_id = request.session['staff_id']
         staff =  staff_details.objects.get(id=staff_id)
-        
+            #updated by Nithya
+
         party_name = request.POST['partyname']
         gst_no = request.POST.get('gstno')
         contact = request.POST['contact']
-        gst_type = request.POST.get('gst')
-        state = request.POST.get('state')
-        address = request.POST.get('address')
-        email = request.POST.get('email')
-        openingbalance = request.POST.get('balance', '')
+        gst_type = request.POST.get('gsttype')
+        state = request.POST.get('splystate')
+        address = request.POST.get('baddress')
+        email = request.POST.get('partyemail')
+        openingbalance = request.POST.get('openbalance', '')
         payment = request.POST.get('paymentType', '')
-        creditlimit = request.POST.get('creditlimit', '')
-        current_date = request.POST.get('currentdate')
+        creditlimit = request.POST.get('crd_lmt', '')
+        current_date = request.POST.get('partydate')
         End_date = request.POST.get('enddate', None)
-        additionalfield1 = request.POST.get('additionalfield1')
-        additionalfield2 = request.POST.get('additionalfield2')
-        additionalfield3 = request.POST.get('additionalfield3')
+        additionalfield1 = request.POST.get('additional1')
+        additionalfield2 = request.POST.get('additional2')
+        additionalfield3 = request.POST.get('additional3')
        
         if ( not party_name ):
           return render(request, 'add_parties.html')

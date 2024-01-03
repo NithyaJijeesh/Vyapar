@@ -1,4 +1,5 @@
 <!-- create by Antony Tom -->
+<!-- updated by Nithya-->
 {% extends 'company/src/html/base.html' %}
 {% block content %}
 {% load static %}
@@ -193,7 +194,7 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <label class="col-form-label mt-4" style="color: black;">GST Type</label>
-                                                                <select class="form-control border-secondary" id="modalgsttype" name="modalgsttype" style="color: black; background-color: white;">
+                                                                <select class="form-control border-secondary" id="modalgsttype" name="gsttype" style="color: black; background-color: white;">
                                                                     <option selected value="" hidden>Select</option>
                                                                     <option value="Registered Party">Registered Party</option>
                                                                     <option value="Unregistered or Consumer">Unregistered or Consumer</option>
@@ -252,7 +253,7 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <label class="col-form-label mt-4" for="partyemail" style="color: black;">Email</label>
-                                                                <input type="email" class="form-control border-secondary" id="partyemail" name="partyemail" style="color: black; background-color: white;" placeholder="Enter Email" required>
+                                                                <input type="email" class="form-control border-secondary" id="partyemail" name="partyemail" style="color: black; background-color: white;" placeholder="Enter Email" >
                                                             </div>
                                                         </div>
         
@@ -486,15 +487,15 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
     <script>
-           $(document).ready(function () {
-        $("#toggle").change(function () {
-            if (this.checked) {
-                $("#crd_lmt").show();
-            } else {
-                $("#crd_lmt").hide();
-            }
-        });
-    })
+        $(document).ready(function () {
+            $("#toggle").change(function () {
+                if (this.checked) {
+                    $("#crd_lmt").show();
+                } else {
+                    $("#crd_lmt").hide();
+                }
+            });
+        })
         $(document).ready(function(){
         $('#gsthead').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
         $('#gsthead a').addClass('text-dark')
