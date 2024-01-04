@@ -283,7 +283,6 @@
                                                                 </label>
                                                                 <input type="number" class="form-control border-secondary" id="crd_lmt" name="crd_lmt" style="color: black; background-color: white; {% if not getparty.creditlimit %} display: none; {% else %} display: block;{% endif %}" value="{% if getparty.creditlimit %}{{ getparty.creditlimit }}{% else %}{% if not toggle %}0{% endif %}{% endif %}">
                                                             </div>
-                                                           
                                                         </div>
         
                                                         <div class="row">
@@ -517,7 +516,7 @@
                     $("#crd_lmt").show();
                 } else {
                     $("#crd_lmt").hide();
-                    // $("#crd_lmt").val(0);
+                    $("#crd_lmt").val(0);
                 }
             });
             

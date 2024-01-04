@@ -98,6 +98,8 @@ class party(models.Model):
     additionalfield1 = models.CharField(max_length=100,null=True,blank=True)
     additionalfield2 = models.CharField(max_length=100,null=True,blank=True)
     additionalfield3 = models.CharField(max_length=100,null=True,blank=True)
+    balance = models.CharField(max_length=100,default='0',null=True,blank=True)
+
     
 #End
 

@@ -857,8 +857,11 @@ def add_parties(request):
   sid = request.session.get('staff_id')
   staff =  staff_details.objects.get(id=sid)
   cmp = company.objects.get(id=staff.company.id)
+  tod = date.today()
+  print(tod)
 
-  return render(request, 'company/add_parties.html',{'staff':staff})
+  return render(request, 'company/add_parties.html',{'staff':staff, 'tod' : tod })
+
 
 def edit_party(request,id):
   #updated-shemeem
@@ -4733,11 +4736,9 @@ def editstaff_profile_action(request):
 def view_parties(request):
   staff_id = request.session['staff_id']
   staff =  staff_details.objects.get(id=staff_id)
-  
- 
   Party=party.objects.filter(company=staff.company.id)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
-  return render(request, 'company/view_parties.html',{'staff':staff,'allmodules':allmodules,'Party':Party})
+  return render(request, 'company/view_parties.html',{'staff':staff,'allmodules':allmodules,'Party':Party, 'getparty' : getparty})
 
 def save_parties(request):
     if request.method == 'POST':
@@ -4753,6 +4754,7 @@ def save_parties(request):
         address = request.POST.get('baddress')
         email = request.POST.get('partyemail')
         openingbalance = request.POST.get('openbalance', '')
+        balance = request.POST.get('openbalance', '')
         payment = request.POST.get('paymentType', '')
         creditlimit = request.POST.get('crd_lmt', '')
         current_date = request.POST.get('partydate')
@@ -4765,7 +4767,7 @@ def save_parties(request):
           return render(request, 'add_parties.html')
 
         part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
-                       creditlimit=creditlimit,current_date=current_date,End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
+                       creditlimit=creditlimit,current_date=current_date, balance = balance, End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
         # part.save() 
         
 
@@ -4790,6 +4792,7 @@ def view_party(request,id):
   staff_id = request.session['staff_id']
   staff =  staff_details.objects.get(id=staff_id)
   getparty=party.objects.get(id=id,company=staff.company.id)
+  # print(getparty)
   Party=party.objects.filter(company=staff.company.id)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
   return render(request, 'company/view_party.html',{'staff':staff,'allmodules':allmodules,'Party':Party,'getparty':getparty})
