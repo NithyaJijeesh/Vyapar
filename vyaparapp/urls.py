@@ -137,7 +137,7 @@ urlpatterns = [
     path('save_parties', views.save_parties, name='save_parties'),
     path('view_parties', views.view_parties, name='view_parties'),
     path('view_party/<int:id>', views.view_party, name='view_party'),
-    path('edit_party/<id>', views.edit_party, name='edit_party'),
+    path('edit_party/<int:id>', views.edit_party, name='edit_party'),
     path('edit_saveparty/<int:id>', views.edit_saveparty, name='edit_saveparty'),
     path('deleteparty/<int:id>', views.deleteparty, name='deleteparty'),
     #End

@@ -163,16 +163,16 @@
                     </div>
                     <p></p>
                     <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-2">SALE PRICE  <span class="ps-2 tg">₹{{ first_item.item_sale_price }}</span></p>
-                        <p class="tb fw-bolder fs-2">STOCK QUANTITY  <span class="ps-2 tg">{{ first_item.item_current_stock }}</span></p>
+                        <p class="tb fw-bolder fs-2">SALE PRICE:  <span class="ps-2 tg">₹{{ first_item.item_sale_price }}</span></p>
+                        <p class="tb fw-bolder fs-2">STOCK QUANTITY:  <span class="ps-2 tg">{{ first_item.item_current_stock }}</span></p>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-2">PURCHASE PRICE  <span class="ps-2 tg">₹{{ first_item.item_purchase_price }}</span></p>
-                        <p class="tb fw-bolder fs-2">STOCK VALUE  <span class="ps-2 tg">₹{{ first_item.item_current_stock|mul:first_item.item_at_price }}</span></p>
+                        <p class="tb fw-bolder fs-2">PURCHASE PRICE:  <span class="ps-2 tg">₹{{ first_item.item_purchase_price }}</span></p>
+                        <p class="tb fw-bolder fs-2">STOCK VALUE:  <span class="ps-2 tg">₹{{ first_item.item_current_stock|mul:first_item.item_at_price }}</span></p>
                     </div>
                     {% if first_item.item_min_stock_maintain %}
                     <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-2">MINIMUM STOCKS TO MAINTAIN  <span class="ps-2 tg">{{ first_item.item_min_stock_maintain }}</span></p>
+                        <p class="tb fw-bolder fs-2">MINIMUM STOCKS TO MAINTAIN:  <span class="ps-2 tg">{{ first_item.item_min_stock_maintain }}</span></p>
                     </div>
                     {% endif %}
                 </div>

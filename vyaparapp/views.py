@@ -876,7 +876,17 @@ def edit_party(request,id):
   getparty=party.objects.get(id=id)
   # Party=party.objects.filter(user=request.user)
   Party=party.objects.filter(user=cmp.user)
-  return render(request, 'company/edit_party.html',{'Company':Company,'user_id':user_id,'Party':Party,'getparty':getparty,'staff':staff})
+  tod = date.today()
+  print(tod)
+  context = {
+              'Company':Company,
+              'user_id':user_id,
+              'Party':Party,
+              'getparty':getparty,
+              'staff':staff, 
+              'tod' : datetime.now()
+            }
+  return render(request, 'company/edit_party.html',context)
 
 
 def edit_saveparty(request, id):
@@ -4738,7 +4748,7 @@ def view_parties(request):
   staff =  staff_details.objects.get(id=staff_id)
   Party=party.objects.filter(company=staff.company.id)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
-  return render(request, 'company/view_parties.html',{'staff':staff,'allmodules':allmodules,'Party':Party, 'getparty' : getparty})
+  return render(request, 'company/view_parties.html',{'staff':staff,'allmodules':allmodules,'Party':Party,})
 
 def save_parties(request):
     if request.method == 'POST':
@@ -4767,7 +4777,7 @@ def save_parties(request):
           return render(request, 'add_parties.html')
 
         part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
-                       creditlimit=creditlimit,current_date=current_date, balance = balance, End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
+                       creditlimit=creditlimit,current_date=current_date, current_balance = balance, End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
         # part.save() 
         
 
@@ -4792,7 +4802,7 @@ def view_party(request,id):
   staff_id = request.session['staff_id']
   staff =  staff_details.objects.get(id=staff_id)
   getparty=party.objects.get(id=id,company=staff.company.id)
-  # print(getparty)
+  print(getparty)
   Party=party.objects.filter(company=staff.company.id)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
   return render(request, 'company/view_party.html',{'staff':staff,'allmodules':allmodules,'Party':Party,'getparty':getparty})
@@ -7017,7 +7027,6 @@ def import_excel(request):
   
 def add_party(request):
   if request.method == 'POST':
-        print("sub===========================")
         staff_id = request.session['staff_id']
         staff =  staff_details.objects.get(id=staff_id)
         
@@ -9878,3 +9887,10 @@ def email_saleorder(request,id):
     email.send(fail_silently=False)
     # msg = messages.success(request, 'Debit note file has been shared via email successfully..!')
     return redirect(saleorder_view,id)
+
+
+
+
+
+
+
