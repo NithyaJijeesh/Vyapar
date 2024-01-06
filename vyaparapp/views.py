@@ -4743,12 +4743,16 @@ def editstaff_profile_action(request):
     return redirect ('staff_profile')
   return redirect ('staff_profile')
 
-def view_parties(request):
+def view_parties(request,pk):
   staff_id = request.session['staff_id']
   staff =  staff_details.objects.get(id=staff_id)
   Party=party.objects.filter(company=staff.company.id)
+  if pk == 0:
+      first_item = party.objects.filter().first()
+  else:
+      first_item = party.objects.get(id=pk)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
-  return render(request, 'company/view_parties.html',{'staff':staff,'allmodules':allmodules,'Party':Party,})
+  return render(request, 'company/view_parties.html',{'staff':staff,'allmodules':allmodules,'Party':Party, 'getparty' : first_item})
 
 def save_parties(request):
     if request.method == 'POST':
@@ -4778,7 +4782,6 @@ def save_parties(request):
 
         part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
                        creditlimit=creditlimit,current_date=current_date, current_balance = balance, End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
-        # part.save() 
         
 
         if 'save_and_new' in request.POST:
@@ -4802,7 +4805,6 @@ def view_party(request,id):
   staff_id = request.session['staff_id']
   staff =  staff_details.objects.get(id=staff_id)
   getparty=party.objects.get(id=id,company=staff.company.id)
-  print(getparty)
   Party=party.objects.filter(company=staff.company.id)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
   return render(request, 'company/view_party.html',{'staff':staff,'allmodules':allmodules,'Party':Party,'getparty':getparty})

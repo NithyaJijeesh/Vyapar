@@ -1,4 +1,5 @@
 <!-- create by athul -->
+<!--updated by Nithya-->
 
 {% extends 'company/src/html/base.html' %}
 
@@ -6,6 +7,9 @@
 {% load static %}
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
+<!-- Add the HTMX library script -->
+<script src="https://unpkg.com/htmx.org@1.9.6" ></script>
+
 <!-- Load SheetJS from a CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
 
@@ -84,8 +88,7 @@
                             <input hidden id="search_item_input" class="form-control border-dark text-dark" type="text" placeholder="search here.." name="searching_item"
                             hx-post=""
                             hx-trigger="keyup"
-                            hx-target="#item_search_filter_target"
-                            >
+                            hx-target="#item_search_filter_target">
                         </form>
                     </div>
                     <div class="ps-3 pe-3">
@@ -96,46 +99,44 @@
                         <div id="item_search_filter_target">
                             <form action="" method="post">
                                 {% csrf_token %}
-
                                 <div style="overflow: auto;height: 42rem;">
-                                <table class="table w-100 table-light table-striped table-hover">
-                                    <thead class="bg-primary">
-                                        <th class="text-start fs-2 tb">PARTY</th>
-                                        <th class="text-end fs-2 tb">AMOUNT</th>
-                                    </thead>
-                                    <tbody>
-                                        {% for i in Party %}
-                                        <tr class="item_lists_hide">
-                                            <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark"
-                                            hx-post="{% url 'view_party' i.id %}"
-                                            hx-trigger="click delay:0s"
-                                            hx-target="#item_get_detail_target"
-                                            >{{ i.party_name|capfirst }}</td>
-                                            <td class="text-end fs-2 fw-bolder" style="color: green;">
-                                                {% if i.payment == 'To Pay' %}
-                                                <span style="border: none; color: red; ">{{ i.current_balance }}</span>
-                                                {% elif i.payment == 'To Receive' %}
-                                                <span style="border: none; color: green; ">{{ i.current_balance }}</span>
-                                                {% else %}
-                                                <span style="border: none; color: black; ">{{ i.current_balance }}</span>
-                                                {% endif %}
-                                                <div class="btn-group mb-1">
-                                                    <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span class="fa fa-ellipsis-v text-dark fs-1 ps-2"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <a class="dropdown-item" href="{% url 'edit_party' i.id %}">Edit</a>
-                                                        <a class="dropdown-item"
-                                                            href="{% url 'deleteparty' i.id %}">Delete</a>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                                    <table class="table w-100 table-light table-striped table-hover">
+                                        <thead class="bg-primary">
+                                            <th class="text-start fs-2 tb">PARTY</th>
+                                            <th class="text-end fs-2 tb">AMOUNT</th>
+                                        </thead>
+                                        <tbody>
+                                            {% for i in Party %}
+                                            <tr class="item_lists_hide">
+                                                <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark"
+                                                hx-post="{% url 'view_parties' i.id %}"
+                                                hx-trigger="click delay:0s"
+                                                hx-target="#item_get_detail_target"
+                                                >{{ i.party_name|capfirst }}</td>
+                                                <td class="text-end fs-2 fw-bolder" style="color: green;">
+                                                    {% if i.payment == 'To Pay' %}
+                                                    <span style="border: none; color: red; ">{{ i.current_balance }}</span>
+                                                    {% elif i.payment == 'To Receive' %}
+                                                    <span style="border: none; color: green; ">{{ i.current_balance }}</span>
+                                                    {% else %}
+                                                    <span style="border: none; color: black; ">{{ i.current_balance }}</span>
+                                                    {% endif %}
+                                                    <div class="btn-group mb-1">
+                                                        <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <span class="fa fa-ellipsis-v text-dark fs-1 ps-2"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <a class="dropdown-item" href="{% url 'edit_party' i.id %}">Edit</a>
+                                                            <a class="dropdown-item"
+                                                                href="{% url 'deleteparty' i.id %}">Delete</a>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 </div>
-
                             </form>
                         </div>
                         {% else %}
@@ -148,70 +149,92 @@
                 </div>
             </div>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var searchInput = document.getElementById('search_item_input');
+                searchInput.addEventListener('keyup', function () {
+                    var filter = searchInput.value.toUpperCase();
+                    var table = document.querySelector('.table tbody');
+                    var rows = table.getElementsByTagName('tr');
+        
+                    for (var i = 0; i < rows.length; i++) {
+                        var td = rows[i].getElementsByTagName('td')[0]; // Assuming the filter is based on the first column
+                        if (td) {
+                            var txtValue = td.textContent || td.innerText;
+                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                rows[i].style.display = '';
+                            } else {
+                                rows[i].style.display = 'none';
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+        
         <div class="col-sm-12 col-lg-9  ps-2 pe-3" style="height: 80%;">
-          <div id="item_get_detail_target">
-            <div class="row m-0" style="height:20%">
-                <div class="card bg-light bs p-3 mb-3">
-                    <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-4">{{ Party.0.party_name|upper }} </p>
-                        
+            <div id="item_get_detail_target">
+                <div class="row m-0" style="height:20%">
+                    <div class="card bg-light bs p-3 mb-3">
+                        <div class="d-flex justify-content-between">
+                            <p class="tb fw-bolder fs-4">{{ getparty.party_name|upper }} </p>
+                        </div>
+                        <p></p>
+                        <div class="d-flex justify-content-between">
+                            <p class="tb fw-bolder fs-2">PHONE:  <span class="ps-2 tg">
+                                {% if getparty.contact %}
+                                    <label for="" style="color: #000000; ">{{ getparty.contact }}</label>
+                                {% else %}
+                                <a href="{% url 'edit_party' getparty.id %}"><i class="fa fa-phone "></i>&nbsp;&nbsp;Add
+                                    Contact</a>
+                                {% endif %}</span>
+                            </p>
+                            <p class="tb fw-bolder fs-2">ADDRESS:  <span class="ps-2 tg">
+                                {% if getparty.address %}
+                                <label for="" style="color: #000000; ">{{ getparty.address }}</label>
+                                {% else %}
+                                <a href="{% url 'edit_party' getparty.id %}"><i class="fa fa-map-marker"></i>&nbsp;&nbsp;Add
+                                    Address</a>
+                                {% endif %}</span>
+                            </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <p class="tb fw-bolder fs-2">EMAIL:  <span class="ps-2 tg">
+                                {% if getparty.email %}
+                                <label for="" style="color: #000000; ">{{ getparty.email}}</label>
+                                {% else %}
+                                <a href="{% url 'edit_party' getparty.id %}"><i class="fa fa-envelope"></i>&nbsp;&nbsp;Add
+                                    Email</a>
+                                {% endif %}</span></p>
+                            <p class="tb fw-bolder fs-2">GSTIN:  <span class="ps-2 tg">
+                                {% if getparty.gst_no %}
+                                <label for="" style="color: #000000; ">{{ getparty.gst_no}}</label>
+                                {% else %}
+                                <a href="{% url 'edit_party' getparty.id %}"><i class="fa fa-barcode "></i>&nbsp;&nbsp;Add
+                                    Gstin</a>
+                                {% endif %}
+                            </span></p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <p class="tb fw-bolder fs-2">CREDIT LIMIT:  <span class="ps-2 tg">
+                                {% if getparty.creditlimit %}
+                                <label for="" style="color: #000000; ">{{ getparty.creditlimit}}</label>
+                                {% else %}
+                                <a href="{% url 'edit_party' getparty.id %}" ><i
+                                        class="fas fa-rupee-sign "></i>&nbsp;&nbsp;Set Credit Limit</a>
+                                {% endif %}</span></p>
+                            <p class="tb fw-bolder fs-2">BALANCE:  <span class="ps-2 tg">
+                                {{ getparty.current_balance}}
+                            </span></p>
+                        </div>
                     </div>
-                    <p></p>
-                    <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-2">PHONE:  <span class="ps-2 tg">
-                            {% if Party.0.contact %}
-                                <label for="" style="color: #000000; ">{{ Party.0.contact }}</label>
-                            {% else %}
-                            <a href="{% url 'edit_party' Party.0.id %}"><i class="fa fa-phone "></i>&nbsp;&nbsp;Add
-                                Contact</a>
-                            {% endif %}</span></p>
-                        <p class="tb fw-bolder fs-2">ADDRESS:  <span class="ps-2 tg">
-                            {% if Party.0.address %}
-                            <label for="" style="color: #000000; ">{{ Party.0.address }}</label>
-                            {% else %}
-                            <a href="{% url 'edit_party' Party.0.id %}"><i class="fa fa-map-marker"></i>&nbsp;&nbsp;Add
-                                Address</a>
-                            {% endif %}
-                        </span></p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-2">EMAIL:  <span class="ps-2 tg">
-                            {% if Party.0.email %}
-                            <label for="" style="color: #000000; ">{{ Party.0.email}}</label>
-                            {% else %}
-                            <a href="{% url 'edit_party' Party.0.id %}"><i class="fa fa-envelope"></i>&nbsp;&nbsp;Add
-                                Email</a>
-                            {% endif %}</span></p>
-                        <p class="tb fw-bolder fs-2">GSTIN:  <span class="ps-2 tg">
-                            {% if Party.0.gst_no %}
-                            <label for="" style="color: #000000; ">{{ Party.0.gst_no}}</label>
-                            {% else %}
-                            <a href="{% url 'edit_party' Party.0.id %}"><i class="fa fa-barcode "></i>&nbsp;&nbsp;Add
-                                Gstin</a>
-                            {% endif %}
-                        </span></p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-2">CREDIT LIMIT:  <span class="ps-2 tg">
-                            {% if Party.0..creditlimit %}
-                            <label for="" style="color: #000000; ">{{ Party.0.creditlimit}}</label>
-                            {% else %}
-                            <a href="{% url 'edit_party' Party.0.id %}" ><i
-                                    class="fas fa-rupee-sign "></i>&nbsp;&nbsp;Set Credit Limit</a>
-                            {% endif %}</span></p>
-                        <p class="tb fw-bolder fs-2">BALANCE:  <span class="ps-2 tg">
-                            {{ Party.0.current_balance}}
-                        </span></p>
-                    </div>
-                    
                 </div>
             </div>
-          </div>
-        </div> 
+        </div>
     </div>
 </div>
  
-<script>
+<!-- <script>
    
     function exportToExcel() {
         $('.hide_table_text_v').text('')
@@ -348,5 +371,5 @@
         });
     }
 </script>
-
+ -->
 {% endblock  %}
