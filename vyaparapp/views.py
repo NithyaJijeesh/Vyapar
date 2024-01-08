@@ -4748,11 +4748,11 @@ def view_parties(request,pk):
   staff =  staff_details.objects.get(id=staff_id)
   Party=party.objects.filter(company=staff.company.id)
   if pk == 0:
-      first_item = party.objects.filter().first()
+      getparty = party.objects.filter().first()
   else:
-      first_item = party.objects.get(id=pk)
+      getparty = party.objects.get(id=pk)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
-  return render(request, 'company/view_parties.html',{'staff':staff,'allmodules':allmodules,'Party':Party, 'getparty' : first_item})
+  return render(request, 'company/view_parties.html',{'staff':staff,'allmodules':allmodules,'Party':Party, 'getparty' : getparty})
 
 def save_parties(request):
     if request.method == 'POST':
