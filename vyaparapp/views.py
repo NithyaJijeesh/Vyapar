@@ -919,15 +919,15 @@ def edit_saveparty(request, id):
 
         getparty.save()
 
-        return redirect('view_party', id=getparty.id)
-
+        # return redirect('view_party', id=getparty.id)
+        return redirect('view_parties', id=getparty.id)
     return render(request, 'edit_party.html', {'getparty': getparty, 'Party': Party, 'Company': Company,'user_id':user_id})
 
 
 def deleteparty(request,id):
     Party=party.objects.get(id=id)
     Party.delete()
-    return redirect('view_parties')
+    return redirect('view_parties', 0)
 
 #End
 
@@ -4797,7 +4797,7 @@ def save_parties(request):
             else:
                 part.save()
           
-            return redirect('view_parties')
+            return redirect('view_parties', 0)
 
     return render(request, 'company/add_parties.html')  
 

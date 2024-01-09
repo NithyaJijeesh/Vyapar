@@ -73,7 +73,7 @@
                             {% csrf_token %}
                             <div class="d-flex justify-content-between">
                                 <span id="search_item" class="fa fa-search tb bg-info text-light ms-2 mt-1" style="border-radius: 50%;padding: 0.77rem;"></span>
-                                <a id="add_party_btn" class="btn btn-sm rounded p-2 mt-1 btn_add" href="{% url 'save_parties' %}"><span class="fa fa-plus"></span> Add Party</a>
+                                <a id="add_party_btn" class="btn btn-sm rounded p-2 mt-1 btn_add" href="{% url 'add_parties' %}"><span class="fa fa-plus"></span> Add Party</a>
                             </div>
                             <div class="position-relative">
                                 <div class="position-absolute end-0" style="margin-top:0.5rem;margin-right:0.7rem">
@@ -152,6 +152,9 @@
         <div class="col-sm-12 col-lg-9  ps-2 pe-3" style="height: 80%;">
             <div id="item_get_detail_target">
                 <div class="row m-0" style="height:20%">
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">{{ message }}</div>
+                    {% endfor %}
                     <div class="card bg-light bs p-3 mb-3">
                         <div class="d-flex justify-content-between">
                             <p class="tb fw-bolder fs-4">{{ getparty.party_name|upper }} </p>
@@ -232,13 +235,13 @@
                                         <thead>
                                             <th>#</th>
                                             <th class="text-center fs-2">TYPE <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center fs-2">INVOIVE <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center fs-2">NAME <span class="fa fa-filter ps-1 fs-1"></span></th>
+                                            <th class="text-center fs-2">NUMBER<span class="fa fa-filter ps-1 fs-1"></span></th>
+                                            <!-- <th class="text-center fs-2">NAME <span class="fa fa-filter ps-1 fs-1"></span></th> -->
                                             <th class="text-center fs-2">DATE <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center fs-2">QUANTITY <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center fs-2">PRICE <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center fs-2">STATUS <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center p-0 m-0"></th>
+                                            <th class="text-center fs-2">TOTAL<span class="fa fa-filter ps-1 fs-1"></span></th>
+                                            <th class="text-center fs-2">BALANCE<span class="fa fa-filter ps-1 fs-1"></span></th>
+                                            <!-- <th class="text-center fs-2">STATUS <span class="fa fa-filter ps-1 fs-1"></span></th>-->
+                                            <th class="text-center p-0 m-0"></th> 
                                         </thead>
                                         <tbody>
                                             {% for i in transactions %}
