@@ -909,6 +909,7 @@ def edit_saveparty(request, id):
         getparty.state = request.POST.get('splystate')
         getparty.address = request.POST.get('baddress')
         getparty.email = request.POST.get('partyemail')
+        getparty.current_balance = request.POST.get('openbalance') if getparty.current_balance == getparty.openingbalance else getparty.current_balance
         getparty.openingbalance = request.POST.get('openbalance')
         getparty.payment = request.POST.get('paymentType')
         getparty.creditlimit = request.POST.get('crd_lmt')
@@ -920,7 +921,7 @@ def edit_saveparty(request, id):
         getparty.save()
 
         # return redirect('view_party', id=getparty.id)
-        return redirect('view_parties', id=getparty.id)
+        return redirect('view_parties', pk=getparty.id)
     return render(request, 'edit_party.html', {'getparty': getparty, 'Party': Party, 'Company': Company,'user_id':user_id})
 
 
