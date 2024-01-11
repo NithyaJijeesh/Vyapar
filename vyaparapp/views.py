@@ -858,7 +858,6 @@ def add_parties(request):
   staff =  staff_details.objects.get(id=sid)
   cmp = company.objects.get(id=staff.company.id)
   tod = date.today()
-  print(tod)
 
   return render(request, 'company/add_parties.html',{'staff':staff, 'tod' : tod })
 
@@ -4748,10 +4747,11 @@ def view_parties(request,pk):
   staff_id = request.session['staff_id']
   staff =  staff_details.objects.get(id=staff_id)
   Party=party.objects.filter(company=staff.company.id)
+  print(Party)
   if pk == 0:
-      getparty = party.objects.filter().first()
+      getparty = party.objects.filter(company=staff.company.id).first()
   else:
-      getparty = party.objects.get(id=pk)
+      getparty = party.objects.get(company=staff.company.id, id=pk)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
   return render(request, 'company/view_parties.html',{'staff':staff,'allmodules':allmodules,'Party':Party, 'getparty' : getparty})
 
@@ -4759,9 +4759,10 @@ def save_parties(request):
     if request.method == 'POST':
         staff_id = request.session['staff_id']
         staff =  staff_details.objects.get(id=staff_id)
+        
             #updated by Nithya
 
-        party_name = request.POST['partyname']
+        party_name = request.POST['partyname'].capitalize()
         gst_no = request.POST.get('gstno')
         contact = request.POST['contact']
         gst_type = request.POST.get('gsttype')
@@ -4777,30 +4778,34 @@ def save_parties(request):
         additionalfield1 = request.POST.get('additional1')
         additionalfield2 = request.POST.get('additional2')
         additionalfield3 = request.POST.get('additional3')
+
+        context  = {'staff' : staff, 'tod' : date.today()}
        
         if ( not party_name ):
-          return render(request, 'add_parties.html')
+          return render(request, 'add_parties.html',context)
 
         part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
                        creditlimit=creditlimit,current_date=current_date, current_balance = balance, End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
         
-
-        if 'save_and_new' in request.POST:
-            if party.objects.filter(party_name=party_name, contact=contact).exists():
-                messages.error(request, 'Contact with the same name and contact number already exists.')
-            else:
-                part.save()
-            
-            return render(request, 'company/add_parties.html')
+        if not party_name or not contact:
+            messages.error(request, 'Please Enter Party Name and Contact.')
         else:
-            if party.objects.filter(party_name=party_name, contact=contact).exists():
-                messages.error(request, 'Contact with the same name and contact number already exists.')
-            else:
-                part.save()
-          
-            return redirect('view_parties', 0)
+          if 'save_and_new' in request.POST:
+              if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
+                  messages.error(request, 'Contact with the same party name and contact number already exists.')
+              else:
+                  part.save()
+              
+              return render(request, 'company/add_parties.html', context)
+          else:
+              if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
+                  messages.error(request, 'Contact with the same party name and contact number already exists.')
+              else:
+                  part.save()
+            
+              return redirect('view_parties', 0)
 
-    return render(request, 'company/add_parties.html')  
+    return render(request, 'company/add_parties.html',context)  
 
 def view_party(request,id):
   staff_id = request.session['staff_id']
