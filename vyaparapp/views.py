@@ -919,6 +919,7 @@ def edit_saveparty(request, id):
 
         getparty.save()
 
+        party_history.objects.create(party = getparty,company=staff.company,staff=staff,action='Updated')
         # return redirect('view_party', id=getparty.id)
         return redirect('view_parties', pk=getparty.id)
     return render(request, 'edit_party.html', {'getparty': getparty, 'Party': Party, 'Company': Company,'user_id':user_id})
@@ -4743,17 +4744,46 @@ def editstaff_profile_action(request):
     return redirect ('staff_profile')
   return redirect ('staff_profile')
 
+
 def view_parties(request,pk):
   staff_id = request.session['staff_id']
   staff =  staff_details.objects.get(id=staff_id)
   Party=party.objects.filter(company=staff.company.id)
-  print(Party)
   if pk == 0:
       getparty = party.objects.filter(company=staff.company.id).first()
   else:
       getparty = party.objects.get(company=staff.company.id, id=pk)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
-  return render(request, 'company/view_parties.html',{'staff':staff,'allmodules':allmodules,'Party':Party, 'getparty' : getparty})
+  party_histories= party_history.objects.filter(party=getparty,company=staff.company)
+
+  bills = PurchaseBill.objects.filter(company = staff.company.id, party = getparty)
+  bill_history = PurchaseBillTransactionHistory.objects.filter(company = staff.company.id, purchasebill__in = bills)
+  latest_records = PurchaseBillTransactionHistory.objects.filter(
+    company=staff.company.id,
+    purchasebill__in=bills
+  ).values('purchasebill').annotate(latest_record=Max('id'))
+  print(latest_records)
+
+  context = { 
+              'staff':staff,
+              'allmodules':allmodules,
+              'Party':Party, 
+              'getparty' : getparty, 
+              'party_history' : party_histories,
+              'bills' : bills, 
+              'bill_history' : bill_history,
+             }
+  return render(request, 'company/view_parties.html',context)
+
+def party_histories(request,id):
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)   
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+  getparty = party.objects.get(id=id,company=cmp)
+  party_histories= party_history.objects.filter(party=getparty,company=cmp)
+  context = {'staff':staff,'allmodules':allmodules,'party_history': party_histories,'getparty': getparty}
+  return render(request,'company/party_history.html',context)
 
 def save_parties(request):
     if request.method == 'POST':
@@ -4795,6 +4825,7 @@ def save_parties(request):
                   messages.error(request, 'Contact with the same party name and contact number already exists.')
               else:
                   part.save()
+                  party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created')
               
               return render(request, 'company/add_parties.html', context)
           else:
@@ -4802,10 +4833,23 @@ def save_parties(request):
                   messages.error(request, 'Contact with the same party name and contact number already exists.')
               else:
                   part.save()
-            
+                  party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created')
+
               return redirect('view_parties', 0)
 
     return render(request, 'company/add_parties.html',context)  
+
+def party_histories(request,id):
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)   
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+  getparty = party.objects.get(id=id,company=cmp)
+  party_histories= party_history.objects.filter(party=getparty,company=cmp)
+  print(party_histories)
+  context = {'staff':staff,'allmodules':allmodules,'party_histories': party_histories,'getparty': getparty}
+  return render(request,'company/party_history.html',context)
+
 
 def view_party(request,id):
   staff_id = request.session['staff_id']

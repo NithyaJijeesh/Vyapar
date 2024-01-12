@@ -54,11 +54,11 @@
         <div class="card " style="background-color: white;width:50rem;box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.249);">
             <div class="row">
                 <div class="col-md-4">
-                    <h4 class="text-primary">PURCHASE BILL NO : {{pbill.billno}}</h4>
+                    <h4 class="text-primary"> Party : {{getparty.party_name}}</h4>
                 </div>
                 <div class="col-md-7"></div>
                 <div class="col-md-1">
-                    <a href="{% url 'view_purchasebill' %}" style="text-align: right; font-size: large;"><i class="fa fa-times mt-3 mr-4" aria-hidden="true"></i></a>
+                    <a href="{% url 'view_parties' getparty.id %}" style="text-align: right; font-size: large;"><i class="fa fa-times mt-3 mr-4" aria-hidden="true"></i></a>
                 </div>
             </div>
             <div class="tablediv" style="overflow: scroll;height: 35rem; width: 97%;">
@@ -80,15 +80,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for h in hst %}
+                        {% for history in party_histories %}
                         <tr>
                             <td>{{forloop.counter}}</td>
-                            <td style="color: black;" >{{h.transactiondate | date:'d-m-Y'}}</td>
-                            <td style="color: black;" >{{h.staff.first_name}} {{h.staff.last_name}}</td>
-                            {% if h.action == 'Created' %}
-                                <td style="color: red;" >{{h.action}}</td>
+                            <td style="color: black;" >{{history.transactiondate | date:'d-m-Y'}}</td>
+                            <td style="color: black;" >{{history.staff.first_name}} {{history.staff.last_name}}</td>
+                            {% if history.action == 'Created' %}
+                                <td style="color: red;" >{{history.action}}</td>
                             {% else %}
-                                <td style="color: #154c79;" >{{h.action}}</td>
+                                <td style="color: #154c79;" >{{history.action}}</td>
                             {% endif %}
                         </tr>
                         {% endfor %}

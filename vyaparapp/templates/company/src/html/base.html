@@ -241,7 +241,7 @@
             <li class="sidebar-item">
               <button class="btn dropdown-btn" style="margin-top: 10px; border: none;outline: none; color: black;background-color: rgb(210, 235, 241,0.5);width: 100%;text-align: left;">
                 <span>
-                  <b><i class="fa fa-shopping-cart" style="margin-right: 10px;"></i></i></b>
+                  <b><i class="fa fa-shopping-cart" style="margin-right: 10px;"></i></b>
                 </span>
                 <span><b>Purchase</b></span>
                 
@@ -300,7 +300,7 @@
               <a class="sidebar-link mt-2" href="{% url 'expense' %}" aria-expanded="false"
                 style="color: black; background-color: rgb(210, 235, 241, 0.5); flex: 1; border-radius: 10px 0px 0px 10px;">
                 <span>
-                  <b style="margin-left: 10px;"><i class="fa fa-wallet"></i></b>
+                  <b ><i class="fa fa-wallet" style="margin-left: 10px;"></i></b>
                 </span>
                 <span class="hide-menu"><b>Expenses</b></span>
               </a>
@@ -439,7 +439,7 @@
 
                       {% else %}
 
-                        {{staff.first_name}}{{staff.last_name}}
+                        {{staff.first_name}} {{staff.last_name}}
 
                       {% endif %} 
                     </b></h5>

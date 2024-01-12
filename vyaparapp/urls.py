@@ -140,8 +140,8 @@ urlpatterns = [
     path('edit_party/<int:id>', views.edit_party, name='edit_party'),
     path('edit_saveparty/<int:id>', views.edit_saveparty, name='edit_saveparty'),
     path('deleteparty/<int:id>', views.deleteparty, name='deleteparty'),
+    path('party_histories/<int:id>', views.party_histories, name='party_histories'),
     #End
-    
     path('view_purchasebill',views.view_purchasebill,name='view_purchasebill'),
     path('add_purchasebill',views.add_purchasebill,name='add_purchasebill'), 
     path('create_purchasebill',views.create_purchasebill,name='create_purchasebill'),

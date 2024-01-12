@@ -14,6 +14,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
 
 {% load my_extras %}
+{% load custom_filters %}
 
 <style>
     .bs{
@@ -44,6 +45,26 @@
     }
     .bg-pink{
         background-color: rgb(239, 3, 82)
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 3px;
+        text-align: center;
+        /* border: 1px solid #ddd; */
+    }
+
+    th.extra {
+        position: relative;
+    }
+
+    th.extra span {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
     }
 </style>
 {% if Party %}
@@ -109,10 +130,7 @@
                                                         {{ i.party_name|capfirst }}
                                                     </a>
                                                 </td>
-                                                <!-- hx-post="{% url 'view_parties' i.id %}"
-                                                hx-trigger="click delay:0s"
-                                                hx-target="#item_get_detail_target"
-                                                >{{ i.party_name|capfirst }}</td> -->
+                                              
                                                 <td class="text-end fs-2 fw-bolder" style="color: green;">
                                                     <a href="{% url 'view_parties' i.id %}" class="my-3">
                                                         {% if i.payment == 'To Pay' %}
@@ -240,73 +258,85 @@
                                     </button>
                                 </div>
                             </div>
-                                <div class="mt-3" style="overflow: scroll;height: 31rem;">
+                                <div class="mt-3" style="overflow: scroll;height: 31rem; ">
                                     <table id="myTable" class="table table-bordered table-info table-striped tb table-responsive w-100">
-                                        <thead>
-                                            <th>#</th>
-                                            <th class="text-center fs-2">TYPE <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center fs-2">NUMBER<span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center fs-2">DATE <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center fs-2">TOTAL<span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center fs-2">BALANCE<span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th class="text-center p-0 m-0"></th> 
+                                        <thead fs-1 tb>
+                                            <th class="text-center fs-2 bg-secondary text-dark extra">#</th>
+                                            <th class="text-center fs-2 bg-secondary text-dark extra">TYPE <span class="fa fa-filter fs-1 mx-1"></span></th>
+                                            <th class="text-center fs-2 bg-secondary text-dark extra">NUMBER <span class="fa fa-filter fs-1 mx-1"></span></th>
+                                            <th class="text-center fs-2 bg-secondary text-dark extra">DATE <span class="fa fa-filter fs-1 mx-1"></span></th>
+                                            <th class="text-center fs-2 bg-secondary text-dark extra">TOTAL <span class="fa fa-filter fs-1 mx-1"></span></th>
+                                            <th class="text-center fs-2 bg-secondary text-dark extra">BALANCE <span class="fa fa-filter fs-1 mx-1"></span></th>
+                                            <th class="text-center fs-2 bg-secondary text-dark extra">ACTION <span class="fa fa-filter fs-1 mx-1"></span></th>
+                                            <th class="text-center fs-2 bg-secondary text-dark extra">BY <span class="fa fa-filter fs-1 mx-1"></span></th>
+                                            <th class="text-center fs-2 bg-secondary text-dark extra"></th> 
                                         </thead>
                                         <tbody>
-                                            {% for i in transactions %}
-                                                <tr>
-                                                    <td class="text-center" style="padding-top: 1.4rem;">
-                                                        <div class="d-flex justify-content-center">
-                                                            <div style="width: 10px;height: 10px;box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.205);border-radius: 50%;" {% if forloop.counter|mod:10 == 0 %}class="bg-success"{% elif forloop.counter|mod:10 == 1 %}class="bg-warning"{% elif forloop.counter|mod:10 == 2 %}class="bg-danger"{% elif forloop.counter|mod:10 == 3 %}class="bg-success"{% elif forloop.counter|mod:10 == 4 %}class="bg-info"{% elif forloop.counter|mod:10 == 5 %}class="bg-primary"{% elif forloop.counter|mod:10 == 6 %}class="bg-secondary"{% elif forloop.counter|mod:10 == 7 %}class="bg-warning"{% elif forloop.counter|mod:10 == 8 %}class="bg-danger"{% else %}class="bg-pink"{% endif %}></div>
-                                                        </div>
-                                                    </td>
-                                                    <!-- <td class="text-center">{% if first_item.item_opening_stock %}{{ first_item.item_opening_stock }}{% else %}0{% endif %}</td> -->
-                                                    <td class="text-">{{ i.trans_type|capfirst }}</td>
-                                                    <td class="text-center"></td>
-                                                    <!-- <td class="text-center">{% if first_item.item_opening_stock %}{{ first_item.item_opening_stock }}{% else %}0{% endif %}</td> -->
-                                                    <!-- <td class="text-center"></td> -->
-                                                    <td class="text-center">{{ i.trans_date|date:"d-m-Y" }}</td>
-                                                    <td class="text-center">{{ i.trans_qty }}</td>
-                                                    <td class="text-center"></td>
-                                                    <td class="text-center"></td>
-                                                    <td class="p-0 pt-1 m-0">
-                                                        <div class="btn-group mb-1">
-                                                            <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
-                                                            </button>
-                                                            <ul class="dropdown-menu">
-                                                              <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'edit_party' getparty.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
-                                                              <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href="{% url 'deleteparty' getparty.id %}"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            {% endfor %}
                                             <tr {% if getparty.openingbalance == 0 %} hidden{% endif %}>
-                                                <td style="font-size: 20px; color: {% if getparty.payment == 'To Pay' %}red{% elif getparty.payment == 'To Receive' %}green{% else %}black{% endif %}; vertical-align: middle;">
-                                                    &#8226;
-                                                </td>
-                                                <td class="text-">Opening Balance</td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center">{{ first_item.item_date|date:"d-m-Y" }}</td>
-                                                <td class="text-center">{{ first_item.item_opening_stock }}</td>
-                                                <td class="text-center">₹{{ first_item.item_at_price }}</td>
-                                                <td class="text-center"></td>
-                                                <td class="p-0 pt-1 m-0">
+                                                <td style="font-size: 20px; color: {% if getparty.payment == 'To Pay' %}red{% elif getparty.payment == 'To Receive' %}green{% else %}black{% endif %}; vertical-align: middle;">&#8226;</td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">Opening Balance</td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;"></td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ getparty.current_date|date:"d-m-Y" }}</td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ getparty.openingbalance }}</td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ getparty.current_balance }}</td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;"></td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;"></td>
+                                                <td class="px-0 pt-3 m-0 text-center extra" style="white-space: nowrap;">
                                                     <div class="btn-group mb-1">
                                                         <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
                                                         </button>
                                                         <ul class="dropdown-menu">
                                                           <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'edit_party' getparty.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
+                                                          <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'party_histories' getparty.id %}"><span class="fa fa-history pe-2 th"></span> History</a></li>
                                                           <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href="{% url 'deleteparty' getparty.id %}"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>
                                             </tr>
+                                            {% for bill in bills %}
+                                            <tr id="billrow">
+                                                <td style="font-size: 20px; color: brown; vertical-align: middle;">
+                                                    &#8226;
+                                                </td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">Purchase Bill</td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ bill.billno }}</td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ bill.billdate|date:"d-m-Y" }}</td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ bill.grandtotal }}</td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ bill.balance }}</td>
+                                                
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">
+                                                    {% with filtered_action=bill_history|last_item_for_bill:bill %}
+                                                        {% if filtered_action.0 %}
+                                                            {{ filtered_action.0 }}
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </td>
+                                                <!-- <td></td> -->
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">
+                                                    {% with filtered_action=bill_history|last_item_for_bill:bill %}
+                                                        {% if filtered_action.1 %}
+                                                            {{ filtered_action.1 }}
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </td>
+                                                <td class="px-0 pt-3 m-0 text-center extra" style="white-space: nowrap;">
+                                                    <div class="btn-group mb-1">
+                                                        <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                          <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'edit_purchasebill' bill.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
+                                                          <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'history_purchasebill' bill.id %}"><span class="fa fa-history pe-2 th"></span> History</a></li>
+                                                          <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href="{% url 'delete_purchasebill' bill.id %}"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
                                         </tbody>
-                                </table>
-                            </div>
+                                    </table>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -447,106 +477,6 @@
             $(".item_lists_hide").show(); // Show all parties
         });
     });
-        // function confirm_delete(Id)
-    // {
-    //     swal({
-    //         title: "Confirmation !",
-    //         text: "Do you want to Delete this item?",
-    //         icon: "warning",
-    //         buttons: true,
-    //         dangerMode: true,
-    //     })
-    //     .then((willDelete) => {
-    //         if (willDelete) {
-    //             swal({
-    //                 title: "Deleted !",
-    //                 text: "Item Deleted Successfilly!",
-    //                 icon: "success",
-    //                 buttons: false,
-    //             })
-    //             // 
-    //             .then((willDelete) => {
-    //             if (willDelete) {
-    //                 // Redirect to the delete_teacher view with the teacher's ID
-    //                 window.location.href = "{% url 'item_delete' 0 %}".replace('0', Id);
-                    
-    //             } else {
-    //                 window.location.href = "{% url 'item_delete' 0 %}".replace('0', Id);
-    //             }
-    //         });
-    //             // 
-    //         } else {
-    //             swal("Action Cancelled!");
-    //         }
-    //     });
-    // }
-    // function delete_transaction(Id)
-    // {
-    //     swal({
-    //         title: "Confirmation !",
-    //         text: "Do you want to Delete this Transaction?",
-    //         icon: "warning",
-    //         buttons: true,
-    //         dangerMode: true,
-    //     })
-    //     .then((willDelete) => {
-    //         if (willDelete) {
-    //             swal({
-    //                 title: "Deleted !",
-    //                 text: "Transaction Deleted Successfilly!",
-    //                 icon: "success",
-    //                 buttons: false,
-    //             })
-    //             // 
-    //             .then((willDelete) => {
-    //             if (willDelete) {
-    //                 // Redirect to the delete_teacher view with the teacher's ID
-    //                 window.location.href = "{% url 'transaction_delete' 0 %}".replace('0', Id);
-                    
-    //             } else {
-    //                 window.location.href = "{% url 'transaction_delete' 0 %}".replace('0', Id);
-    //             }
-    //         });
-    //             // 
-    //         } else {
-    //             swal("Action Cancelled!");
-    //         }
-    //     });
-    // }
-
-    // function item_open_stk_delete(Id)
-    // {
-    //     swal({
-    //         title: "Confirmation !",
-    //         text: "Do you want to Delete this Opening Stock Detail?",
-    //         icon: "warning",
-    //         buttons: true,
-    //         dangerMode: true,
-    //     })
-    //     .then((willDelete) => {
-    //         if (willDelete) {
-    //             swal({
-    //                 title: "Deleted !",
-    //                 text: "Opening Stock Deleted Successfilly!",
-    //                 icon: "success",
-    //                 buttons: false,
-    //             })
-    //             // 
-    //             .then((willDelete) => {
-    //             if (willDelete) {
-    //                 // Redirect to the delete_teacher view with the teacher's ID
-    //                 window.location.href = "{% url 'item_delete_open_stk' 0 %}".replace('0', Id);
-                    
-    //             } else {
-    //                 window.location.href = "{% url 'item_delete_open_stk' 0 %}".replace('0', Id);
-    //             }
-    //         });
-    //             // 
-    //         } else {
-    //             swal("Action Cancelled!");
-    //         }
-    //     });
-    // }
-</script>
+    </script>
  
 {% endblock  %}

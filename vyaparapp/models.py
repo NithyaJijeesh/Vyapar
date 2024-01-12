@@ -100,7 +100,17 @@ class party(models.Model):
     additionalfield3 = models.CharField(max_length=100,null=True,blank=True)
     current_balance = models.CharField(max_length=100,default='0',null=True,blank=True)
 
-    
+class party_history(models.Model):
+    party = models.ForeignKey(party,on_delete=models.CASCADE)
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    CHOICES = [
+        ('Created', 'Created'),
+        ('Updated', 'Updated'),
+    ]
+    action = models.CharField(max_length=20, choices=CHOICES)
+    transactiondate = models.DateField(auto_now=True)
+
 #End
 
 # ========================= ASHIKH V U (START)===========================
