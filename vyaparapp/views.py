@@ -506,14 +506,16 @@ def items_list(request,pk):
       first_item = all_items.filter().first()
     else:
       first_item = all_items.get(id=pk)
+    allmodules= modules_list.objects.get(company=staff.company,status='New')
     # transactions = TransactionModel.objects.filter(user=request.user.id,item=first_item.id).order_by('-trans_created_date')
     transactions = TransactionModel.objects.filter(company = cmp,item=first_item.id).order_by('-trans_created_date')
+
     check_var = 0
     if all_items == None or all_items == '' or first_item == None or first_item == '' or transactions == None or transactions == '':
       return render(request,'company/items_create_first_item.html')
-    return render(request,'company/items_list.html',{'all_items':all_items,'first_item':first_item,'transactions':transactions,'company':cmp, 'staff':staff})
+    return render(request,'company/items_list.html',{'all_items':all_items,'first_item':first_item,'transactions':transactions,'company':cmp, 'staff':staff, 'allmodules' : allmodules})
   except:
-    return render(request,'company/items_create_first_item.html')
+    return render(request,'company/items_create_first_item.html', {'first_item':first_item,'transactions':transactions,'company':cmp, 'staff':staff, 'allmodules' : allmodules})
 
 # @login_required(login_url='login')
 def item_create_new(request):
@@ -858,8 +860,10 @@ def add_parties(request):
   staff =  staff_details.objects.get(id=sid)
   cmp = company.objects.get(id=staff.company.id)
   tod = date.today()
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
 
-  return render(request, 'company/add_parties.html',{'staff':staff, 'tod' : tod })
+
+  return render(request, 'company/add_parties.html',{'staff':staff, 'tod' : tod , 'allmodules' : allmodules})
 
 
 def edit_party(request,id):
@@ -875,15 +879,17 @@ def edit_party(request,id):
   getparty=party.objects.get(id=id)
   # Party=party.objects.filter(user=request.user)
   Party=party.objects.filter(user=cmp.user)
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+
   tod = date.today()
-  print(tod)
   context = {
               'Company':Company,
               'user_id':user_id,
               'Party':Party,
               'getparty':getparty,
               'staff':staff, 
-              'tod' : datetime.now()
+              'tod' : datetime.now(),
+              'allmodules' : allmodules
             }
   return render(request, 'company/edit_party.html',context)
 
@@ -4754,15 +4760,24 @@ def view_parties(request,pk):
   else:
       getparty = party.objects.get(company=staff.company.id, id=pk)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
-  party_histories= party_history.objects.filter(party=getparty,company=staff.company)
+  party_histories= party_history.objects.filter(
+    party=getparty,
+    company=staff.company
+  ).values('party', 'action' , 'staff__first_name' , 'staff__last_name').last()
 
+  #purchase bill deatils
   bills = PurchaseBill.objects.filter(company = staff.company.id, party = getparty)
-  bill_history = PurchaseBillTransactionHistory.objects.filter(company = staff.company.id, purchasebill__in = bills)
-  latest_records = PurchaseBillTransactionHistory.objects.filter(
+  bill_history = PurchaseBillTransactionHistory.objects.filter(
     company=staff.company.id,
     purchasebill__in=bills
-  ).values('purchasebill').annotate(latest_record=Max('id'))
-  print(latest_records)
+  ).values('purchasebill', 'action' , 'staff__first_name' , 'staff__last_name').last()
+
+  # purchase order
+  orders = PurchaseOrder.objects.filter(company = staff.company.id, party = getparty)
+  order_history = PurchaseOrderTransactionHistory.objects.filter(
+    company=staff.company.id,
+    purchaseorder__in=orders
+  ).values('purchaseorder', 'action' , 'staff__first_name' , 'staff__last_name').last()
 
   context = { 
               'staff':staff,
@@ -4770,8 +4785,12 @@ def view_parties(request,pk):
               'Party':Party, 
               'getparty' : getparty, 
               'party_history' : party_histories,
+
               'bills' : bills, 
               'bill_history' : bill_history,
+
+              'orders' : orders,
+              'order_history' : order_history,
              }
   return render(request, 'company/view_parties.html',context)
 
@@ -4782,7 +4801,9 @@ def party_histories(request,id):
   allmodules= modules_list.objects.get(company=staff.company,status='New')
   getparty = party.objects.get(id=id,company=cmp)
   party_histories= party_history.objects.filter(party=getparty,company=cmp)
-  context = {'staff':staff,'allmodules':allmodules,'party_history': party_histories,'getparty': getparty}
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+
+  context = {'staff':staff,'allmodules':allmodules,'party_history': party_histories,'getparty': getparty, 'allmodules' : allmodules}
   return render(request,'company/party_history.html',context)
 
 def save_parties(request):
@@ -4859,6 +4880,17 @@ def view_party(request,id):
   allmodules= modules_list.objects.get(company=staff.company,status='New')
   return render(request, 'company/view_party.html',{'staff':staff,'allmodules':allmodules,'Party':Party,'getparty':getparty})
 
+def party_purchaseorderhistory(request,id):
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+  porder = PurchaseOrder.objects.get(orderno=id,company=cmp)
+  phistory = PurchaseOrderTransactionHistory.objects.filter(purchaseorder=porder,company=cmp).last()
+  # name = hst.staff.first_name + ' ' + hst.staff.last_name 
+  # action = hst.action
+  context = {'staff':staff,'allmodules':allmodules,'purchaseorder_histories': phistory,'prod': porder }
+  return render(request,'company/purchaseorderhistory.html',context)
 
 #______________Sales Invoice_________________Antony Tom___________________________
 
@@ -6610,7 +6642,7 @@ def delete_purchaseorder(request,id):
 
 
 def orderhistory(request):
-  pid = request.POST['id']
+  pid = request.POST.get('id')
   sid = request.session.get('staff_id')
   staff = staff_details.objects.get(id=sid)
   cmp = company.objects.get(id=staff.company.id)
@@ -6619,7 +6651,6 @@ def orderhistory(request):
   name = hst.staff.first_name + ' ' + hst.staff.last_name 
   action = hst.action
   return JsonResponse({'name':name,'action':action,'pid':pid})
-
 
 def convert_to_bill(request,id):
   toda = date.today()

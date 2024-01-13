@@ -136,6 +136,7 @@
         margin-bottom: 0.75rem;
     }
 </style>
+{% if estimates %}
 <div class="body-wrapper">
     <div class="container-fluid">
         <div class="row mb-4 mt-3">
@@ -147,7 +148,7 @@
             </div>
             <div class="col-md-3"></div>
         </div>
-        {% if not estimates %}
+        <!-- {% if not estimates %}
         <div class="no_estimates_section">
             <div class="row">
                 <div class="col-12 d-flex justify-content-center">
@@ -162,7 +163,7 @@
                 </div>
             </div>
         </div>
-        {% else %}
+        {% else %} -->
         <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
             <div class="row pb-0 mb-0">
                 <div class="col text-center pb-2" style="border-bottom: 3px solid rgba(0, 0, 0, 0.548);"><a class="fw-bolder fs-4 text-dark" href="#">ESTIMATE/QUOTATION</a></div>
@@ -461,6 +462,38 @@
         </div>
     </div>
 </div>
+
+{% else %}
+    <div class="body-wrapper ">
+        <br><br>
+        <div class="p-5 text-center" style="display: flex;justify-content: center;" id="default">
+            <div class="card"
+                style="background-color: white;width:60rem;box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.249);">
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <img height="500vw" src="{% static 'images/estimate.webp' %}" id="img" class="card-img" alt="no img" style="border-radius: 10px 0px 0px 10px;">
+                    </div>
+                    <div class="col-sm-12 col-md-6 ps-3 pe-4">
+                        <div class="p-1 rounded" style="border: 1px solid rgba(0, 0, 0, 0);border-bottom: none;">
+                            <p style="margin-bottom: 4rem;"></p>
+                            <div class="d-flex" style="padding-left: 130px;">
+                                <img src="{% static 'assets/images/logos/favicon.png' %}"  width="30" height="30" alt="" />
+                                <h3 style="font-family: 'Times New Roman', Times, serif; "><b class="p-3">VYAPAR</b></h3>
+                            </div>
+                            <p style="margin-bottom: 0.5rem;"></p>
+                            <p class="card-text p-5" id="text" style=" text-align: justify;font-family: 'Times New Roman', Times, serif;font-weight: bold;font-size: 16px;">Welcome to vyapar, We're committed to providing a seamless and secure
+                                online marketplace for buyers and sellers. Our platform offers a range of features.</p>
+                            <h5 style="color: rgb(48, 111, 56);font-weight: bold;font-family: 'Times New Roman', Times, serif;" class="card-text">Please Create Your First Estimate Here</h5>
+                            <p class="mt-4"></p>
+                            <a class="btn btn-lg btn-primary btn-gradient" style="font-weight: bold; font-size: 15px ;" href="{% url 'create_estimate' %}">CREATE &nbsp; ESTIMATE</a>
+                            <p style="margin-bottom: 4rem;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
 
 <script>
     $(document).ready(function() {

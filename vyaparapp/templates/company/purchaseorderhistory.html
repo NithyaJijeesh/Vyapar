@@ -84,7 +84,7 @@
                         <tr>
                             <td>{{forloop.counter}}</td>
                             <td style="color: black;" >{{h.transactiondate | date:'d-m-Y'}}</td>
-                            <td style="color: black;" >{{staff.first_name}} {{staff.last_name}}</td>
+                            <td style="color: black;" >{{h.staff.first_name}} {{h.staff.last_name}}</td>
                             {% if h.action == 'Created' %}
                                 <td style="color: red;" >{{h.action}}</td>
                             {% else %}
