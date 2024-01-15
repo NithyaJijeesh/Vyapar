@@ -6,15 +6,15 @@
 {% block content %}
 {% load static %}
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-<script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
-<!-- Add the HTMX library script -->
-<script src="https://unpkg.com/htmx.org@1.9.6" ></script>
+<script src="https://unpkg.com/htmx.org@1.9.6"></script>
 
-<!-- Load SheetJS from a CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
 
+<!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script> -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script> -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
 {% load my_extras %}
-{% load custom_filters %}
 
 <style>
     .bs{
@@ -86,13 +86,17 @@
         </div>
     </div>
     <br>
+
     <div class="row ps-3 pe-3 m-0">
-        <div class="col-sm-12 col-lg-3  ps-2 pe-3 pb-2" style="height: 50rem;">
+        <div class="col-sm-12 col-lg-3  ps-2 pe-3 pb-2" style="height: 52.5rem;">
             <div class="card bg-light bs"style="height:100%;">
                 <div class="row m-0">
                     <div class="col-12 p-1 bs justify-content-center pe-3" style="z-index:2; ">
                         <div class="d-flex justify-content-center">
-                            <button class="btn btn-sm" type="button" data-toggle="modal" data-target="#excelModal" onclick="excelmodel()">
+                            <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                                Open Import Modal
+                            </button> -->
+                            <button class="btn btn-sm" type="button" data-toggle="modal" data-target="#importModal">
                                 <span><img width="25px" src="{% static 'images/import.png' %}" alt="no img" class="bg-info"></span> &nbsp;
                                 <span style="color: black; font-size: small; font-weight: bold;" class="text-dark">IMPORT PARTY</span>
                             </button> 
@@ -307,67 +311,7 @@
                                                 </td>
                                             </tr>
 
-                                            <!-- purchase bills -->
-                                            {% for bill in bills %}
-                                            <tr id="billrow">
-                                                <td style="font-size: 20px; color: brown; vertical-align: middle;">
-                                                    &#8226;
-                                                </td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">Purchase Bill</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ bill.billno }}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ bill.billdate|date:"d-m-Y" }}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ bill.grandtotal }}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ bill.balance }}</td>
-
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{bill_history.action}} </td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">
-                                                    {{ bill_history.staff__first_name }} {{ bill_history.staff__last_name }}
-                                                </td>
-                                                <td class="px-0 pt-3 m-0 text-center extra" style="white-space: nowrap;">
-                                                    <div class="btn-group mb-1">
-                                                        <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                          <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'edit_purchasebill' bill.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
-                                                          <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'history_purchasebill' bill.id %}"><span class="fa fa-history pe-2 th"></span> History</a></li>
-                                                          <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href="{% url 'delete_purchasebill' bill.id %}"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-
-                                            <!-- purchase order -->
-                                            {% for order in orders %}
-                                            <tr id="billrow">
-                                                <td style="font-size: 20px; color: rgb(173, 102, 102); vertical-align: middle;">
-                                                    &#8226;
-                                                </td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">Purchase orders</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ order.orderno }}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ order.orderdate|date:"d-m-Y" }}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ order.grandtotal }}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ order.balance }}</td>
-
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ order_history.action}} </td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">
-                                                    {{ order_history.staff__first_name }} {{ order_history.staff__last_name }}
-                                                </td>
-                                                <td class="px-0 pt-3 m-0 text-center extra" style="white-space: nowrap;">
-                                                    <div class="btn-group mb-1">
-                                                        <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                          <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'edit_purchaseorder' order.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
-                                                          <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'party_purchaseorderhistory' order.id %}"><span class="fa fa-history pe-2 th"></span> History</a></li>
-                                                          <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href="{% url 'delete_purchaseorder' order.id %}"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
+                                            
                                         </tbody>
                                     </table>
                                 </div>
@@ -378,6 +322,9 @@
         </div>
     </div>
 </div>
+
+
+
 {% else %}
 <div class="body-wrapper ">
     <br><br>
@@ -410,72 +357,37 @@
 </div>
 </div>
 
-<!-- <div class="body-wrapper ">
-    <br><br><br>
-    <div class="p-5 text-center" style="display: flex;justify-content: center;">
-        <div class="card "
-            style="background-color: white;width:50rem;box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.249);">
-            <div class="row">
-                <div class="col-sm-12 col-md-6">
-                    <img height="500vw" src="{% static 'images/party.png' %}" class="card-img" alt="no img">
-                    <div class="card-img-overlay">
-                                    <h5 class="card-title">Card title</h5>
-                                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                                    <p class="card-text"><small>Last updated 3 mins ago</small></p>
-                                </div> 
-                </div>
-                <div class="col-sm-12 col-md-6 ps-4 pe-4">
-                    <div class="p-1 rounded" style="border: 1px solid rgba(0, 0, 0, 0);border-bottom: none;">
-                        <p style="margin-bottom: 4rem;"></p>
-                        <img width="100vw" src="{{'static/images/fav.png'}}" alt="no img">
-                        <p></p>
-                        <h1 style="font-weight:900;color:rgba(0, 0, 0, 0.644);font-size: 1.5rem;">VYAPAR</h1>
-                        <p style="margin-bottom: 1.5rem;"></p>
-                        <p class="card-text">Welcome to vyapar, We're committed to providing a seamless and secure
-                            online marketplace for buyers and sellers. Our platform offers a range of features.</p>
-                        <p style="color: rgb(0, 89, 10);font-weight: light;" class="card-text">Please add your first
-                            party</p>
-                        <p class="mt-4"></p>
-                        <a class="btn btn-lg btn-info btn-gradient" href="{% url 'add_parties' %}">Add Party</a>
-                        <p style="margin-bottom: 4rem;"></p>
+{% endif %}
+
+<!-- import modal -->
+
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Upload File
+                <label for="" style="color: red; font-size: x-small;">* Refer Downloaded Sheet For Format</label><br></h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'import_parties' %}" enctype="multipart/form-data" id="excelForm" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="file" style="color: black;">Choose Excel File- </label>
+                        <input type="file" class="form-control-file" id="partyfile" name="partyfile" accept=".xls, .xlsx"><br><br>
                     </div>
-                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
-<p>No parties available.</p> -->
 
-
-    <div class="modal" id="excelModal" tabindex="-1" role="dialog" aria-labelledby="excelModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="excelModalLabel">Upload File
-                    <label for="" style="color: red; font-size: x-small;" >* Refer Downloaded Sheet For Format </label><br></h5>
-                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true" style="font-size: x-large;">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="excelForm" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="file" style="color: black;">Choose Excel File for Party- </label> <br>
-                            <input type="file" class="form-control-file" id="billfile" name="billfile" accept=".xls, .xlsx"><br><br>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="uploadFile()" data-dismiss="modal">Upload</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-{% endif %}
  
 <script>
    
@@ -538,7 +450,7 @@
     function uploadFile() {
         const form = document.getElementById('excelForm');
         const formData = new FormData(form);
-        fetch('import_purchase_bill', {
+        fetch('import_parties', {
             method: 'POST',
             body: formData
         })
@@ -565,7 +477,7 @@
         });
     }
 
-    function excelmodel(){
+    function excelmodal(){
         const table1 = document.querySelector('#billtablemodel');
         const ws1 = XLSX.utils.table_to_sheet(table1);
         const wb1 = XLSX.utils.book_new();

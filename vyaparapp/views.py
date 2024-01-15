@@ -925,16 +925,100 @@ def edit_saveparty(request, id):
 
         getparty.save()
 
-        party_history.objects.create(party = getparty,company=staff.company,staff=staff,action='Updated')
+        party_history.objects.create(party = getparty,company=staff.company,staff=staff,action='Updated').save()
         # return redirect('view_party', id=getparty.id)
         return redirect('view_parties', pk=getparty.id)
     return render(request, 'edit_party.html', {'getparty': getparty, 'Party': Party, 'Company': Company,'user_id':user_id})
 
 
-def deleteparty(request,id):
-    Party=party.objects.get(id=id)
-    Party.delete()
+def deleteparty(request, id):
+    sid = request.session.get('staff_id')
+    staff = staff_details.objects.get(id=sid)
+    Party = party.objects.get(id=id)
+
+    # List of models to check
+    models_to_check1 = [PurchaseBill, PurchaseOrder, SalesInvoice, purchasedebit, PaymentOut,PaymentIn, CreditNote]
+    models_to_check2 = [Estimate, DeliveryChallan]
+    # Check conditions for each model
+    conditions_met1 = any(model.objects.filter(company=staff.company.id, party=Party).exists() for model in models_to_check1)
+    conditions_met2 = any(model.objects.filter(company=staff.company.id, party_name=Party.party_name).exists() for model in models_to_check2)
+
+    if conditions_met1 or conditions_met2 or Expense.objects.filter(staff_id = staff, party_id = Party) or salesorder.objects.filter(comp = staff.company.id, party = Party):
+        
+        messages.error(request, 'Cannot delete Party with transactions.')
+        return redirect('view_parties', 0)  # 1 could be a code indicating failure
+    else:
+        Party.delete()
+        return redirect('view_parties', 0) 
+    
+# ---------------Nithya-------import party-----------------
+
+def import_parties(request):
+    
+    if request.method == 'POST':
+
+      staff_id = request.session['staff_id']
+      staff =  staff_details.objects.get(id=staff_id)
+      file = request.FILES['partyfile']
+      print(file)
+      
+      try:
+        df = pd.read_excel(file)
+        print(df)
+
+        for index, row in df.iterrows():
+            
+            party_name =row.get('Party Name', '').capitalize()
+            contact = row.get('Contact', '')
+
+            party_obj = party(
+                gst_no = row.get('gst_no', ''),
+                gst_type = row.get('gst_type', ''),
+                state = row.get('state', ''),
+                address =  row.get('address', ''),
+                email = row.get('email', ''),
+                openingbalance = row.get('openingbalance', '') if row.get('openingbalance', '') else 0,
+                payment = row.get('payment', ''),
+                creditlimit = row.get('creditlimit', ''),
+                current_date = row.get('current_date', '') if row.get('current_date', '') else date.today(),
+                additionalfield1 = row.get('additionalfield1', ''),
+                additionalfield2 = row.get('additionalfield2', ''),
+                additionalfield3 = row.get('additionalfield3', ''),
+                current_balance = row.get('openingbalance', '') if row.get('openingbalance', '') else 0,
+                user = staff.company.user,
+                company = staff.company
+            )
+
+            if not party_name or not contact:
+              messages.error(request, 'Please Enter Party Name and Contact.')
+            else:
+              
+              if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
+                messages.error(request, 'Contact with the same party name and contact number already exists.')
+              else:
+                party(party_name = party_name, contact = contact).save()
+                print(party_name )
+                print(contact)
+            party_obj.save()
+
+        return redirect('view_parties', 0)
+
+      except Exception as e:
+            print(f"Error reading or processing Excel file: {e}")
     return redirect('view_parties', 0)
+
+
+
+
+
+
+
+    #   return redirect('view_parties', 0)
+    
+    # context  = {'staff' : staff, 'tod' : date.today()}
+
+    # return render(request, 'company/add_parties.html',context)
+    
 
 #End
 
@@ -4760,24 +4844,11 @@ def view_parties(request,pk):
   else:
       getparty = party.objects.get(company=staff.company.id, id=pk)
   allmodules= modules_list.objects.get(company=staff.company,status='New')
+
   party_histories= party_history.objects.filter(
     party=getparty,
     company=staff.company
   ).values('party', 'action' , 'staff__first_name' , 'staff__last_name').last()
-
-  #purchase bill deatils
-  bills = PurchaseBill.objects.filter(company = staff.company.id, party = getparty)
-  bill_history = PurchaseBillTransactionHistory.objects.filter(
-    company=staff.company.id,
-    purchasebill__in=bills
-  ).values('purchasebill', 'action' , 'staff__first_name' , 'staff__last_name').last()
-
-  # purchase order
-  orders = PurchaseOrder.objects.filter(company = staff.company.id, party = getparty)
-  order_history = PurchaseOrderTransactionHistory.objects.filter(
-    company=staff.company.id,
-    purchaseorder__in=orders
-  ).values('purchaseorder', 'action' , 'staff__first_name' , 'staff__last_name').last()
 
   context = { 
               'staff':staff,
@@ -4785,12 +4856,6 @@ def view_parties(request,pk):
               'Party':Party, 
               'getparty' : getparty, 
               'party_history' : party_histories,
-
-              'bills' : bills, 
-              'bill_history' : bill_history,
-
-              'orders' : orders,
-              'order_history' : order_history,
              }
   return render(request, 'company/view_parties.html',context)
 
@@ -4846,7 +4911,7 @@ def save_parties(request):
                   messages.error(request, 'Contact with the same party name and contact number already exists.')
               else:
                   part.save()
-                  party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created')
+                  party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created').save()
               
               return render(request, 'company/add_parties.html', context)
           else:
@@ -4854,7 +4919,7 @@ def save_parties(request):
                   messages.error(request, 'Contact with the same party name and contact number already exists.')
               else:
                   part.save()
-                  party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created')
+                  party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created').save()
 
               return redirect('view_parties', 0)
 
@@ -4880,17 +4945,7 @@ def view_party(request,id):
   allmodules= modules_list.objects.get(company=staff.company,status='New')
   return render(request, 'company/view_party.html',{'staff':staff,'allmodules':allmodules,'Party':Party,'getparty':getparty})
 
-def party_purchaseorderhistory(request,id):
-  sid = request.session.get('staff_id')
-  staff = staff_details.objects.get(id=sid)
-  cmp = company.objects.get(id=staff.company.id)
-  allmodules= modules_list.objects.get(company=staff.company,status='New')
-  porder = PurchaseOrder.objects.get(orderno=id,company=cmp)
-  phistory = PurchaseOrderTransactionHistory.objects.filter(purchaseorder=porder,company=cmp).last()
-  # name = hst.staff.first_name + ' ' + hst.staff.last_name 
-  # action = hst.action
-  context = {'staff':staff,'allmodules':allmodules,'purchaseorder_histories': phistory,'prod': porder }
-  return render(request,'company/purchaseorderhistory.html',context)
+
 
 #______________Sales Invoice_________________Antony Tom___________________________
 
