@@ -40,6 +40,9 @@ from django.db.models import Count
 from collections import defaultdict
 from .models import LoanAccounts, LoanHistory, party
 from datetime import datetime
+import re
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 
 # Create your views here.
 def home(request):
@@ -960,51 +963,84 @@ def import_parties(request):
       staff_id = request.session['staff_id']
       staff =  staff_details.objects.get(id=staff_id)
       file = request.FILES['partyfile']
-      print(file)
-      
-      try:
-        df = pd.read_excel(file)
-        print(df)
 
-        for index, row in df.iterrows():
+      df = pd.read_excel(file)
+
+      errors = []
+      count_rows = 0
+
+      for index, row in df.iterrows():
+        try:    
+          count_rows +=1
+
+          party_name =row.get('Party Name').capitalize()
+          contact = str(row.get('Contact'))
+
+          print(row.get('Party Name'))
+          print(row.get('Contact'))
+          print(row.get('GST Type'))
+          print(row.get('GST No.'))
+          print(row.get('Supply State'))
+          print(row.get('Billing Address'))
+          print(row.get('Opening Balance'))
+          print(row.get('Payment'))
+          print(row.get('Credit Limit'))
+          print(row.get('Current Date'))
+          print(row.get('Additional Field 1'))
+          print(row.get('Additional Field 2'))
+          print(row.get('Additional Field 3'))
+          
+
+          phone_pattern = re.compile(r'^\d{10}$')
+          contact = contact if phone_pattern.match(contact) else " "
+          print(contact)
+          # print(phone_pattern.match(contact))
+          gst_pattern = re.compile(r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[0-9A-Z]{1}$')
+          gstno = str(row.get('GST No.', '')) if gst_pattern.match(str(row.get('GST No.', ''))) else " "
+          print(gstno)
+          print(validate_email(row.get('Email')))
+          email = row.get('Email') if row.get('Email') and validate_email(row.get('Email')) else messages.error(request, f'Row "{count_rows}" :Email should follow the format.')
+
+
+          party_obj = party(
+              party_name = party_name, 
+              contact = contact,
+              gst_no = gstno,
+              gst_type = row.get('GST Type', ''),
+              email = row.get('Email'),
+              state = row.get('Supply State', ''),
+              address =  row.get('Billing Address', ''),
+              openingbalance = row.get('Opening Balance') if row.get('Opening Balance') else 0,
+              payment = row.get('Payment', ''),
+              creditlimit = row.get('Credit Limit'),
+              current_date = row.get('Current Date') if row.get('Current Date') else date.today(),
+              additionalfield1 = row.get('Additional Field 1', ''),
+              additionalfield2 = row.get('Additional Field 2', ''),
+              additionalfield3 = row.get('Additional Field 3', ''),
+              current_balance = row.get('Opening Balance') if row.get('Opening Balance') else 0,
+              user = staff.company.user,
+              company = staff.company
+          )
+
+          if not party_name or not contact or contact is " ":
+            messages.error(request, f'Row "{count_rows}" :Please Enter Party Name and Contact Number.')
+          else:
             
-            party_name =row.get('Party Name', '').capitalize()
-            contact = row.get('Contact', '')
-
-            party_obj = party(
-                gst_no = row.get('gst_no', ''),
-                gst_type = row.get('gst_type', ''),
-                state = row.get('state', ''),
-                address =  row.get('address', ''),
-                email = row.get('email', ''),
-                openingbalance = row.get('openingbalance', '') if row.get('openingbalance', '') else 0,
-                payment = row.get('payment', ''),
-                creditlimit = row.get('creditlimit', ''),
-                current_date = row.get('current_date', '') if row.get('current_date', '') else date.today(),
-                additionalfield1 = row.get('additionalfield1', ''),
-                additionalfield2 = row.get('additionalfield2', ''),
-                additionalfield3 = row.get('additionalfield3', ''),
-                current_balance = row.get('openingbalance', '') if row.get('openingbalance', '') else 0,
-                user = staff.company.user,
-                company = staff.company
-            )
-
-            if not party_name or not contact:
-              messages.error(request, 'Please Enter Party Name and Contact.')
-            else:
-              
-              if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
-                messages.error(request, 'Contact with the same party name and contact number already exists.')
+            if party.objects.filter(contact=contact).exists(): 
+              if party.objects.filter(party_name=party_name, contact=contact).exists():
+                messages.error(request, f'Row "{count_rows}" :Party with the same party name "{party_name}"  and contact number "{contact}" already exists.')
               else:
-                party(party_name = party_name, contact = contact).save()
-                print(party_name )
-                print(contact)
-            party_obj.save()
+                messages.error(request, f'Row "{count_rows}" :Party with the same contact number "{contact}" already exists.')
+            else:
+                party_obj.save() 
 
-        return redirect('view_parties', 0)
+          return redirect('view_parties', party_obj.id)
 
-      except Exception as e:
+        except Exception as e:
+            error_message = f"Error in row {index + 1}: {e}"
+            errors.append(error_message)
             print(f"Error reading or processing Excel file: {e}")
+
     return redirect('view_parties', 0)
 
 
@@ -4908,7 +4944,7 @@ def save_parties(request):
         else:
           if 'save_and_new' in request.POST:
               if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
-                  messages.error(request, 'Contact with the same party name and contact number already exists.')
+                  messages.error(request, 'Party with the same party name and contact number already exists.')
               else:
                   part.save()
                   party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created').save()
@@ -4916,12 +4952,12 @@ def save_parties(request):
               return render(request, 'company/add_parties.html', context)
           else:
               if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
-                  messages.error(request, 'Contact with the same party name and contact number already exists.')
+                  messages.error(request, 'Party with the same party name and contact number already exists.')
               else:
                   part.save()
                   party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created').save()
 
-              return redirect('view_parties', 0)
+              return redirect('view_parties', part.id)
 
     return render(request, 'company/add_parties.html',context)  
 

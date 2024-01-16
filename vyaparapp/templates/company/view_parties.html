@@ -365,18 +365,20 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="importModalLabel">Upload File
-                <label for="" style="color: red; font-size: x-small;">* Refer Downloaded Sheet For Format</label><br></h5>
+                <h5 class="modal-title" id="importModalLabel">IMPORT PARTY</h5>
                 <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                    <span aria-hidden="true" style="font-size: large;">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <form action="{% url 'import_parties' %}" enctype="multipart/form-data" id="excelForm" method="POST">
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="file" style="color: black;">Choose Excel File- </label>
-                        <input type="file" class="form-control-file" id="partyfile" name="partyfile" accept=".xls, .xlsx"><br><br>
+                        <label for="" style="color: red; font-size: x-small;">* Refer Downloaded Excel Work Sheet for Values and Fields 
+                        Details</label><br>
+                        <a href="#" id="downloadExcelLink">Download Sample Template Here</a><br><br>
+
+                        <input type="file" class="form-control-file" id="partyfile" name="partyfile" accept=".xls, .xlsx" /><br><br>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -447,43 +449,51 @@
         });
     });
 
-    function uploadFile() {
-        const form = document.getElementById('excelForm');
-        const formData = new FormData(form);
-        fetch('import_parties', {
-            method: 'POST',
-            body: formData
-        })
-        .then(data => {
-            swal({
-                title: "Imported !",
-                text: "Purchase Bill Import Successfull!",
-                icon: "success",
-                buttons: false,
-            })
-        })
-        .then(response => {
-            setTimeout(function () {
-                location.reload();
-            }, 1250);
-        })
-        .catch(error => {
-            swal({
-                title: "Error !",
-                text: "Purchase Bill Import Unuccessfull!",
-                icon: "warning",
-                buttons: false,
-            })
-        });
-    }
+    // function uploadFile() {
+    //     const form = document.getElementById('excelForm');
+    //     const formData = new FormData(form);
+    //     fetch('import_parties', {
+    //         method: 'POST',
+    //         body: formData
+    //     })
+    //     .then(data => {
+    //         swal({
+    //             title: "Imported !",
+    //             text: "Purchase Bill Import Successfull!",
+    //             icon: "success",
+    //             buttons: false,
+    //         })
+    //     })
+    //     .then(response => {
+    //         setTimeout(function () {
+    //             location.reload();
+    //         }, 1250);
+    //     })
+    //     .catch(error => {
+    //         swal({
+    //             title: "Error !",
+    //             text: "Purchase Bill Import Unuccessfull!",
+    //             icon: "warning",
+    //             buttons: false,
+    //         })
+    //     });
+    // }
 
-    function excelmodal(){
-        const table1 = document.querySelector('#billtablemodel');
-        const ws1 = XLSX.utils.table_to_sheet(table1);
-        const wb1 = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb1, ws1, 'Sheet1');
-        XLSX.writeFile(wb1, 'PurchaseBillModel.xlsx');
-    }
-    </script>
+    // function excelmodal(){
+    //     const table1 = document.querySelector('#billtablemodel');
+    //     const ws1 = XLSX.utils.table_to_sheet(table1);
+    //     const wb1 = XLSX.utils.book_new();
+    //     XLSX.utils.book_append_sheet(wb1, ws1, 'Sheet1');
+    //     XLSX.writeFile(wb1, 'PurchaseBillModel.xlsx');
+    // }
+
+    document.getElementById('downloadExcelLink').addEventListener('click', function() {
+        var downloadLink = document.createElement('a');
+        downloadLink.href = 'Sample Worksheet.xlsx';
+        downloadLink.download = 'Sample Worksheet.xlsx';
+        downloadLink.click();
+    });
+
+</script>
  
 {% endblock  %}
