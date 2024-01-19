@@ -247,29 +247,41 @@
                 <div class="row pt-0 m-0" {% if first_item.item_min_stock_maintain %} style="height:39rem;"{% else %}style="height:41.1rem;"{% endif %}>
                     <div class="card p-0 bg-light bs">
                         <div class="row m-0 p-0 pt-3">
-                            <div class="col-sm-12 col-lg-3">
+                            <div class="col-sm-12 col-lg-5">
                                 <p class="tb fw-bolder pt-2">TRANSACTIONS</p>
-                            </div>
-                            <div class="col-sm-12 col-lg-3">
-                                
-                            </div>
-                            
-                            <div class="col-sm-12 col-lg-6 pt-1">
                                 <div class="position-relative">
                                     <div class="position-absolute" style="margin-top:0.4rem;margin-left: 0.5rem;">
                                         <span class="fa fa-search fs-5 text-info"></span>
                                     </div>
                                 </div>
+                                <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" search here..">
+
+                            </div>
+                            <div class="col-sm-12 col-lg-3">
+
+                            </div>
+                            
+                            <div class="col-sm-12 col-lg-4 pt-1">
+                                
                                 <div class="d-flex">
-                                    <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" search here..">
                                     <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="exportToExcel()">
-                                        <span>
-                                            <img width="28px" src="{% static 'assets/excel2.png' %}" alt="no img">
+                                        <span >
+                                            <img width="25px" src="{% static 'images/shareimg.png' %}" alt="no img"><br><span style="font-size: 10px;"><strong>SHARE</strong></span></em>
+                                        </span>
+                                    </button>
+                                    <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="exportToExcel()">
+                                        <span >
+                                            <img width="25px" src="{% static 'assets/excel2.png' %}" alt="no img"><br><span style="font-size: 10px;"><strong>EXPORT</strong></span></em>
+                                        </span>
+                                    </button>
+                                    <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="exportToExcel()">
+                                        <span >
+                                            <img width="20px" src="{% static 'images/pdfdownload.png' %}" alt="no img"><br><span style="font-size: 10px;"><strong>PDF</strong></span></em>
                                         </span>
                                     </button>
 
                                     <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="printfunction()">
-                                        <span><img width="30px" src="{% static 'images/printer.jpeg' %}" alt="no img"></span>
+                                        <span><img width="25px" src="{% static 'images/printer.jpeg' %}" alt="no img"><br><span style="font-size: 10px;"><strong>PRINT</strong></span></span>
                                         <!-- <br><span style="color: black; font-size: small; font-weight: bold;">Print</span> -->
                                     </button>
                                 </div>
@@ -277,7 +289,7 @@
                                 <div class="mt-3" style="overflow: scroll;height: 31rem; ">
                                     <table id="myTable" class="table table-bordered table-info table-striped tb table-responsive w-100">
                                         <thead fs-1 tb>
-                                            <th class="text-center fs-2 bg-secondary text-dark extra">#</th>
+                                            <th class="text-center fs-2 bg-secondary text-dark extra hide_table_text_i">#</th>
                                             <th class="text-center fs-2 bg-secondary text-dark extra">TYPE <span class="fa fa-filter fs-1 mx-1"></span></th>
                                             <th class="text-center fs-2 bg-secondary text-dark extra">NUMBER <span class="fa fa-filter fs-1 mx-1"></span></th>
                                             <th class="text-center fs-2 bg-secondary text-dark extra">DATE <span class="fa fa-filter fs-1 mx-1"></span></th>
@@ -289,8 +301,8 @@
                                         </thead>
                                         <tbody>
                                             <tr {% if getparty.openingbalance == 0 %} hidden{% endif %}>
-                                                <td style="font-size: 20px; color: {% if getparty.payment == 'To Pay' %}red{% elif getparty.payment == 'To Receive' %}green{% else %}black{% endif %}; vertical-align: middle;">&#8226;</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">Opening Balance</td>
+                                                <td class= "hide_table_text_in" style="font-size: 20px; color: {% if getparty.payment == 'To Pay' %}red{% elif getparty.payment == 'To Receive' %}green{% else %}black{% endif %}; vertical-align: middle;">&#8226;</td>
+                                                <td class="text-center extra px-0" style="white-space: nowrap;">{% if getparty.payment == 'To Pay' %} Payable Opening Balance {% else %} Receivable Opening Balance{% endif %}</td>
                                                 <td class="text-center extra px-0" style="white-space: nowrap;"></td>
                                                 <td class="text-center extra px-0" style="white-space: nowrap;">{{ getparty.current_date|date:"d-m-Y" }}</td>
                                                 <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ getparty.openingbalance }}</td>
@@ -376,7 +388,7 @@
                     <div class="form-group">
                         <label for="" style="color: red; font-size: x-small;">* Refer Downloaded Excel Work Sheet for Values and Fields 
                         Details</label><br>
-                        <a href="#" id="downloadExcelLink">Download Sample Template Here</a><br><br>
+                        <a href="{% url 'downloadPartySampleImportFile' %}" id="downloadExcelLink">Download Sample Template Here</a><br><br>
 
                         <input type="file" class="form-control-file" id="partyfile" name="partyfile" accept=".xls, .xlsx" /><br><br>
                     </div>
@@ -394,14 +406,41 @@
 <script>
    
     function exportToExcel() {
-        $('.hide_table_text_v').text('')
-        $('.hide_table_text_d').text('')
-        const table = document.getElementById('myTable');
-        const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-        XLSX.writeFile(wb, "table_data.xlsx");
-        $('.hide_table_text_v').html('<span class="fa fa-eye pe-2 tg"></span> View / Edit')
-        $('.hide_table_text_d').html('<span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete')
+        $('.hide_table_text_v').text('');
+        $('.hide_table_text_d').text('');
+        $('.hide_table_text_i').text('');
+        $('.hide_table_text_in').text('');
+
+        // Create a copy of the table for export and remove unwanted columns
+        const originalTable = document.getElementById('myTable');
+        const exportTable = originalTable.cloneNode(true);
+
+        const headerRow = exportTable.querySelector('thead tr');
+        const columnsToRemove = ["#"];
+        
+
+        for (let i = 0; i < columnsToRemove.length; i++) {
+            const columnIndex = Array.from(headerRow.children).findIndex(cell => cell.innerText.trim() === columnsToRemove[i]);
+            if (columnIndex !== -1) {
+                headerRow.children[columnIndex].remove();
+                for (const row of exportTable.querySelectorAll('tbody tr')) {
+                    row.children[columnIndex].remove();
+                }
+            }
+        }
+
+        // Export the modified table to Excel
+        const wb = XLSX.utils.table_to_book(exportTable, { sheet: "Party Details" });
+        XLSX.writeFile(wb, "Party.xlsx");
+
+        // Update the displayed text
+        $('.hide_table_text_v').html('<span class="fa fa-eye pe-2 tg"></span> View / Edit');
+        $('.hide_table_text_d').html('<span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete');
+        $('.hide_table_text_i').html('#');
+        $('.hide_table_text_in').html('&#8226;');
     }
+
+
     $(document).ready(function() {
         $("#search_input1").on("keyup", function() {
             var value = $(this).val().toLowerCase();
@@ -448,52 +487,7 @@
             $(".item_lists_hide").show(); // Show all parties
         });
     });
-
-    // function uploadFile() {
-    //     const form = document.getElementById('excelForm');
-    //     const formData = new FormData(form);
-    //     fetch('import_parties', {
-    //         method: 'POST',
-    //         body: formData
-    //     })
-    //     .then(data => {
-    //         swal({
-    //             title: "Imported !",
-    //             text: "Purchase Bill Import Successfull!",
-    //             icon: "success",
-    //             buttons: false,
-    //         })
-    //     })
-    //     .then(response => {
-    //         setTimeout(function () {
-    //             location.reload();
-    //         }, 1250);
-    //     })
-    //     .catch(error => {
-    //         swal({
-    //             title: "Error !",
-    //             text: "Purchase Bill Import Unuccessfull!",
-    //             icon: "warning",
-    //             buttons: false,
-    //         })
-    //     });
-    // }
-
-    // function excelmodal(){
-    //     const table1 = document.querySelector('#billtablemodel');
-    //     const ws1 = XLSX.utils.table_to_sheet(table1);
-    //     const wb1 = XLSX.utils.book_new();
-    //     XLSX.utils.book_append_sheet(wb1, ws1, 'Sheet1');
-    //     XLSX.writeFile(wb1, 'PurchaseBillModel.xlsx');
-    // }
-
-    document.getElementById('downloadExcelLink').addEventListener('click', function() {
-        var downloadLink = document.createElement('a');
-        downloadLink.href = 'Sample Worksheet.xlsx';
-        downloadLink.download = 'Sample Worksheet.xlsx';
-        downloadLink.click();
-    });
-
+  
 </script>
  
 {% endblock  %}

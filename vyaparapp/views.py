@@ -43,6 +43,8 @@ from datetime import datetime
 import re
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from itertools import zip_longest
+from openpyxl.styles import Font
 
 # Create your views here.
 def home(request):
@@ -869,6 +871,108 @@ def add_parties(request):
   return render(request, 'company/add_parties.html',{'staff':staff, 'tod' : tod , 'allmodules' : allmodules})
 
 
+def view_parties(request,pk):
+  staff_id = request.session['staff_id']
+  staff =  staff_details.objects.get(id=staff_id)
+  Party=party.objects.filter(company=staff.company.id)
+  if pk == 0:
+      getparty = party.objects.filter(company=staff.company.id).first()
+  else:
+      getparty = party.objects.get(company=staff.company.id, id=pk)
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+
+  party_histories= party_history.objects.filter(
+    party=getparty,
+    company=staff.company
+  ).values('party', 'action' , 'staff__first_name' , 'staff__last_name').last()
+
+  context = { 
+              'staff':staff,
+              'allmodules':allmodules,
+              'Party':Party, 
+              'getparty' : getparty, 
+              'party_history' : party_histories,
+             }
+  return render(request, 'company/view_parties.html',context)
+
+def party_histories(request,id):
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)   
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+  getparty = party.objects.get(id=id,company=cmp)
+  party_histories= party_history.objects.filter(party=getparty,company=cmp)
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+
+  context = {'staff':staff,'allmodules':allmodules,'party_history': party_histories,'getparty': getparty, 'allmodules' : allmodules}
+  return render(request,'company/party_history.html',context)
+
+def save_parties(request):
+    if request.method == 'POST':
+        staff_id = request.session['staff_id']
+        staff =  staff_details.objects.get(id=staff_id)
+        
+            #updated by Nithya
+
+        party_name = request.POST['partyname'].capitalize()
+        gst_no = request.POST.get('gstno')
+        contact = request.POST['contact']
+        gst_type = request.POST.get('gsttype')
+        state = request.POST.get('splystate')
+        address = request.POST.get('baddress')
+        email = request.POST.get('partyemail')
+        openingbalance = request.POST.get('openbalance', '')
+        balance = request.POST.get('openbalance', '')
+        payment = request.POST.get('paymentType', '')
+        creditlimit = request.POST.get('crd_lmt', '')
+        current_date = request.POST.get('partydate')
+        End_date = request.POST.get('enddate', None)
+        additionalfield1 = request.POST.get('additional1')
+        additionalfield2 = request.POST.get('additional2')
+        additionalfield3 = request.POST.get('additional3')
+
+        context  = {'staff' : staff, 'tod' : date.today()}
+       
+        if ( not party_name ):
+          return render(request, 'add_parties.html',context)
+
+        part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
+                       creditlimit=creditlimit,current_date=current_date, current_balance = balance, End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
+        
+        if not party_name or not contact:
+            messages.error(request, 'Please Enter Party Name and Contact.')
+        else:
+          if 'save_and_new' in request.POST:
+              if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
+                  messages.error(request, 'Party with the same party name and contact number already exists.')
+              else:
+                  part.save()
+                  party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created').save()
+              
+              return render(request, 'company/add_parties.html', context)
+          else:
+              if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
+                  messages.error(request, 'Party with the same party name and contact number already exists.')
+              else:
+                  part.save()
+                  party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created').save()
+
+              return redirect('view_parties', part.id)
+
+    return render(request, 'company/add_parties.html',context)  
+
+def party_histories(request,id):
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)   
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+  getparty = party.objects.get(id=id,company=cmp)
+  party_histories= party_history.objects.filter(party=getparty,company=cmp)
+  print(party_histories)
+  context = {'staff':staff,'allmodules':allmodules,'party_histories': party_histories,'getparty': getparty}
+  return render(request,'company/party_history.html',context)
+
+
 def edit_party(request,id):
   #updated-shemeem
   sid = request.session.get('staff_id')
@@ -956,6 +1060,50 @@ def deleteparty(request, id):
     
 # ---------------Nithya-------import party-----------------
 
+def downloadPartySampleImportFile(request):
+    
+    party_table_data = [['Party Name','Contact','Email','GST No.','GST Type','Supply State','Billing Address','Opening Balance','Payment','Current Date','Credit Limit','Additional Field 1','Additional Field 2','Additional Field 3'],['Check GSTType, Supply States, Payment Sheet for details. And remove this row for add party details']]
+    details_table_data = [
+          ['GST Type','Registered Party', 'Unregistered or Consumer', 'Registered Business or Composition'],
+          ['Supply State','1', '2', '3', '4', '5'],
+          ['Payment','To Pay', 'To Recieve'],
+          ['GST Number Format','32AAQFR1222B1ZS'],
+          ['Email Format','abc@example.com'],
+          ['Conatct Format', '7890555444']
+    ]  
+    wb = Workbook()
+
+    sheet1 = wb.active
+    sheet1.title = 'Sample Party Details'
+    sheet2 = wb.create_sheet(title='GSTType, Supply States, Payment')
+
+    # Populate the sheets with data
+    for row in party_table_data:
+        sheet1.append(row)
+
+    transposed_data = list(zip_longest(*details_table_data))
+    for row in transposed_data:
+      sheet2.append(row)
+
+
+    bold_headers = ['Party Name','Contact','Email','GST No.','GST Type','Supply State','Billing Address','Opening Balance','Payment','Current Date','Credit Limit','Additional Field 1','Additional Field 2','Additional Field 3','GST Number Format','Email Format','Conatct Format']
+    for col_num, header in enumerate(party_table_data[0], start=1):
+        if header in bold_headers:
+            sheet1.cell(row=1, column=col_num).font = Font(bold=True)
+
+    for col_num, header in enumerate(transposed_data[0], start=1):
+        if header in bold_headers:
+            sheet2.cell(row=1, column=col_num).font = Font(bold=True)
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=party_sample_file.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+
 def import_parties(request):
     
     if request.method == 'POST':
@@ -975,31 +1123,12 @@ def import_parties(request):
 
           party_name =row.get('Party Name').capitalize()
           contact = str(row.get('Contact'))
-
-          print(row.get('Party Name'))
-          print(row.get('Contact'))
-          print(row.get('GST Type'))
-          print(row.get('GST No.'))
-          print(row.get('Supply State'))
-          print(row.get('Billing Address'))
-          print(row.get('Opening Balance'))
-          print(row.get('Payment'))
-          print(row.get('Credit Limit'))
-          print(row.get('Current Date'))
-          print(row.get('Additional Field 1'))
-          print(row.get('Additional Field 2'))
-          print(row.get('Additional Field 3'))
-          
+         
 
           phone_pattern = re.compile(r'^\d{10}$')
           contact = contact if phone_pattern.match(contact) else " "
-          print(contact)
-          # print(phone_pattern.match(contact))
           gst_pattern = re.compile(r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[0-9A-Z]{1}$')
           gstno = str(row.get('GST No.', '')) if gst_pattern.match(str(row.get('GST No.', ''))) else " "
-          print(gstno)
-          print(validate_email(row.get('Email')))
-          email = row.get('Email') if row.get('Email') and validate_email(row.get('Email')) else messages.error(request, f'Row "{count_rows}" :Email should follow the format.')
 
 
           party_obj = party(
@@ -1033,6 +1162,8 @@ def import_parties(request):
                 messages.error(request, f'Row "{count_rows}" :Party with the same contact number "{contact}" already exists.')
             else:
                 party_obj.save() 
+                party_history.objects.create(party = party_obj,company=staff.company,staff=staff,action='Created').save()
+
 
           return redirect('view_parties', party_obj.id)
 
@@ -4870,107 +5001,6 @@ def editstaff_profile_action(request):
     return redirect ('staff_profile')
   return redirect ('staff_profile')
 
-
-def view_parties(request,pk):
-  staff_id = request.session['staff_id']
-  staff =  staff_details.objects.get(id=staff_id)
-  Party=party.objects.filter(company=staff.company.id)
-  if pk == 0:
-      getparty = party.objects.filter(company=staff.company.id).first()
-  else:
-      getparty = party.objects.get(company=staff.company.id, id=pk)
-  allmodules= modules_list.objects.get(company=staff.company,status='New')
-
-  party_histories= party_history.objects.filter(
-    party=getparty,
-    company=staff.company
-  ).values('party', 'action' , 'staff__first_name' , 'staff__last_name').last()
-
-  context = { 
-              'staff':staff,
-              'allmodules':allmodules,
-              'Party':Party, 
-              'getparty' : getparty, 
-              'party_history' : party_histories,
-             }
-  return render(request, 'company/view_parties.html',context)
-
-def party_histories(request,id):
-  sid = request.session.get('staff_id')
-  staff = staff_details.objects.get(id=sid)
-  cmp = company.objects.get(id=staff.company.id)   
-  allmodules= modules_list.objects.get(company=staff.company,status='New')
-  getparty = party.objects.get(id=id,company=cmp)
-  party_histories= party_history.objects.filter(party=getparty,company=cmp)
-  allmodules= modules_list.objects.get(company=staff.company,status='New')
-
-  context = {'staff':staff,'allmodules':allmodules,'party_history': party_histories,'getparty': getparty, 'allmodules' : allmodules}
-  return render(request,'company/party_history.html',context)
-
-def save_parties(request):
-    if request.method == 'POST':
-        staff_id = request.session['staff_id']
-        staff =  staff_details.objects.get(id=staff_id)
-        
-            #updated by Nithya
-
-        party_name = request.POST['partyname'].capitalize()
-        gst_no = request.POST.get('gstno')
-        contact = request.POST['contact']
-        gst_type = request.POST.get('gsttype')
-        state = request.POST.get('splystate')
-        address = request.POST.get('baddress')
-        email = request.POST.get('partyemail')
-        openingbalance = request.POST.get('openbalance', '')
-        balance = request.POST.get('openbalance', '')
-        payment = request.POST.get('paymentType', '')
-        creditlimit = request.POST.get('crd_lmt', '')
-        current_date = request.POST.get('partydate')
-        End_date = request.POST.get('enddate', None)
-        additionalfield1 = request.POST.get('additional1')
-        additionalfield2 = request.POST.get('additional2')
-        additionalfield3 = request.POST.get('additional3')
-
-        context  = {'staff' : staff, 'tod' : date.today()}
-       
-        if ( not party_name ):
-          return render(request, 'add_parties.html',context)
-
-        part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
-                       creditlimit=creditlimit,current_date=current_date, current_balance = balance, End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
-        
-        if not party_name or not contact:
-            messages.error(request, 'Please Enter Party Name and Contact.')
-        else:
-          if 'save_and_new' in request.POST:
-              if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
-                  messages.error(request, 'Party with the same party name and contact number already exists.')
-              else:
-                  part.save()
-                  party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created').save()
-              
-              return render(request, 'company/add_parties.html', context)
-          else:
-              if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
-                  messages.error(request, 'Party with the same party name and contact number already exists.')
-              else:
-                  part.save()
-                  party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created').save()
-
-              return redirect('view_parties', part.id)
-
-    return render(request, 'company/add_parties.html',context)  
-
-def party_histories(request,id):
-  sid = request.session.get('staff_id')
-  staff = staff_details.objects.get(id=sid)
-  cmp = company.objects.get(id=staff.company.id)   
-  allmodules= modules_list.objects.get(company=staff.company,status='New')
-  getparty = party.objects.get(id=id,company=cmp)
-  party_histories= party_history.objects.filter(party=getparty,company=cmp)
-  print(party_histories)
-  context = {'staff':staff,'allmodules':allmodules,'party_histories': party_histories,'getparty': getparty}
-  return render(request,'company/party_history.html',context)
 
 
 def view_party(request,id):

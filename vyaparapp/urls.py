@@ -142,6 +142,7 @@ urlpatterns = [
     path('deleteparty/<int:id>', views.deleteparty, name='deleteparty'),
     path('party_histories/<int:id>', views.party_histories, name='party_histories'),
     path('import_parties', views.import_parties, name='import_parties'),
+    path('downloadPartySampleImportFile', views.downloadPartySampleImportFile, name='downloadPartySampleImportFile'),
 
     #End
     path('view_purchasebill',views.view_purchasebill,name='view_purchasebill'),
