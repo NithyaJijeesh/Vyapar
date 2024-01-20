@@ -2,7 +2,7 @@
 <!--updated by Nithya-->
 
 {% extends 'company/src/html/base.html' %}
-
+{% load social_share %}
 {% block content %}
 {% load static %}
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -59,6 +59,7 @@
 
     th.extra {
         position: relative;
+        
     }
 
     th.extra span {
@@ -66,6 +67,65 @@
         top: 50%;
         transform: translateY(-50%);
     }
+    /* .extra{
+            display: none;
+        } */
+    #myDropdown {
+        display: none;
+    }
+
+    #myDropdown.show {
+        display: block;
+    }
+    #templates, #slip{
+        cursor: pointer;
+    }
+
+    #myDropdown {
+        display: none;
+        position: absolute;
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+        background-color: #f9f9f9;
+        min-width: 160px;
+        /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+        z-index: 1;
+    }
+
+    #myDropdown  a {
+        display: block;
+        padding: 12px 16px;
+        text-decoration: none;
+        color: #333;
+    }
+
+    #myDropdown  a:hover {
+        background-color: #ddd;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+        padding: 10px;
+        z-index: 1;
+        width: 15%;
+    }
+
+    .dropdown-content label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .dropdown-content input {
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+
 </style>
 {% if Party %}
 
@@ -264,10 +324,12 @@
                             <div class="col-sm-12 col-lg-4 pt-1">
                                 
                                 <div class="d-flex">
-                                    <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="exportToExcel()">
-                                        <span >
-                                            <img width="25px" src="{% static 'images/shareimg.png' %}" alt="no img"><br><span style="font-size: 10px;"><strong>SHARE</strong></span></em>
+                                    <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="toggleDropdown()">
+                                        <span>
+                                            <img width="25px" src="{% static 'images/shareimg.png' %}" alt="no img"><br>
+                                            <span style="font-size: 10px;"><strong>SHARE</strong></span>
                                         </span>
+                                        
                                     </button>
                                     <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="exportToExcel()">
                                         <span >
@@ -285,10 +347,14 @@
                                         <!-- <br><span style="color: black; font-size: small; font-weight: bold;">Print</span> -->
                                     </button>
                                 </div>
+                                <div class="dropdown-share" id="myDropdown">
+                                    <ul style="margin-bottom: -1px;">{% post_to_whatsapp object_or_url "WhatsApp" %}</ul>
+                                    <ul style="margin-bottom: -1px;">{% send_email object.title "{{object.title}}" object_or_url "Email" %}</ul>
+                                </div>
                             </div>
                                 <div class="mt-3" style="overflow: scroll;height: 31rem; ">
                                     <table id="myTable" class="table table-bordered table-info table-striped tb table-responsive w-100">
-                                        <thead fs-1 tb>
+                                        <!-- <thead fs-1 tb>
                                             <th class="text-center fs-2 bg-secondary text-dark extra hide_table_text_i">#</th>
                                             <th class="text-center fs-2 bg-secondary text-dark extra">TYPE <span class="fa fa-filter fs-1 mx-1"></span></th>
                                             <th class="text-center fs-2 bg-secondary text-dark extra">NUMBER <span class="fa fa-filter fs-1 mx-1"></span></th>
@@ -298,18 +364,97 @@
                                             <th class="text-center fs-2 bg-secondary text-dark extra">ACTION <span class="fa fa-filter fs-1 mx-1"></span></th>
                                             <th class="text-center fs-2 bg-secondary text-dark extra">BY <span class="fa fa-filter fs-1 mx-1"></span></th>
                                             <th class="text-center fs-2 bg-secondary text-dark extra"></th> 
+                                        </thead> -->
+                                        <thead >
+                                            <tr class="fs-2 tb">
+                                                <th class="bg-secondary text-dark text-center align-middle">
+                                                    # 
+                                                </th>
+                                                <th class="bg-secondary text-dark align-middle">
+                                                    TYPE
+                                                    <a class="extra text-dark " onclick="filterDropdown(0)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                    <div class="dropdown-content" id="dropdownContent0">
+                                                        <label for="filterInput0" style="color: black; text-align: left;">Equal To</label>
+                                                        <input type="date" id="filterInput0"  />
+                                                        <a class="btn btn-info" onclick="cleardropdown(0)">Clear</a> 
+                                                        &nbsp;<a class="btn btn-info" onclick="filterTable(0)">Apply</a>
+                                                    </div>
+                                                </th>
+                                                <th class="bg-secondary text-dark text-center align-middle">
+                                                    NUMBER
+                                                    <a class="extra text-dark" onclick="filterDropdown(1)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                    <div class="dropdown-content" id="dropdownContent1">
+                                                        <label for="filterInput1" style="color: black; text-align: left;">Equal To</label>
+                                                        <input type="text" id="filterInput1"  />
+                                                        <a class="btn btn-info" onclick="cleardropdown(1)">Clear</a> 
+                                                        &nbsp;<a class="btn btn-info" onclick="filterTable(1)">Apply</a>
+                                                    </div>
+                                                </th>
+                                                <th class="bg-secondary text-dark align-middle">
+                                                    DATE
+                                                    <a class="extra text-dark" onclick="filterDropdown(2)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                    <div class="dropdown-content" id="dropdownContent2">
+                                                        <label for="filterInput2" style="color: black; text-align: left;">Equal To</label>
+                                                        <input type="text" id="filterInput2"  />
+                                                        <a class="btn btn-info" onclick="cleardropdown(2)">Clear</a> 
+                                                        &nbsp;<a class="btn btn-info" onclick="filterTable(2)">Apply</a>
+                                                    </div>
+                                                </th>
+                                                <th class="bg-secondary text-dark align-middle">
+                                                    TOTAL
+                                                    <a class="extra text-dark" onclick="filterDropdown(3)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                    <div class="dropdown-content" id="dropdownContent3">
+                                                        <label for="filterInput3" style="color: black; text-align: left;">Equal To</label>
+                                                        <input type="text" id="filterInput3"  />
+                                                        <a class="btn btn-info" onclick="cleardropdown(3)">Clear</a> 
+                                                        &nbsp;<a class="btn btn-info" onclick="filterTable(3)">Apply</a>
+                                                    </div>
+                                                </th>
+                                                <th class="bg-secondary text-dark align-middle">
+                                                    BALANCE
+                                                    <a class="extra text-dark" onclick="filterDropdown(5)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                    <div class="dropdown-content" id="dropdownContent5">
+                                                        <label for="filterInput5" style="color: black; text-align: left;">Equal To</label>
+                                                        <input type="text" id="filterInput5" />
+                                                        <a class="btn btn-info" onclick="cleardropdown(5)">Clear</a> 
+                                                        &nbsp;<a class="btn btn-info" onclick="filterTable(5)">Apply</a>
+                                                    </div>
+                                                </th>
+                                                
+                                                <th class="bg-secondary text-dark align-middle">
+                                                    ACTION
+                                                    &nbsp; <a onclick="filterDropdown(6)"><i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                    <div class="dropdown-content" id="dropdownContent6">
+                                                        <label for="filterInput6" style="color: black; text-align: left;">Equal To</label>
+                                                        <input type="text" id="filterInput6" />
+                                                        <a class="btn btn-info" onclick="cleardropdown(6)">Clear</a> 
+                                                        &nbsp;<a class="btn btn-info" onclick="filterTable(6)">Apply</a>
+                                                    </div>
+                                                </th>
+                                                <th class="bg-secondary text-dark align-middle">
+                                                    BY
+                                                    &nbsp; <a onclick="filterDropdown(7)"><i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                    <div class="dropdown-content" id="dropdownContent7">
+                                                        <label for="filterInput7" style="color: black; text-align: left;">Equal To</label>
+                                                        <input type="text" id="filterInput7" />
+                                                        <a class="btn btn-info" onclick="cleardropdown(7)">Clear</a> 
+                                                        &nbsp;<a class="btn btn-info" onclick="filterTable(7)">Apply</a>
+                                                    </div>
+                                                </th>
+                                                <th class="bg-secondary text-dark align-middle"></th>
+                                            </tr>
                                         </thead>
                                         <tbody>
                                             <tr {% if getparty.openingbalance == 0 %} hidden{% endif %}>
                                                 <td class= "hide_table_text_in" style="font-size: 20px; color: {% if getparty.payment == 'To Pay' %}red{% elif getparty.payment == 'To Receive' %}green{% else %}black{% endif %}; vertical-align: middle;">&#8226;</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">{% if getparty.payment == 'To Pay' %} Payable Opening Balance {% else %} Receivable Opening Balance{% endif %}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;"></td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ getparty.current_date|date:"d-m-Y" }}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ getparty.openingbalance }}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">₹ {{ getparty.current_balance }}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ party_history.action }}</td>
-                                                <td class="text-center extra px-0" style="white-space: nowrap;">{{ party_history.staff__first_name }} {{ party_history.staff__last_name }}</td>
-                                                <td class="px-0 pt-3 m-0 text-center extra" style="white-space: nowrap;">
+                                                <td class="text-center  px-0" style="white-space: nowrap;">{% if getparty.payment == 'To Pay' %} Payable Opening Balance {% else %} Receivable Opening Balance{% endif %}</td>
+                                                <td class="text-center  px-0" style="white-space: nowrap;"></td>
+                                                <td class="text-center  px-0" style="white-space: nowrap;">{{ getparty.current_date|date:"d-m-Y" }}</td>
+                                                <td class="text-center  px-0" style="white-space: nowrap;">₹ {{ getparty.openingbalance }}</td>
+                                                <td class="text-center  px-0" style="white-space: nowrap;">₹ {{ getparty.current_balance }}</td>
+                                                <td class="text-center  px-0" style="white-space: nowrap;">{{ party_history.action }}</td>
+                                                <td class="text-center  px-0" style="white-space: nowrap;">{{ party_history.staff__first_name }} {{ party_history.staff__last_name }}</td>
+                                                <td class="px-0 pt-3 m-0 text-center " style="white-space: nowrap;">
                                                     <div class="btn-group mb-1">
                                                         <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
@@ -334,8 +479,6 @@
         </div>
     </div>
 </div>
-
-
 
 {% else %}
 <div class="body-wrapper ">
@@ -487,6 +630,75 @@
             $(".item_lists_hide").show(); // Show all parties
         });
     });
+
+    function toggleDropdown() {
+        var dropdownContent = document.getElementById("myDropdown");
+        dropdownContent.classList.toggle("show");
+    }
+
+    function cleardropdown(index){
+        if(index == 0){
+            document.getElementById('filterInput'+index).value = '';
+        }else{
+            document.getElementById('filterInput'+index).value = null;
+        }
+    }
+
+    function filterDropdown(index) {
+        var dropdownContent = document.getElementById('dropdownContent' + index);
+        var isVisible = dropdownContent.style.display === 'block';
+        var allDropdowns = document.querySelectorAll('.dropdown-content');
+        allDropdowns.forEach(function (dropdown) {
+            dropdown.style.display = 'none';
+        });
+        dropdownContent.style.display = isVisible ? 'none' : 'block';
+    }
+
+    function filterTable(index) {
+        var input;
+        document.getElementById('dropdownContent' + index).style.display = 'none';
+        if (index === 0) {
+            input = document.getElementById('filterInput' + index).value;
+        } else {
+            input = document.getElementById('filterInput' + index).value.toUpperCase();
+        }
+        var table = document.getElementById('billtable');
+        var rows = table.getElementsByTagName('tr');
+        var emptyMessage = document.getElementById('emptyMessage');
+        var isEmpty = true;
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var cell = cells[index];
+            if (cell) {
+                var textValue = cell.textContent || cell.innerText;
+                if (index === 0) {
+                    if (input==''){
+                        rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                    }else{
+                        dateval  = textValue.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                        inputval  = input.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                        const formattedDate = formatDateString(input);
+                        if (dateval === formattedDate) {
+                            rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                        } else {
+                            rows[i].style.display = 'none';
+                        }
+                    }
+                } else {
+                    if (textValue.toUpperCase().includes(input)) {
+                        rows[i].style.display = 'table-row';
+                        isEmpty = false;
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+        emptyMessage.style.display = isEmpty ? 'block' : 'none';
+        calculatetotal()
+    }
   
 </script>
  
