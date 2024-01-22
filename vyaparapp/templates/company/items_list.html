@@ -210,6 +210,8 @@
                                         <th class="text-center fs-2">QUANTITY <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center fs-2">PRICE <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center fs-2">STATUS <span class="fa fa-filter ps-1 fs-1"></span></th>
+                                        <th class="text-center fs-2">ACTION <span class="fa fa-filter ps-1 fs-1"></span></th>
+                                        <th class="text-center fs-2">BY <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center p-0 m-0"></th>
                                     </thead>
                                     <tbody>
@@ -227,6 +229,8 @@
                                                 <td class="text-center"></td>
                                                 <td class="text-center">{{ i.trans_date|date:"d-m-Y" }}</td>
                                                 <td class="text-center">{{ i.trans_qty }}</td>
+                                                <td class="text-center"></td>
+                                                <td class="text-center"></td>
                                                 <td class="text-center"></td>
                                                 <td class="text-center"></td>
                                                 <td class="p-0 pt-1 m-0">
@@ -253,7 +257,7 @@
                                                 </div>
                                             </td>
                                             <!-- <td class="text-center">{% if first_item.item_opening_stock %}{{ first_item.item_opening_stock }}{% else %}0{% endif %}</td> -->
-                                            <td class="text-">Open stk</td>
+                                            <td class="text-">Opening Stock</td>
                                             <td class="text-center"></td>
                                             <!-- <td class="text-center">{% if first_item.item_opening_stock %}{{ first_item.item_opening_stock }}{% else %}0{% endif %}</td> -->
                                             <td class="text-center"></td>

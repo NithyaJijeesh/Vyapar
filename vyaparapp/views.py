@@ -1065,7 +1065,10 @@ def downloadPartySampleImportFile(request):
     party_table_data = [['Party Name','Contact','Email','GST No.','GST Type','Supply State','Billing Address','Opening Balance','Payment','Current Date','Credit Limit','Additional Field 1','Additional Field 2','Additional Field 3'],['Check GSTType, Supply States, Payment Sheet for details. And remove this row for add party details']]
     details_table_data = [
           ['GST Type','Registered Party', 'Unregistered or Consumer', 'Registered Business or Composition'],
-          ['Supply State','1', '2', '3', '4', '5'],
+          ['Supply State','Andaman and Nicobar Islands','Andhra Pradhesh','Arunachal Pradesh','Assam','Bihar','Chandigarh','Chhattisgarh',
+           'Dadra and Nagar Haveli','Daman and Diu','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jammu and Kashmir','Jharkhand',
+           'Karnataka','Kerala','Ladakh','Lakshadweep','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha',
+           'Pondicherry','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Other Territory'],
           ['Payment','To Pay', 'To Recieve'],
           ['GST Number Format','32AAQFR1222B1ZS'],
           ['Email Format','abc@example.com'],
