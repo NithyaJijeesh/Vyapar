@@ -108,9 +108,9 @@
         background-color: #fff;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         border-radius: 5px;
-        padding: 10px;
+        padding: 15px;
         z-index: 1;
-        width: 15%;
+        width: 25%;
     }
 
     .dropdown-content label {
@@ -364,7 +364,7 @@
                                                 <a class="extra text-dark " onclick="filterDropdown(0)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                                 <div class="dropdown-content" id="dropdownContent0">
                                                     <label for="filterInput0" style="color: black; text-align: left;">Equal To</label>
-                                                    <input type="date" id="filterInput0"  />
+                                                    <input type="text" id="filterInput0"  /><br>
                                                     <a class="btn btn-info" onclick="cleardropdown(0)">Clear</a> 
                                                     &nbsp;<a class="btn btn-info" onclick="filterTable(0)">Apply</a>
                                                 </div>
@@ -374,7 +374,7 @@
                                                 <a class="extra text-dark" onclick="filterDropdown(1)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                                 <div class="dropdown-content" id="dropdownContent1">
                                                     <label for="filterInput1" style="color: black; text-align: left;">Equal To</label>
-                                                    <input type="text" id="filterInput1"  />
+                                                    <input type="text" id="filterInput1"  /><br>
                                                     <a class="btn btn-info" onclick="cleardropdown(1)">Clear</a> 
                                                     &nbsp;<a class="btn btn-info" onclick="filterTable(1)">Apply</a>
                                                 </div>
@@ -384,7 +384,7 @@
                                                 <a class="extra text-dark" onclick="filterDropdown(2)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                                 <div class="dropdown-content" id="dropdownContent2">
                                                     <label for="filterInput2" style="color: black; text-align: left;">Equal To</label>
-                                                    <input type="text" id="filterInput2"  />
+                                                    <input type="date" id="filterInput2"  /><br>
                                                     <a class="btn btn-info" onclick="cleardropdown(2)">Clear</a> 
                                                     &nbsp;<a class="btn btn-info" onclick="filterTable(2)">Apply</a>
                                                 </div>
@@ -394,7 +394,7 @@
                                                 <a class="extra text-dark" onclick="filterDropdown(3)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                                 <div class="dropdown-content" id="dropdownContent3">
                                                     <label for="filterInput3" style="color: black; text-align: left;">Equal To</label>
-                                                    <input type="text" id="filterInput3"  />
+                                                    <input type="text" id="filterInput3"  /><br>
                                                     <a class="btn btn-info" onclick="cleardropdown(3)">Clear</a> 
                                                     &nbsp;<a class="btn btn-info" onclick="filterTable(3)">Apply</a>
                                                 </div>
@@ -404,7 +404,7 @@
                                                 <a class="extra text-dark" onclick="filterDropdown(5)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                                 <div class="dropdown-content" id="dropdownContent5">
                                                     <label for="filterInput5" style="color: black; text-align: left;">Equal To</label>
-                                                    <input type="text" id="filterInput5" />
+                                                    <input type="text" id="filterInput5" /><br>
                                                     <a class="btn btn-info" onclick="cleardropdown(5)">Clear</a> 
                                                     &nbsp;<a class="btn btn-info" onclick="filterTable(5)">Apply</a>
                                                 </div>
@@ -415,7 +415,7 @@
                                                 &nbsp; <a onclick="filterDropdown(6)"><i class="fa fa-filter" aria-hidden="true"></i></a>
                                                 <div class="dropdown-content" id="dropdownContent6">
                                                     <label for="filterInput6" style="color: black; text-align: left;">Equal To</label>
-                                                    <input type="text" id="filterInput6" />
+                                                    <input type="text" id="filterInput6" /><br>
                                                     <a class="btn btn-info" onclick="cleardropdown(6)">Clear</a> 
                                                     &nbsp;<a class="btn btn-info" onclick="filterTable(6)">Apply</a>
                                                 </div>
@@ -425,7 +425,7 @@
                                                 &nbsp; <a onclick="filterDropdown(7)"><i class="fa fa-filter" aria-hidden="true"></i></a>
                                                 <div class="dropdown-content" id="dropdownContent7">
                                                     <label for="filterInput7" style="color: black; text-align: left;">Equal To</label>
-                                                    <input type="text" id="filterInput7" />
+                                                    <input type="text" id="filterInput7" /><br>
                                                     <a class="btn btn-info" onclick="cleardropdown(7)">Clear</a> 
                                                     &nbsp;<a class="btn btn-info" onclick="filterTable(7)">Apply</a>
                                                 </div>
@@ -619,6 +619,7 @@
         });
     });
 
+    // Filter data in each column
     function toggleDropdown() {
         var dropdownContent = document.getElementById("myDropdown");
         dropdownContent.classList.toggle("show");
@@ -643,23 +644,35 @@
     }
 
     function filterTable(index) {
+        console.log(index);
         var input;
         document.getElementById('dropdownContent' + index).style.display = 'none';
-        if (index === 0) {
+        if (index === 2) {
             input = document.getElementById('filterInput' + index).value;
+            
         } else {
             input = document.getElementById('filterInput' + index).value.toUpperCase();
         }
-        var table = document.getElementById('billtable');
+        var table = document.getElementById('myTable');
         var rows = table.getElementsByTagName('tr');
-        var emptyMessage = document.getElementById('emptyMessage');
         var isEmpty = true;
         for (var i = 1; i < rows.length; i++) {
             var cells = rows[i].getElementsByTagName('td');
             var cell = cells[index];
+            console.log(cell)
             if (cell) {
                 var textValue = cell.textContent || cell.innerText;
-                if (index === 0) {
+                
+                if (index === 0 | index === 1) {
+                    console.log('yesss');
+                    if (textValue.toUpperCase().includes(input)) {
+                        rows[i].style.display = 'table-row';
+                        isEmpty = false;
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                } else if (index === 2) {
+                    console.log('yes');
                     if (input==''){
                         rows[i].style.display = 'table-row';
                             isEmpty = false;
@@ -674,7 +687,8 @@
                             rows[i].style.display = 'none';
                         }
                     }
-                } else {
+                } else if (index === 3 | index === 4 | index === 5 | index === 6) {
+                    console.log('no');
                     if (textValue.toUpperCase().includes(input)) {
                         rows[i].style.display = 'table-row';
                         isEmpty = false;
@@ -684,9 +698,18 @@
                 }
             }
         }
-        emptyMessage.style.display = isEmpty ? 'block' : 'none';
-        calculatetotal()
+        // emptyMessage.style.display = isEmpty ? 'block' : 'none';
+        // calculatetotal()
     }
+    function formatDateString(inputDate) {
+        const parsedDate = new Date(inputDate);
+        const day = parsedDate.getDate();
+        const month = parsedDate.getMonth() + 1;
+        const year = parsedDate.getFullYear();
+        const formattedDate = `${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}-${year}`;
+        return formattedDate;
+    }
+    
   
 </script>
  

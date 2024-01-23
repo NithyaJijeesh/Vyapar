@@ -1114,8 +1114,10 @@ def import_parties(request):
       staff_id = request.session['staff_id']
       staff =  staff_details.objects.get(id=staff_id)
       file = request.FILES['partyfile']
+      print(file)
 
       df = pd.read_excel(file)
+      print(df)
 
       errors = []
       count_rows = 0
@@ -1130,14 +1132,11 @@ def import_parties(request):
 
           phone_pattern = re.compile(r'^\d{10}$')
           contact = contact if phone_pattern.match(contact) else " "
-          gst_pattern = re.compile(r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[0-9A-Z]{1}$')
-          gstno = str(row.get('GST No.', '')) if gst_pattern.match(str(row.get('GST No.', ''))) else " "
-
 
           party_obj = party(
               party_name = party_name, 
               contact = contact,
-              gst_no = gstno,
+              gst_no = str(row.get('GST No.', '')),
               gst_type = row.get('GST Type', ''),
               email = row.get('Email'),
               state = row.get('Supply State', ''),
@@ -1167,28 +1166,14 @@ def import_parties(request):
                 party_obj.save() 
                 party_history.objects.create(party = party_obj,company=staff.company,staff=staff,action='Created').save()
 
-
-          return redirect('view_parties', party_obj.id)
-
         except Exception as e:
             error_message = f"Error in row {index + 1}: {e}"
             errors.append(error_message)
             print(f"Error reading or processing Excel file: {e}")
-
+      return redirect('view_parties', party_obj.id)
     return redirect('view_parties', 0)
 
-
-
-
-
-
-
-    #   return redirect('view_parties', 0)
-    
-    # context  = {'staff' : staff, 'tod' : date.today()}
-
-    # return render(request, 'company/add_parties.html',context)
-    
+   
 
 #End
 
