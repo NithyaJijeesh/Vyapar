@@ -7,11 +7,8 @@
 {% load static %}
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
-
-<!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script> -->
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 {% load my_extras %}
@@ -310,18 +307,18 @@
                             <div class="col-sm-12 col-lg-5">
                                 <p class="tb fw-bolder pt-2">TRANSACTIONS</p>
                                 <div class="position-relative">
-                                    <div class="position-absolute" style="margin-top:0.4rem;margin-left: 0.5rem;">
+                                    <div class="position-absolute removefields" style="margin-top:0.4rem;margin-left: 0.5rem;">
                                         <span class="fa fa-search fs-5 text-info"></span>
                                     </div>
                                 </div>
-                                <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" search here..">
+                                <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded removefields" type="text" placeholder=" search here..">
 
                             </div>
 
-                            <div class="col-sm-12 col-lg-3">
+                            <div class="col-sm-12 col-lg-3 removefields">
                             </div>
                             
-                            <div class="col-sm-12 col-lg-4 pt-1">
+                            <div class="col-sm-12 col-lg-4 pt-1 removefields">
                                 <div class="d-flex">
                                     <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="toggleDropdown()">
                                         <span>
@@ -335,7 +332,7 @@
                                             <img width="25px" src="{% static 'assets/excel2.png' %}" alt="no img"><br><span style="font-size: 10px;"><strong>EXPORT</strong></span></em>
                                         </span>
                                     </button>
-                                    <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="exportToExcel()">
+                                    <button class="btn p-0 ps-2 pe-2 ms-2" type="button" id="pdflink">
                                         <span >
                                             <img width="20px" src="{% static 'images/pdfdownload.png' %}" alt="no img"><br><span style="font-size: 10px;"><strong>PDF</strong></span></em>
                                         </span>
@@ -346,9 +343,9 @@
                                         <!-- <br><span style="color: black; font-size: small; font-weight: bold;">Print</span> -->
                                     </button>
                                 </div>
-                                <div class="dropdown-share" id="myDropdown">
+                                <div class="dropdown-content" id="myDropdown">
                                     <ul style="margin-bottom: -1px;">{% post_to_whatsapp object_or_url "WhatsApp" %}</ul>
-                                    <ul style="margin-bottom: -1px;">{% send_email object.title "{{object.title}}" object_or_url "Email" %}</ul>
+                                    <ul style="margin-bottom: -1px;"><a data-toggle="modal" data-target="#emailModal">Email</a></ul>
                                 </div>
                             </div>
                             <div class="mt-3 col-sm-12 col-lg-12 pt-1" style="overflow: scroll;height: 31rem;">
@@ -361,17 +358,7 @@
                                             </th>
                                             <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                                 TYPE
-                                                <a class="extra text-dark " onclick="filterDropdown(0)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
-                                                <div class="dropdown-content" id="dropdownContent0">
-                                                    <label for="filterInput0" style="color: black; text-align: left;">Equal To</label>
-                                                    <input type="text" id="filterInput0"  /><br>
-                                                    <a class="btn btn-info" onclick="cleardropdown(0)">Clear</a> 
-                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(0)">Apply</a>
-                                                </div>
-                                            </th>
-                                            <th class="bg-secondary text-dark align-middle px-1 "  style="white-space: nowrap;">
-                                                NUMBER
-                                                <a class="extra text-dark" onclick="filterDropdown(1)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <a class="extra text-dark " onclick="filterDropdown(1)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                                 <div class="dropdown-content" id="dropdownContent1">
                                                     <label for="filterInput1" style="color: black; text-align: left;">Equal To</label>
                                                     <input type="text" id="filterInput1"  /><br>
@@ -379,24 +366,34 @@
                                                     &nbsp;<a class="btn btn-info" onclick="filterTable(1)">Apply</a>
                                                 </div>
                                             </th>
-                                            <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                                DATE
+                                            <th class="bg-secondary text-dark align-middle px-1 "  style="white-space: nowrap;">
+                                                NUMBER
                                                 <a class="extra text-dark" onclick="filterDropdown(2)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                                 <div class="dropdown-content" id="dropdownContent2">
                                                     <label for="filterInput2" style="color: black; text-align: left;">Equal To</label>
-                                                    <input type="date" id="filterInput2"  /><br>
+                                                    <input type="text" id="filterInput2"  /><br>
                                                     <a class="btn btn-info" onclick="cleardropdown(2)">Clear</a> 
                                                     &nbsp;<a class="btn btn-info" onclick="filterTable(2)">Apply</a>
                                                 </div>
                                             </th>
                                             <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                                TOTAL
+                                                DATE
                                                 <a class="extra text-dark" onclick="filterDropdown(3)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                                 <div class="dropdown-content" id="dropdownContent3">
                                                     <label for="filterInput3" style="color: black; text-align: left;">Equal To</label>
-                                                    <input type="text" id="filterInput3"  /><br>
+                                                    <input type="date" id="filterInput3"  /><br>
                                                     <a class="btn btn-info" onclick="cleardropdown(3)">Clear</a> 
                                                     &nbsp;<a class="btn btn-info" onclick="filterTable(3)">Apply</a>
+                                                </div>
+                                            </th>
+                                            <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
+                                                TOTAL
+                                                <a class="extra text-dark" onclick="filterDropdown(4)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                                <div class="dropdown-content" id="dropdownContent4">
+                                                    <label for="filterInput4" style="color: black; text-align: left;">Equal To</label>
+                                                    <input type="text" id="filterInput4"  /><br>
+                                                    <a class="btn btn-info" onclick="cleardropdown(4)">Clear</a> 
+                                                    &nbsp;<a class="btn btn-info" onclick="filterTable(4)">Apply</a>
                                                 </div>
                                             </th>
                                             <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
@@ -533,7 +530,40 @@
     </div>
 </div>
 
- 
+
+<!-- email modal -->
+
+<div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">EMAIL PARTY DETAILS</h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="font-size: large;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" enctype="multipart/form-data" id="emailForm" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group p-5 align-items-center justify-content-center">
+                        <!-- <label for="partyemail" style="color: black; text-align: left;">Email</label> -->
+                        <input type="text" class="form-control-file" id="partyemail" name="partyemail" placeholder="Enter Email"/><br><br>
+                        <!-- <label for="partymessage" style="color: black; text-align: left;">Message</label> -->
+                        <input type="text" class="form-control-file" id="partymessage" name="partymessage" placeholder="Enter Message"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="generatePDFAndSendEmail()">SEND</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.14.0/dist/pdf-lib.js"></script>
+
 <script>
    
     function exportToExcel() {
@@ -618,6 +648,7 @@
             $(".item_lists_hide").show(); // Show all parties
         });
     });
+    
 
     // Filter data in each column
     function toggleDropdown() {
@@ -644,10 +675,9 @@
     }
 
     function filterTable(index) {
-        console.log(index);
         var input;
         document.getElementById('dropdownContent' + index).style.display = 'none';
-        if (index === 2) {
+        if (index === 3) {
             input = document.getElementById('filterInput' + index).value;
             
         } else {
@@ -656,23 +686,20 @@
         var table = document.getElementById('myTable');
         var rows = table.getElementsByTagName('tr');
         var isEmpty = true;
-        for (var i = 1; i < rows.length; i++) {
+        for (var i = 0; i < rows.length; i++) {
             var cells = rows[i].getElementsByTagName('td');
             var cell = cells[index];
-            console.log(cell)
             if (cell) {
                 var textValue = cell.textContent || cell.innerText;
                 
-                if (index === 0 | index === 1) {
-                    console.log('yesss');
+                if (index === 1 | index === 2) {
                     if (textValue.toUpperCase().includes(input)) {
                         rows[i].style.display = 'table-row';
                         isEmpty = false;
                     } else {
                         rows[i].style.display = 'none';
                     }
-                } else if (index === 2) {
-                    console.log('yes');
+                } else if (index === 3) {
                     if (input==''){
                         rows[i].style.display = 'table-row';
                             isEmpty = false;
@@ -687,8 +714,7 @@
                             rows[i].style.display = 'none';
                         }
                     }
-                } else if (index === 3 | index === 4 | index === 5 | index === 6) {
-                    console.log('no');
+                } else if (index === 4 | index === 5 | index === 6 | index === 7) {
                     if (textValue.toUpperCase().includes(input)) {
                         rows[i].style.display = 'table-row';
                         isEmpty = false;
@@ -710,7 +736,137 @@
         return formattedDate;
     }
     
-  
+    $(document).ready(function ($) {
+        $(document).on('click', '#pdflink', function (event) {
+            event.preventDefault();
+            var element = document.getElementById('item_get_detail_target');
+            var elementClone = element.cloneNode(true);
+
+            // Remove the specific sections from the cloned element
+            var elementsToRemove = elementClone.querySelectorAll('.removefields');
+            elementsToRemove.forEach(function (el) {
+                el.remove();
+            });
+            
+            var opt =
+            {
+                margin: 1,
+                filename: 'Party - '+ '{{ getparty.party_name|upper }}' + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait', }
+            };
+            html2pdf().set(opt).from(elementClone).save();
+        });
+    });
+
+
+    function printfunction(){
+        var element = document.getElementById('item_get_detail_target');
+        var elementClone = element.cloneNode(true);
+
+        var elementsToRemove = elementClone.querySelectorAll('.removefields');
+        elementsToRemove.forEach(function (el) {
+            el.remove();
+        });
+        var filterElements = elementClone.querySelectorAll('.fa-filter, .dropdown-content');
+        filterElements.forEach(function (el) {
+            el.style.display = 'none'; // Hide filter-related elements
+        });
+        var rows = elementClone.querySelectorAll('.table tr');
+        rows.forEach(function (row) {
+            var lastColumn = row.lastElementChild;
+            lastColumn.parentNode.removeChild(lastColumn); // Remove last column
+        });
+
+        var printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Party Details</title>');
+        printWindow.document.write('<link rel="stylesheet" href="{% static 'assets/css/styles.min.css' %}" />');
+        printWindow.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />');
+        printWindow.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">');
+        printWindow.document.write('  <link rel="shortcut icon" type="image/png" href="{% static 'assets/images/logos/favicon.png' %}" />');
+        printWindow.document.write('<style>');
+        printWindow.document.write(document.body.querySelector('style').innerHTML); // Copy existing styles
+        printWindow.document.write('</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.body.appendChild(elementClone);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+            
+        printWindow.print();
+        
+    }
+
+
+
+    function generatePDFAndSendEmail() {
+        const recipientEmail = document.getElementById("partyemail").value;
+        const emailMessage = document.getElementById("partymessage").value;
+        console.log(recipientEmail);
+        console.log(emailMessage);
+
+        // Validate email and message
+        if (!recipientEmail || !emailMessage) {
+            alert("Please enter both email and message.");
+            return;
+        }
+
+        // Use html2canvas to capture the section content
+        html2canvas(document.getElementById("item_get_detail_target"), {
+            ignoreElements: (element) => element.classList.contains("removefields"),
+        }).then(async (canvas) => {
+            // Create a PDF using pdf-lib
+            const pdfDoc = await PDFLib.PDFDocument.create();
+            const page = pdfDoc.addPage();
+
+            // Convert canvas image data to Uint8Array
+            const imgData = canvas.toDataURL("image/png").split(',')[1];
+            const imgBytes = Uint8Array.from(atob(imgData), (c) => c.charCodeAt(0));
+
+            // Embed image in the PDF
+            const pngImage = await pdfDoc.embedPng(imgBytes);
+            const { width, height } = pngImage.scale(1);
+            page.drawImage(pngImage, {
+                x: 0,
+                y: height,
+                width,
+                height,
+            });
+
+            // Get the PDF content as a data URI
+            const pdfBytes = await pdfDoc.save();
+            const pdfDataUri = `data:application/pdf;base64,${btoa(String.fromCharCode(...pdfBytes))}`;
+
+            // Send PDF via email using Django (replace with your Django view and email logic)
+            sendEmailWithPDF(pdfDataUri, recipientEmail, emailMessage);
+        });
+    }
+
+    function sendEmailWithPDF(pdfDataUri, email, message) {
+        // Use AJAX or fetch to send the PDF data to Django backend
+        // Example using fetch
+        fetch("generate_pdf_and_send_email", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                pdfDataUri: pdfDataUri,
+                email: email,
+                message: message,
+            }),
+        })
+        .then((response) => {
+            if (response.ok) {
+                console.log("Email sent successfully!");
+            } else {
+                console.error("Error sending email");
+            }
+        })
+        .catch((error) => {
+            console.error("Error sending email:", error);
+        });
+    }
 </script>
  
 {% endblock  %}

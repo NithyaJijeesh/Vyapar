@@ -1173,7 +1173,28 @@ def import_parties(request):
       return redirect('view_parties', party_obj.id)
     return redirect('view_parties', 0)
 
-   
+  #  Email Party Details
+
+def generate_pdf_and_send_email(request):
+    if request.method == 'POST':
+        pdf_data_uri = request.POST.get('pdfDataUri')
+        recipient_email = request.POST.get('email')
+        email_message = request.POST.get('message')
+
+
+        subject = 'PDF Attachment'
+        body = render_to_string('email_body.html', {'message': email_message})
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to_email = [recipient_email]
+
+        email = EmailMessage(subject, body, from_email, to_email)
+        email.attach(filename='document.pdf', content=pdf_data_uri.split(';base64,')[1], mimetype='application/pdf')
+        email.send()
+
+        return JsonResponse({'success': True})
+    else:
+        # Handle GET request or other methods if needed
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
 #End
 
