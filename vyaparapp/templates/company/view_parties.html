@@ -781,10 +781,10 @@
 
         var printWindow = window.open('', '_blank');
         printWindow.document.write('<html><head><title>Party Details</title>');
-        printWindow.document.write('<link rel="stylesheet" href="{% static 'assets/css/styles.min.css' %}" />');
+        printWindow.document.write('<link rel="stylesheet" href="{% static "assets/css/styles.min.css" %}" />');
         printWindow.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />');
         printWindow.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">');
-        printWindow.document.write('  <link rel="shortcut icon" type="image/png" href="{% static 'assets/images/logos/favicon.png' %}" />');
+        printWindow.document.write('  <link rel="shortcut icon" type="image/png" href="{% static "assets/images/logos/favicon.png" %}" />');
         printWindow.document.write('<style>');
         printWindow.document.write(document.body.querySelector('style').innerHTML); // Copy existing styles
         printWindow.document.write('</style>');

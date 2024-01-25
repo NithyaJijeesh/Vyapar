@@ -512,6 +512,7 @@ def items_list(request,pk):
     else:
       first_item = all_items.get(id=pk)
     allmodules= modules_list.objects.get(company=staff.company,status='New')
+    transactions = None
     # transactions = TransactionModel.objects.filter(user=request.user.id,item=first_item.id).order_by('-trans_created_date')
     transactions = TransactionModel.objects.filter(company = cmp,item=first_item.id).order_by('-trans_created_date')
 
@@ -1114,10 +1115,10 @@ def import_parties(request):
       staff_id = request.session['staff_id']
       staff =  staff_details.objects.get(id=staff_id)
       file = request.FILES['partyfile']
-      print(file)
+      # print(file)
 
       df = pd.read_excel(file)
-      print(df)
+      # print(df)
 
       errors = []
       count_rows = 0
