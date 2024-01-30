@@ -218,9 +218,13 @@
                                                         <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <span class="fa fa-ellipsis-v text-dark fs-1 ps-2 p-0"></span>
                                                         </button>
-                                                        <ul class="dropdown-menu">
+                                                        <!-- <ul class="dropdown-menu">
                                                             <li><a class="dropdown-item" href="{% url 'edit_party' i.id %}">Edit</a></li>
                                                             <li><a class="dropdown-item" href="{% url 'deleteparty' i.id %}">Delete</a></li>
+                                                        </ul> -->
+                                                        <ul class="dropdown-menu">
+                                                            <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'edit_party' i.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
+                                                            <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href="{% url 'deleteparty' i.id %}"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>

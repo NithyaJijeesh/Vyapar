@@ -694,7 +694,7 @@ def item_search_filter(request):
   search_string = request.POST.get('searching_item')
   # items_filtered = ItemModel.objects.filter(user=request.user.id)
   items_filtered = ItemModel.objects.filter(user=cmp.user)
-  items_filtered = items_filtered.filter(Q(item_name__icontains=search_string))
+  items_filtered = items_filtered.filter(Q(item_name__icontains=search_string) | Q(item_current_stock__icontains = search_string))
   item_unit_name = request.POST.get('item_unit_name')
   return TemplateResponse(request,'company/item_search_filter.html',{'all_items':items_filtered})
 
