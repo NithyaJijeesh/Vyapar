@@ -1137,7 +1137,7 @@ def import_parties(request):
           party_obj = party(
               party_name = party_name, 
               contact = contact,
-              gst_no = str(row.get('GST No.', '')),
+              gst_no = None if 'nan' else str(row.get('GST No.', '')),
               gst_type = row.get('GST Type', ''),
               email = row.get('Email'),
               state = row.get('Supply State', ''),
@@ -1182,7 +1182,9 @@ def generate_pdf_and_send_email(request):
         recipient_email = request.POST.get('email')
         email_message = request.POST.get('message')
 
-
+        print(pdf_data_uri)
+        # print(recipient_email)
+        # print(email_message)
         subject = 'PDF Attachment'
         body = render_to_string('email_body.html', {'message': email_message})
         from_email = settings.DEFAULT_FROM_EMAIL

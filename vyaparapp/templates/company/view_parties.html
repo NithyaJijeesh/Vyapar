@@ -265,8 +265,7 @@
                                 {% if getparty.address %}
                                 <label for="" style="color: #000000; ">{{ getparty.address }}</label>
                                 {% else %}
-                                <a href="{% url 'edit_party' getparty.id %}"><i class="fa fa-map-marker"></i>&nbsp;&nbsp;Add
-                                    Address</a>
+                                <a href="{% url 'edit_party' getparty.id %}"><i class="fa fa-map-marker"></i>&nbsp;&nbsp;Add Address</a>
                                 {% endif %}</span>
                             </p>
                         </div>
@@ -275,12 +274,14 @@
                                 {% if getparty.email %}
                                 <label for="" style="color: #000000; ">{{ getparty.email}}</label>
                                 {% else %}
-                                <a href="{% url 'edit_party' getparty.id %}"><i class="fa fa-envelope"></i>&nbsp;&nbsp;Add
-                                    Email</a>
-                                {% endif %}</span></p>
+                                <a href="{% url 'edit_party' getparty.id %}"><i class="fa fa-envelope"></i>&nbsp;&nbsp;Add Email</a>
+                                {% endif %}</span>
+                            </p>
                             <p class="tb fw-bolder fs-2">GSTIN:  <span class="ps-2 tg">
                                 {% if getparty.gst_no %}
-                                <label for="" style="color: #000000; ">{{ getparty.gst_no}}</label>
+                                    {% if getparty.gst_no is not null %}
+                                        <label for="" style="color: #000000; ">{{ getparty.gst_no}}</label>
+                                    {% endif %}
                                 {% else %}
                                 <a href="{% url 'edit_party' getparty.id %}"><i class="fa fa-barcode "></i>&nbsp;&nbsp;Add
                                     Gstin</a>
@@ -845,6 +846,9 @@
     function sendEmailWithPDF(pdfDataUri, email, message) {
         // Use AJAX or fetch to send the PDF data to Django backend
         // Example using fetch
+        console.log(pdfDataUri);
+        console.log(email);
+        console.log(message);
         fetch("generate_pdf_and_send_email", {
             method: "POST",
             headers: {
@@ -857,6 +861,7 @@
             }),
         })
         .then((response) => {
+            console.log(response);
             if (response.ok) {
                 console.log("Email sent successfully!");
             } else {
