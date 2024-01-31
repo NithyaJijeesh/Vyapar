@@ -503,10 +503,11 @@ def items_list(request,pk):
     sid = request.session.get('staff_id')
     staff =  staff_details.objects.get(id=sid)
     cmp = company.objects.get(id=staff.company.id)
-    
+
     # get_company_id_using_user_id = company.objects.get(user=request.user.id)
     # all_items = ItemModel.objects.filter(company=get_company_id_using_user_id.id)
     all_items = ItemModel.objects.filter(company=cmp) #updated - shemeem
+
     if pk == 0:
       first_item = all_items.filter().first()
     else:
@@ -1154,7 +1155,7 @@ def import_parties(request):
               company = staff.company
           )
 
-          if not party_name or not contact or contact is " ":
+          if not party_name or not contact or contact == " ":
             messages.error(request, f'Row "{count_rows}" :Please Enter Party Name and Contact Number.')
           else:
             
@@ -1176,28 +1177,6 @@ def import_parties(request):
 
   #  Email Party Details
 
-def generate_pdf_and_send_email(request):
-    if request.method == 'POST':
-        pdf_data_uri = request.POST.get('pdfDataUri')
-        recipient_email = request.POST.get('email')
-        email_message = request.POST.get('message')
-
-        print(pdf_data_uri)
-        # print(recipient_email)
-        # print(email_message)
-        subject = 'PDF Attachment'
-        body = render_to_string('email_body.html', {'message': email_message})
-        from_email = settings.DEFAULT_FROM_EMAIL
-        to_email = [recipient_email]
-
-        email = EmailMessage(subject, body, from_email, to_email)
-        email.attach(filename='document.pdf', content=pdf_data_uri.split(';base64,')[1], mimetype='application/pdf')
-        email.send()
-
-        return JsonResponse({'success': True})
-    else:
-        # Handle GET request or other methods if needed
-        return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
 #End
 

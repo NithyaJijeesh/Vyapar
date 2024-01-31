@@ -143,7 +143,6 @@ urlpatterns = [
     path('party_histories/<int:id>', views.party_histories, name='party_histories'),
     path('import_parties', views.import_parties, name='import_parties'),
     path('downloadPartySampleImportFile', views.downloadPartySampleImportFile, name='downloadPartySampleImportFile'),
-    path('generate_pdf_and_send_email', views.generate_pdf_and_send_email, name='generate_pdf_and_send_email'),
 
     #End
     path('view_purchasebill',views.view_purchasebill,name='view_purchasebill'),

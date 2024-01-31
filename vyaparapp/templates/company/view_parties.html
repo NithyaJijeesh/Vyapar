@@ -306,7 +306,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row pt-0 m-0" {% if first_item.item_min_stock_maintain %} style="height:39rem;"{% else %}style="height:41.1rem;"{% endif %}>
+                <div class="row pt-0 m-0" >
                     <div class="card p-0 bg-light bs">
                         <div class="row m-0 p-0 pt-3 ">
                             <div class="col-sm-12 col-lg-5">
@@ -535,36 +535,6 @@
     </div>
 </div>
 
-
-<!-- email modal -->
-
-<div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="importModalLabel">EMAIL PARTY DETAILS</h5>
-                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" style="font-size: large;">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="" enctype="multipart/form-data" id="emailForm" method="POST">
-                    {% csrf_token %}
-                    <div class="form-group p-5 align-items-center justify-content-center">
-                        <!-- <label for="partyemail" style="color: black; text-align: left;">Email</label> -->
-                        <input type="text" class="form-control-file" id="partyemail" name="partyemail" placeholder="Enter Email"/><br><br>
-                        <!-- <label for="partymessage" style="color: black; text-align: left;">Message</label> -->
-                        <input type="text" class="form-control-file" id="partymessage" name="partymessage" placeholder="Enter Message"/>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="generatePDFAndSendEmail()">SEND</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.14.0/dist/pdf-lib.js"></script>
@@ -804,78 +774,6 @@
 
 
 
-    function generatePDFAndSendEmail() {
-        const recipientEmail = document.getElementById("partyemail").value;
-        const emailMessage = document.getElementById("partymessage").value;
-        console.log(recipientEmail);
-        console.log(emailMessage);
-
-        // Validate email and message
-        if (!recipientEmail || !emailMessage) {
-            alert("Please enter both email and message.");
-            return;
-        }
-
-        // Use html2canvas to capture the section content
-        html2canvas(document.getElementById("item_get_detail_target"), {
-            ignoreElements: (element) => element.classList.contains("removefields"),
-        }).then(async (canvas) => {
-            // Create a PDF using pdf-lib
-            const pdfDoc = await PDFLib.PDFDocument.create();
-            const page = pdfDoc.addPage();
-
-            // Convert canvas image data to Uint8Array
-            const imgData = canvas.toDataURL("image/png").split(',')[1];
-            const imgBytes = Uint8Array.from(atob(imgData), (c) => c.charCodeAt(0));
-
-            // Embed image in the PDF
-            const pngImage = await pdfDoc.embedPng(imgBytes);
-            const { width, height } = pngImage.scale(1);
-            page.drawImage(pngImage, {
-                x: 0,
-                y: height,
-                width,
-                height,
-            });
-
-            // Get the PDF content as a data URI
-            const pdfBytes = await pdfDoc.save();
-            const pdfDataUri = `data:application/pdf;base64,${btoa(String.fromCharCode(...pdfBytes))}`;
-
-            // Send PDF via email using Django (replace with your Django view and email logic)
-            sendEmailWithPDF(pdfDataUri, recipientEmail, emailMessage);
-        });
-    }
-
-    function sendEmailWithPDF(pdfDataUri, email, message) {
-        // Use AJAX or fetch to send the PDF data to Django backend
-        // Example using fetch
-        console.log(pdfDataUri);
-        console.log(email);
-        console.log(message);
-        fetch("generate_pdf_and_send_email", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                pdfDataUri: pdfDataUri,
-                email: email,
-                message: message,
-            }),
-        })
-        .then((response) => {
-            console.log(response);
-            if (response.ok) {
-                console.log("Email sent successfully!");
-            } else {
-                console.error("Error sending email");
-            }
-        })
-        .catch((error) => {
-            console.error("Error sending email:", error);
-        });
-    }
 </script>
  
 {% endblock  %}
