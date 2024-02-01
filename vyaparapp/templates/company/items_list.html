@@ -121,7 +121,12 @@
         margin-bottom: 10px;
     }
 
-
+    .sticky-header thead {
+        position: sticky;
+        top: 0;
+        background-color: #3498db; /* Add your desired background color */
+        color: #fff; /* Add your desired text color */
+    }
 </style>
 
 
@@ -150,14 +155,12 @@
     </div>
     <br>
     <div class="row ps-3 pe-3 m-0">
-        <div class="col-sm-12 col-lg-3  ps-2 pe-3 pb-2" style="height: 50rem;">
-            <div class="card bg-light bs"style="height:100%;">
+        <div class="col-sm-12 col-lg-3  ps-2 pe-3 pb-2" style="height: 100%;">
+            <div class="card bg-light bs" style="height:100%;">
                 <div class="row m-0">
                     <div class="col-12 p-1 bs justify-content-center pe-3" style="z-index:2; ">
                         <div class="d-flex justify-content-center">
-                            <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#importModal">
-                                Open Import Modal
-                            </button> -->
+                            
                             <button class="btn btn-sm" type="button" data-toggle="modal" data-target="#importModal">
                                 <span><img width="25px" src="{% static 'images/import.png' %}" alt="no img" class="bg-info"></span> &nbsp;
                                 <span style="color: black; font-size: small; font-weight: bold;" class="text-dark">IMPORT ITEM</span>
@@ -175,7 +178,7 @@
                             </div>
                             <div class="position-relative">
                                 <div class="position-absolute end-0" style="margin-top:0.5rem;margin-right:0.7rem">
-                                    <span hidden id="close_seacrh" class="fa fa-times fs-4 tr"
+                                    <span hidden id="close_seacrh" class="fa fa-times fs-4 tr bg-gradient"
                                     hx-post="{% url 'item_search_filter' %}"
                                     hx-trigger="click delay:0.1s"
                                     hx-target="#item_search_filter_target"
@@ -200,22 +203,43 @@
                                 {% csrf_token %}
 
                                 <div style="overflow: auto;height: 42rem;">
-                                <table class="table w-100 table-light table-striped table-hover">
-                                    <thead class="bg-primary">
+                                <table class="table w-100 table-light table-striped table-hover sticky-header">
+                                    <thead class="bg-primary ">
                                         <th class="text-start fs-2 tb">ITEM</th>
                                         <th class="text-end fs-2 tb">QUANTITY</th>
                                     </thead>
                                     <tbody>
                                         
                                         {% for i in all_items %}
-                                        <tr class="item_lists_hide">
-                                            <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark"
+                                        <tr class="item_lists_hide clickable-row" data-href="{% url 'items_list' i.id %}">
+                                            <!-- <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark"
                                             hx-post="{% url 'item_get_detail' i.id %}"
                                             hx-trigger="click delay:0s"
                                             hx-target="#item_get_detail_target"
                                             >{{ i.item_name|capfirst }}</td>
                                             <td class="text-end fs-2 fw-bolder" style="color: green;">
                                                 {{ i.item_current_stock }}
+                                                <div class="btn-group mb-1">
+                                                    <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <span class="fa fa-ellipsis-v text-dark fs-1 ps-2"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item fw-bold tb" href="{% url 'item_view_or_edit' i.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
+                                                    <li><a class="dropdown-item fw-bold tb" type="button" onclick="confirm_delete({{ i.id }})"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td> -->
+
+                                            <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark">
+                                                <a href=" " class="my-3">
+                                                    {{ i.item_name|capfirst }}
+                                                </a>
+                                            </td>
+                                          
+                                            <td class="text-end fs-2 fw-bolder" style="white-space: nowrap;">
+                                                <a href=" " class="my-3 mx-0 p-0 ">
+                                                    {{ i.item_current_stock }}
+                                                </a>
                                                 <div class="btn-group mb-1">
                                                     <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                                                         <span class="fa fa-ellipsis-v text-dark fs-1 ps-2"></span>
@@ -244,9 +268,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-12 col-lg-9  ps-2 pe-3" style="height: 80%;">
+        <div class="col-sm-12 col-lg-9  ps-2 pe-3 d-flex flex-column style="height: 100%;">
           <div id="item_get_detail_target">
-            <div class="row m-0" style="height:20%">
+            <div class="row m-0 bg-pink" style="height:20%">
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">{{ message }}</div>
+                {% endfor %}
                 <div class="card bg-light bs p-3 mb-3">
                     <div class="d-flex justify-content-between">
                         
@@ -276,13 +303,10 @@
                 </div>
             </div>
             <!-- <div class="row" style="height: 0.5rem;"></div> -->
-            <div class="row pt-0 m-0" {% if first_item.item_min_stock_maintain %} style="height:39rem;"{% else %}style="height:41.1rem;"{% endif %}>
+            <div class="row pt-0 m-0 bg-warning" >
+            <!-- {% if first_item.item_min_stock_maintain %} style="height:40rem;"{% else %} style="height:42rem;"{% endif %}> -->
                 <div class="card p-0 bg-light bs">
                     <div class="row m-0 p-0 pt-3">
-                        <!-- <div class="col-sm-12 col-lg-3">
-                            <p class="tb fw-bolder pt-2">TRANSACTIONS</p>
-                        </div> -->
-
                         <div class="col-sm-12 col-lg-5">
                             <p class="tb fw-bolder pt-2">TRANSACTIONS</p>
                             <div class="position-relative">
@@ -338,8 +362,8 @@
                         </div>
                        
                         <div class="mt-3 col-sm-12 col-lg-12 pt-1" style="overflow: scroll;height: 31rem;">
-                            <table id="myTable" class="table table-bordered table-info table-striped tb table-responsive w-100">
-                                <thead fs-1 tb>
+                            <table id="myTable" class="table table-bordered table-info table-striped tb table-responsive w-100" style="overflow: scroll;">
+                                <thead class="fs-1 tb">
                                     <tr class="fs-2 tb">
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             # 
@@ -365,7 +389,7 @@
                                             </div>
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                            ITEM NAME
+                                            NAME
                                             <a class="extra text-dark" onclick="filterDropdown(3)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content" id="dropdownContent3">
                                                 <label for="filterInput3" style="color: black; text-align: left;">Equal To</label>
@@ -439,12 +463,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr {% if first_item.item_opening_stock == 0 %} hidden{% endif %}>
-                                        <td class= "hide_table_text_in" style="font-size: 20px; color: {% if first_item.item_opening_stock == 0 %}green{% else %} red {% endif %}; vertical-align: middle;">&#8226;</td>
-                                        <td class="text-center  px-0">{% if first_item.item_opening_stock %}{{ first_item.item_opening_stock }}{% else %}0{% endif %}</td>
+                                    <tr {% if not first_item.item_opening_stock  %} hidden{% endif %}>
+                                        <td class= "hide_table_text_in" style="font-size: 20px; color: {% if first_item.item_opening_stock == 0 %}red{% else %} orange{% endif %}; vertical-align: middle;">&#8226;</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">Opening Stock</td>
                                         <td class="text-center  px-0" style="white-space: nowrap;"></td>
                                         <td class="text-center  px-0" style="white-space: nowrap;"></td>
-                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_date|date:"d-m-Y" }}</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_opening_stock }}</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_at_price }}</td>
                                         <td class="text-center  px-0" style="white-space: nowrap;"></td>
                                         <td class="text-center  px-0" style="white-space: nowrap;"></td>
                                         <td class="text-center  px-0" style="white-space: nowrap;"></td>
@@ -461,67 +487,34 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr {% if first_item.item_opening_stock == 0 %} hidden{% endif %}>
-                                        <td class="text-center" style="padding-top: 1.4rem;">
-                                            <div class="d-flex justify-content-center">
-                                                <div style="width: 10px;height: 10px;" class="bg-dark rounded-pill bs_sm"></div>
-                                            </div>
-                                        </td>
-                                        <!-- <td class="text-center">{% if first_item.item_opening_stock %}{{ first_item.item_opening_stock }}{% else %}0{% endif %}</td> -->
-                                        <td class="text-">Opening Stock</td>
-                                        <td class="text-center"></td>
-                                        <!-- <td class="text-center">{% if first_item.item_opening_stock %}{{ first_item.item_opening_stock }}{% else %}0{% endif %}</td> -->
-                                        <td class="text-center"></td>
-                                        <td class="text-center">{{ first_item.item_date|date:"d-m-Y" }}</td>
-                                        <td class="text-center">{{ first_item.item_opening_stock }}</td>
-                                        <td class="text-center">₹{{ first_item.item_at_price }}</td>
-                                        <td class="text-center"></td>
-                                        <td class="p-0 pt-1 m-0">
+                                    {% for i in transactions %}
+                                    <tr>
+                                        <!-- <div style="width: 10px;height: 10px;box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.205);border-radius: 50%;" {% if forloop.counter|mod:10 == 0 %}class="bg-success"{% elif forloop.counter|mod:10 == 1 %}class="bg-warning"{% elif forloop.counter|mod:10 == 2 %}class="bg-danger"{% elif forloop.counter|mod:10 == 3 %}class="bg-success"{% elif forloop.counter|mod:10 == 4 %}class="bg-info"{% elif forloop.counter|mod:10 == 5 %}class="bg-primary"{% elif forloop.counter|mod:10 == 6 %}class="bg-secondary"{% elif forloop.counter|mod:10 == 7 %}class="bg-warning"{% elif forloop.counter|mod:10 == 8 %}class="bg-danger"{% else %}class="bg-pink"{% endif %}></div> -->
+
+                                        <td style="font-size: 20px; vertical-align: middle;; color: {% if i.trans_type == 'add stock' %} green {% elif i.trans_type == 'reduce stock' %} red {% else %}  black {% endif %}">&#8226;</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ i.trans_type|capfirst }}</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ i.trans_date|date:"d-m-Y" }}</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ i.trans_qty }}</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_at_price }}</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
+                                        <td class="px-0 pt-3 m-0 text-center " style="white-space: nowrap;">
                                             <div class="btn-group mb-1">
                                                 <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_view_or_edit' first_item.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
-                                                    <li><a class="dropdown-item fw-bold tb hide_table_text_d" onclick="item_open_stk_delete({{ first_item.id }})"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
+                                                    <li><a class="dropdown-item fw-bold tb hide_table_text_v" href=""><span class="fa fa-history pe-2 th"></span> History</a></li>
+                                                    <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href=""><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
                                                 </ul>
                                             </div>
                                         </td>
                                     </tr>
-                                    {% for i in transactions %}
-                                        <tr>
-                                            <td class="text-center" style="padding-top: 1.4rem;">
-                                                <div class="d-flex justify-content-center">
-                                                    <div style="width: 10px;height: 10px;box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.205);border-radius: 50%;" {% if forloop.counter|mod:10 == 0 %}class="bg-success"{% elif forloop.counter|mod:10 == 1 %}class="bg-warning"{% elif forloop.counter|mod:10 == 2 %}class="bg-danger"{% elif forloop.counter|mod:10 == 3 %}class="bg-success"{% elif forloop.counter|mod:10 == 4 %}class="bg-info"{% elif forloop.counter|mod:10 == 5 %}class="bg-primary"{% elif forloop.counter|mod:10 == 6 %}class="bg-secondary"{% elif forloop.counter|mod:10 == 7 %}class="bg-warning"{% elif forloop.counter|mod:10 == 8 %}class="bg-danger"{% else %}class="bg-pink"{% endif %}></div>
-                                                </div>
-                                            </td>
-                                            <!-- <td class="text-center">{% if first_item.item_opening_stock %}{{ first_item.item_opening_stock }}{% else %}0{% endif %}</td> -->
-                                            <td class="text-">{{ i.trans_type|capfirst }}</td>
-                                            <td class="text-center"></td>
-                                            <!-- <td class="text-center">{% if first_item.item_opening_stock %}{{ first_item.item_opening_stock }}{% else %}0{% endif %}</td> -->
-                                            <td class="text-center"></td>
-                                            <td class="text-center">{{ i.trans_date|date:"d-m-Y" }}</td>
-                                            <td class="text-center">{{ i.trans_qty }}</td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="p-0 pt-1 m-0">
-                                                <div class="btn-group mb-1">
-                                                    <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><button type="button" data-bs-toggle="modal" data-bs-target="#myModal2" class="dropdown-item fw-bold tb hide_table_text_v" 
-                                                        hx-get="{% url 'item_transaction_view_or_edit' first_item.id i.id %}"
-                                                        hx-trigger="click delay:0s"
-                                                        hx-target="#item_transaction_view_or_edit_target"
-                                                        ><span class="fa fa-eye pe-2 tg"></span> View / Edit</button></li>
-                                                        <li><button type="button" onclick="delete_transaction({{ i.id }})" class="dropdown-item fw-bold tb hide_table_text_d" href=""><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</button></li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        
                                     {% endfor %}
                                     
                                 </tbody>
@@ -730,6 +723,15 @@
         var dropdownContent = document.getElementById("myDropdown");
         dropdownContent.classList.toggle("show");
     }
+
+
+    $(document).ready(function() {
+        // Add click event to the rows with the "clickable-row" class
+        $(".clickable-row").click(function() {
+            // Get the data-href attribute value (URL)
+            window.location = $(this).data("href");
+        });
+    });
 </script>
 
 {% endblock  %}

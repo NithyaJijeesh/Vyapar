@@ -85,28 +85,35 @@
                       </div>
                     <br>
                     <div id="main_form_div">
-                      
-                      <div class="d-flex">
-                        <input style="color: black;" class="form-control border-dark fw-bolder" type="text" placeholder="ITEM NAME" autocomplete="off" name="item_name" required>
-                        <input style="color: black;" class="form-control border-dark ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" required>
-                        <select style="color: black;" class="form-control ms-2 border-dark bg-light me-2" id="" name="item_unit" required>
-                          <option value="">Select a unit</option>
-                          <option value="NOS">NOS</option>
-                          <option value="BOX">BOX</option>
-                          <option value="PACKET">PACKET</option>
-                          {% if item_units %}
-                            {% for i in item_units %}
-                            <option value="{{ i.unit_name|upper }}">{{ i.unit_name|upper }}</option>
-                            {% endfor %}
-                          {% endif %}
-                          <option id="load_new_unit" hidden value=""></option>
-                        </select>
-                        <!-- <button class="btn bg-warning"><span class="fa fa-plus"></span></button> -->
-                        
-                        <button id="modal_closing" type="button" class="btn bg-warning" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo"><span class="fa fa-plus"></span></button>
-                        
+                      <div class="row" style="margin-left: -1vh;">
+                        <div class="col-md-4">
+                          <input style="color: black;" class="form-control border-secondary fw-bolder" type="text" placeholder="ITEM NAME" autocomplete="off" name="item_name" required>
+
+                        </div>
+                        <div class="col-md-4">
+                          <div style="position: relative;">
+                            <input style="color: black;" class="form-control border-secondary ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" id="item_hsn" required oninput="validateInput()">
+                            <span id="gstno-validation" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"></span>
+                          </div>
+                        </div>
+                        <div class="col-md-4 d-flex">
+                            
+                          <select style="color: black;" class="form-control ms-2 border-secondary bg-light me-2" id="" name="item_unit" required>
+                            <option value="">Select a unit</option>
+                            <option value="NOS">NOS</option>
+                            <option value="BOX">BOX</option>
+                            <option value="PACKET">PACKET</option>
+                            {% if item_units %}
+                              {% for i in item_units %}
+                              <option value="{{ i.unit_name|upper }}">{{ i.unit_name|upper }}</option>
+                              {% endfor %}
+                            {% endif %}
+                            <option id="load_new_unit" hidden value=""></option>
+                          </select>
+                          <button id="modal_closing" type="button" class="btn bg-warning" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo"><span class="fa fa-plus"></span></button>
+
+                        </div>
                       </div>
-                    
                       <div>
                           <p></p>
                           <hr class="p-0 m-0">
@@ -279,6 +286,23 @@
 </div>
 
 <script>
+  function validateInput() {
+        // Get the value entered by the user
+        var inputValue = document.getElementById("item_hsn").value;
+        const validationLabel = document.getElementById("gstno-validation");
+
+        // Check if the input value has less than 6 digits
+        if (inputValue.length >= 6) {
+            // Display a checkmark
+            validationLabel.innerHTML = "&#10004;"; // Checkmark symbol
+            validationLabel.style.color = "green";
+        } else {
+            // Display a cross mark
+            validationLabel.innerHTML = "&#10060;"; // Cross mark symbol
+            validationLabel.style.color = "red";
+        }
+    }
+
   $(document).on("submit","#unit_form",function(e){
     e.preventDefault();
   $.ajax({

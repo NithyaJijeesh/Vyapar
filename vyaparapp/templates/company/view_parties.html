@@ -122,6 +122,12 @@
         margin-bottom: 10px;
     }
 
+    .sticky-header thead {
+        position: sticky;
+        top: 0;
+        background-color: #3498db; /* Add your desired background color */
+        color: #fff; /* Add your desired text color */
+    }
 
 </style>
 {% if Party %}
@@ -145,8 +151,8 @@
     <br>
 
     <div class="row ps-3 pe-3 m-0">
-        <div class="col-sm-12 col-lg-3  ps-2 pe-3 pb-2" style="height: 52.5rem;">
-            <div class="card bg-light bs"style="height:100%;">
+        <div class="col-sm-12 col-lg-3  ps-2 pe-3 pb-2" style="height: 100%;">
+            <div class="card bg-light bs" style="height:100%;">
                 <div class="row m-0">
                     <div class="col-12 p-1 bs justify-content-center pe-3" style="z-index:2; ">
                         <div class="d-flex justify-content-center">
@@ -190,22 +196,22 @@
                             <form action="" method="post">
                                 {% csrf_token %}
                                 <div style="overflow: auto;height: 42rem;">
-                                    <table class="table w-100 table-light table-striped table-hover">
+                                    <table class="table w-100 table-light table-striped table-hover sticky-header bg-light">
                                         <thead class="bg-primary">
                                             <th class="text-start fs-2 tb">PARTY</th>
                                             <th class="text-end fs-2 tb">AMOUNT</th>
                                         </thead>
                                         <tbody>
                                             {% for i in Party %}
-                                            <tr class="item_lists_hide">
+                                            <tr class="item_lists_hide clickable-row" data-href="{% url 'view_parties' i.id %}">
                                                 <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark">
-                                                    <a href="{% url 'view_parties' i.id %}" class="my-3">
+                                                    <a href="" class="my-3">
                                                         {{ i.party_name|capfirst }}
                                                     </a>
                                                 </td>
                                               
                                                 <td class="text-end fs-2 fw-bolder" style="white-space: nowrap;">
-                                                    <a href="{% url 'view_parties' i.id %}" class="my-3 mx-0 p-0 ">
+                                                    <a href="" class="my-3 mx-0 p-0 ">
                                                         {% if i.payment == 'To Pay' %}
                                                         <span style="border: none; color: red; ">{{ i.current_balance }}</span>
                                                         {% elif i.payment == 'To Receive' %}
@@ -218,10 +224,7 @@
                                                         <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <span class="fa fa-ellipsis-v text-dark fs-1 ps-2 p-0"></span>
                                                         </button>
-                                                        <!-- <ul class="dropdown-menu">
-                                                            <li><a class="dropdown-item" href="{% url 'edit_party' i.id %}">Edit</a></li>
-                                                            <li><a class="dropdown-item" href="{% url 'deleteparty' i.id %}">Delete</a></li>
-                                                        </ul> -->
+                                                        
                                                         <ul class="dropdown-menu">
                                                             <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'edit_party' i.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
                                                             <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href="{% url 'deleteparty' i.id %}"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
@@ -245,7 +248,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-12 col-lg-9  ps-2 pe-3" style="height: 80%;">
+        <div class="col-sm-12 col-lg-9  ps-2 pe-3 d-flex flex-column" style="height: 100%;">
             <div id="item_get_detail_target">
                 <div class="row m-0" style="height:20%">
                     {% for message in messages %}
@@ -772,6 +775,13 @@
         
     }
 
+    $(document).ready(function() {
+        // Add click event to the rows with the "clickable-row" class
+        $(".clickable-row").click(function() {
+            // Get the data-href attribute value (URL)
+            window.location = $(this).data("href");
+        });
+    });
 
 
 </script>

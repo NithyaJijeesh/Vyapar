@@ -107,7 +107,7 @@
                             </div>
                         </div>
                         <select style="color: black;" class="form-control ms-2 border-dark bg-light me-2" id="" name="item_unit" required>
-                          <option value=""{% if item.item_unit == '' %}selected{% endif %}>Select an option</option>
+                          <option value="{{ item.unit_name }}>{{ item.unit_name|upper }}</option>
                           <option value="NOS"{% if item.item_unit == 'NOS' %}selected{% endif %}>NOS</option>
                           <option value="BOX"{% if item.item_unit == 'BOX' %}selected{% endif %}>BOX</option>
                           <option value="PACKET"{% if item.item_unit == 'PACKET' %}selected{% endif %}>PACKET</option>

@@ -522,7 +522,7 @@ def items_list(request,pk):
       return render(request,'company/items_create_first_item.html')
     return render(request,'company/items_list.html',{'all_items':all_items,'first_item':first_item,'transactions':transactions,'company':cmp, 'staff':staff, 'allmodules' : allmodules})
   except:
-    return render(request,'company/items_create_first_item.html', {'first_item':first_item,'transactions':transactions,'company':cmp, 'staff':staff, 'allmodules' : allmodules})
+    return render(request,'company/items_create_first_item.html', {'first_item':first_item,'transactions':transactions,'company':cmp, 'staff':staff, 'allmodules' : allmodules, 'all_items' : all_items})
 
 # @login_required(login_url='login')
 def item_create_new(request):
@@ -532,8 +532,6 @@ def item_create_new(request):
     staff =  staff_details.objects.get(id=sid)
     cmp = company.objects.get(id=staff.company.id)
 
-    # user = User.objects.get(id=request.user.id)
-    # company_user_data = company.objects.get(user=request.user.id)
     item_name = request.POST.get('item_name')
     item_hsn = request.POST.get('item_hsn')
     item_unit = request.POST.get('item_unit')
@@ -1108,49 +1106,49 @@ def downloadPartySampleImportFile(request):
 
     return response
 
-
 def import_parties(request):
     
     if request.method == 'POST':
 
       staff_id = request.session['staff_id']
       staff =  staff_details.objects.get(id=staff_id)
+      cmp = company.objects.get(id=staff.company.id)
       file = request.FILES['partyfile']
-      # print(file)
 
       df = pd.read_excel(file)
-      # print(df)
 
       errors = []
       count_rows = 0
 
-      for index, row in df.iterrows():
-        try:    
+      try:    
+        for index, row in df.iterrows():
           count_rows +=1
 
-          party_name =row.get('Party Name').capitalize()
+          party_name = row.get('Party Name').capitalize()
           contact = str(row.get('Contact'))
-         
 
           phone_pattern = re.compile(r'^\d{10}$')
-          contact = contact if phone_pattern.match(contact) else " "
+          contact = contact if phone_pattern.match(contact) else None
+
+          current_date = date.today() if 'nan' else datetime.strptime(str(row.get('Current Date')), '%Y-%m-%d').date()
 
           party_obj = party(
               party_name = party_name, 
               contact = contact,
-              gst_no = None if 'nan' else str(row.get('GST No.', '')),
-              gst_type = row.get('GST Type', ''),
-              email = row.get('Email'),
-              state = row.get('Supply State', ''),
-              address =  row.get('Billing Address', ''),
-              openingbalance = row.get('Opening Balance') if row.get('Opening Balance') else 0,
-              payment = row.get('Payment', ''),
-              creditlimit = row.get('Credit Limit'),
-              current_date = row.get('Current Date') if row.get('Current Date') else date.today(),
-              additionalfield1 = row.get('Additional Field 1', ''),
-              additionalfield2 = row.get('Additional Field 2', ''),
-              additionalfield3 = row.get('Additional Field 3', ''),
-              current_balance = row.get('Opening Balance') if row.get('Opening Balance') else 0,
+              gst_no = '' if 'nan' else str(row.get('GST No.', '')),
+              gst_type = '' if 'nan' else row.get('GST Type', ''),
+              email = '' if 'nan' else row.get('Email'),
+              state = '' if 'nan' else row.get('Supply State', ''),
+              address =  '' if 'nan' else row.get('Billing Address', ''),
+              openingbalance = 0 if 'nan' else row.get('Opening Balance'),
+              payment ='' if 'nan' else row.get('Payment', ''),
+              creditlimit = '' if 'nan' else row.get('Credit Limit'),
+              current_date = current_date,
+              End_date = current_date,
+              additionalfield1 = '' if 'nan' else row.get('Additional Field 1', ''),
+              additionalfield2 = '' if 'nan' else row.get('Additional Field 2', ''),
+              additionalfield3 = '' if 'nan' else row.get('Additional Field 3', ''),
+              current_balance = 0 if 'nan' else row.get('Opening Balance'),
               user = staff.company.user,
               company = staff.company
           )
@@ -1165,17 +1163,17 @@ def import_parties(request):
               else:
                 messages.error(request, f'Row "{count_rows}" :Party with the same contact number "{contact}" already exists.')
             else:
-                party_obj.save() 
-                party_history.objects.create(party = party_obj,company=staff.company,staff=staff,action='Created').save()
+              party_obj.save() 
+              party_history.objects.create(party = party_obj,company=staff.company,staff=staff,action='Created').save()
 
-        except Exception as e:
-            error_message = f"Error in row {index + 1}: {e}"
-            errors.append(error_message)
-            print(f"Error reading or processing Excel file: {e}")
-      return redirect('view_parties', party_obj.id)
+        party_final = party.objects.filter(company=cmp).last()
+        return redirect('view_parties', party_final.id)
+      
+      except Exception as e:
+          error_message = f"Error in row {index + 1}: {e}"
+          errors.append(error_message)
+          return redirect('view_parties', 0)
     return redirect('view_parties', 0)
-
-  #  Email Party Details
 
 
 #End
