@@ -203,15 +203,15 @@
                                         </thead>
                                         <tbody>
                                             {% for i in Party %}
-                                            <tr class="item_lists_hide clickable-row" data-href="{% url 'view_parties' i.id %}">
-                                                <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark">
-                                                    <a href="" class="my-3">
+                                            <tr class="item_lists_hide " data-href="{% url 'view_parties' i.id %}">
+                                                <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark clickable-row" data-href="{% url 'view_parties' i.id %}">
+                                                    <a href="{% url 'view_parties' i.id %}" class="my-3">
                                                         {{ i.party_name|capfirst }}
                                                     </a>
                                                 </td>
                                               
-                                                <td class="text-end fs-2 fw-bolder" style="white-space: nowrap;">
-                                                    <a href="" class="my-3 mx-0 p-0 ">
+                                                <td class="text-end fs-2 fw-bolder clickable-row" style="white-space: nowrap;"   data-href="{% url 'view_parties' i.id %}">
+                                                    <a href="{% url 'view_parties' i.id %}" class="my-3 mx-0 p-0 ">
                                                         {% if i.payment == 'To Pay' %}
                                                         <span style="border: none; color: red; ">{{ i.current_balance }}</span>
                                                         {% elif i.payment == 'To Receive' %}
@@ -220,7 +220,9 @@
                                                         <span style="border: none; color: black; ">{{ i.current_balance }}</span>
                                                         {% endif %}
                                                     </a>
-                                                    <div class="btn-group mb-1">
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group mb-1 m-0 p-0">
                                                         <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <span class="fa fa-ellipsis-v text-dark fs-1 ps-2 p-0"></span>
                                                         </button>
@@ -442,7 +444,7 @@
                                     <tbody>
                                         <tr {% if getparty.openingbalance == 0 %} hidden{% endif %}>
                                             <td class= "hide_table_text_in" style="font-size: 20px; color: {% if getparty.payment == 'To Pay' %}red{% elif getparty.payment == 'To Receive' %}green{% else %}black{% endif %}; vertical-align: middle;">&#8226;</td>
-                                            <td class="text-center  px-0">{% if getparty.payment == 'To Pay' %} Payable Opening Balance {% elif getparty.payment == 'To Pay' %} Receivable Opening Balance{% else %} Opening Balance{% endif %}</td>
+                                            <td class="text-center  px-0">{% if getparty.payment == 'To Pay' %} Payable Opening Balance {% elif getparty.payment == 'To Receive' %} Receivable Opening Balance{% else %} Opening Balance{% endif %}</td>
                                             <td class="text-center  px-0" style="white-space: nowrap;"></td>
                                             <td class="text-center  px-0" style="white-space: nowrap;">{{ getparty.current_date|date:"d-m-Y" }}</td>
                                             <td class="text-center  px-0" style="white-space: nowrap;">₹ {{ getparty.openingbalance }}</td>

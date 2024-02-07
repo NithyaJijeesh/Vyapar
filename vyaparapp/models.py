@@ -243,8 +243,6 @@ class PurchaseBillTransactionHistory(models.Model):
     
 # ==============delivery challan & Estimate ============shemeem --start=======
 
-
-
 class DeletedEstimate(models.Model):
     staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
