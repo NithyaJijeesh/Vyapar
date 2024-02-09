@@ -203,15 +203,16 @@
                                 {% csrf_token %}
 
                                 <div style="overflow: auto;height: 42rem;">
-                                <table class="table w-100 table-light table-striped table-hover sticky-header">
+                                <table class="table w-100 table-light table-striped table-hover sticky-header bg-light">
                                     <thead class="bg-primary ">
                                         <th class="text-start fs-2 tb">ITEM</th>
-                                        <th class="text-end fs-2 tb">QUANTITY</th>
+                                        <th class="text-start fs-2 tb " colspan="2">QUANTITY</th>
+                                        <!-- <th></th> -->
                                     </thead>
                                     <tbody>
                                         
                                         {% for i in all_items %}
-                                        <tr class="item_lists_hide clickable-row" data-href="{% url 'items_list' i.id %}">
+                                        <tr class="item_lists_hide">
                                             <!-- <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark"
                                             hx-post="{% url 'item_get_detail' i.id %}"
                                             hx-trigger="click delay:0s"
@@ -230,23 +231,27 @@
                                                 </div>
                                             </td> -->
 
-                                            <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark">
-                                                <a href=" " class="my-3">
+                                            <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark clickable-row" data-href="{% url 'items_list' i.id %}">
+                                                <a href="{% url 'items_list' i.id %} " class="my-3">
                                                     {{ i.item_name|capfirst }}
                                                 </a>
                                             </td>
-                                          
-                                            <td class="text-end fs-2 fw-bolder" style="white-space: nowrap;">
-                                                <a href=" " class="my-3 mx-0 p-0 ">
+                                         
+                                            <td class="text-end fs-2 fw-bolder clickable-row px-0 mx-0" style="white-space: nowrap;"   data-href="{% url 'items_list' i.id %}">
+                                                <a href="{% url 'items_list' i.id %}" class="my-3 mx-0 p-0 ">
                                                     {{ i.item_current_stock }}
                                                 </a>
-                                                <div class="btn-group mb-1">
-                                                    <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span class="fa fa-ellipsis-v text-dark fs-1 ps-2"></span>
+                                            </td>
+
+                                            <td class="px-0 mx-0">
+                                                <div class="btn-group mb-1 m-0 p-0">
+                                                    <button style="border: none;background: none;" type="button" class=" dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <span class="fa fa-ellipsis-v text-dark fs-1 ps-2 p-0"></span>
                                                     </button>
+                                                    
                                                     <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item fw-bold tb" href="{% url 'item_view_or_edit' i.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
-                                                    <li><a class="dropdown-item fw-bold tb" type="button" onclick="confirm_delete({{ i.id }})"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_view_or_edit' i.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href=""><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
                                                     </ul>
                                                 </div>
                                             </td>
@@ -268,9 +273,9 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-12 col-lg-9  ps-2 pe-3 d-flex flex-column style="height: 100%;">
+        <div class="col-sm-12 col-lg-9  ps-2 pe-3 d-flex flex-column" style="height: 100%;">
           <div id="item_get_detail_target">
-            <div class="row m-0 bg-pink" style="height:20%">
+            <div class="row m-0" style="height:20%">
                 {% for message in messages %}
                     <div class="alert alert-danger" role="alert">{{ message }}</div>
                 {% endfor %}
@@ -303,8 +308,9 @@
                 </div>
             </div>
             <!-- <div class="row" style="height: 0.5rem;"></div> -->
-            <div class="row pt-1 m-0 bg-warning" >
-            <!-- {% if first_item.item_min_stock_maintain %} style="height:40rem;"{% else %} style="height:42rem;"{% endif %}> -->
+            <div class="row pt-1 m-0" style="height: 42rem;">
+                {% if first%}
+            <!-- {% if first_item.item_min_stock_maintain %} style="height:40rem;" {% else %} style="height:42rem;" {% endif %}> -->
                 <div class="card p-0 bg-light bs">
                     <div class="row m-0 p-0 pt-3">
                         <div class="col-sm-12 col-lg-5">
@@ -378,7 +384,7 @@
                                                 &nbsp;<a class="btn btn-info" onclick="filterTable(1)">Apply</a>
                                             </div>
                                         </th>
-                                        <th class="bg-secondary text-dark align-middle px-1 "  style="white-space: nowrap;">
+                                        <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             INVOICE
                                             <a class="extra text-dark" onclick="filterDropdown(2)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content" id="dropdownContent2">
@@ -462,6 +468,7 @@
                                         <th class="bg-secondary text-dark align-middle px-1"></th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     <tr {% if not first_item.item_opening_stock  %} hidden{% endif %}>
                                         <td class= "hide_table_text_in" style="font-size: 20px; color: {% if first_item.item_opening_stock == 0 %}red{% else %} orange{% endif %}; vertical-align: middle;">&#8226;</td>
@@ -514,9 +521,7 @@
                                             </div>
                                         </td>
                                     </tr>
-                                        
                                     {% endfor %}
-                                    
                                 </tbody>
                             </table>
                         </div>
