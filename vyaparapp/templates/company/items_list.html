@@ -277,7 +277,7 @@
           <div id="item_get_detail_target">
             <div class="row m-0" style="height:20%">
                 {% for message in messages %}
-                    <div class="alert alert-danger" role="alert">{{ message }}</div>
+                    <div class="alert alert-danger text-center" role="alert">{{ message }}</div>
                 {% endfor %}
                 <div class="card bg-light bs p-3 mb-3">
                     <div class="d-flex justify-content-between">
@@ -309,7 +309,7 @@
             </div>
             <!-- <div class="row" style="height: 0.5rem;"></div> -->
             <div class="row pt-1 m-0" style="height: 42rem;">
-                {% if first %}
+                {% if first_item %}
             <!-- {% if first_item.item_min_stock_maintain %} style="height:40rem;" {% else %} style="height:42rem;" {% endif %}> -->
                 <div class="card p-0 bg-light bs">
                     <div class="row m-0 p-0 pt-3">
@@ -527,6 +527,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
           </div>
         </div>

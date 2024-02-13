@@ -73,6 +73,7 @@
                       </div>
                     </div>
                   </div>
+                 
                   <div class="bg-light bs p-4 rounded mb-5">
                       <div class="d-md-flex d-sm-block">
                         <h5><strong class="fw-bolder">ADD ITEM</strong></h5>
@@ -83,6 +84,9 @@
                           <label id="lbl2" class="form-check-label fw-bolder" for="flexSwitchCheckChecked">SERVICES</label>
                         </div>
                       </div>
+                      {% for message in messages %}
+                        <div class="alert alert-danger text-center" role="alert">{{ message }}</div>
+                      {% endfor %}
                     <br>
                     <div id="main_form_div">
                       <div class="row" style="margin-left: -1vh;">
@@ -93,6 +97,7 @@
                         <div class="col-md-4">
                           <div style="position: relative;">
                             <input style="color: black;" class="form-control border-secondary ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" id="item_hsn" required oninput="validateInput()">
+                            <span id="validd" hidden></span>
                             <span id="gstno-validation" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"></span>
                           </div>
                         </div>
@@ -227,8 +232,8 @@
                                   </div>
                                   <div class="text-start mt-5">
                                     <button id="prev_btn" class="btn btn-primary bg-gradient  me-3" type="button">PREVIOUS</button>
-                                    <button id="" class="btn btn-primary bg-gradient  me-3" type="submit" name="save_and_next" value="save_and_next">SAVE AND NEXT</button>
-                                    <button id="" class="btn btn-primary bg-gradient" type="submit"name="save" value="save">SAVE</button>
+                                    <button id="save_and_next" class="btn btn-primary bg-gradient  me-3" type="submit" name="save_and_next" value="save_and_next">SAVE AND NEXT</button>
+                                    <button id="save" class="btn btn-primary bg-gradient" type="submit"name="save" value="save">SAVE</button>
                                   </div>
                               </div>
                               <div  class="col-sm-12 col-md-1">
@@ -289,17 +294,30 @@
   function validateInput() {
         // Get the value entered by the user
         var inputValue = document.getElementById("item_hsn").value;
+        console.log("Input value:", inputValue);
         const validationLabel = document.getElementById("gstno-validation");
+        const saveAndNextButton = document.getElementById("save_and_next");
+        const saveButton = document.getElementById("save");
 
-        // Check if the input value has less than 6 digits
         if (inputValue.length >= 6) {
+          console.log("Input value is valid.");
             // Display a checkmark
             validationLabel.innerHTML = "&#10004;"; // Checkmark symbol
             validationLabel.style.color = "green";
+            saveAndNextButton.disabled = false;
+            saveButton.disabled = false;
+            saveAndNextButton.removeAttribute("title");
+        saveButton.removeAttribute("title");
+
         } else {
             // Display a cross mark
+console.log("Input value is not valid.");
             validationLabel.innerHTML = "&#10060;"; // Cross mark symbol
             validationLabel.style.color = "red";
+            saveAndNextButton.disabled = true;
+            saveButton.disabled = true;
+            saveAndNextButton.title = "Item HSN must have at least 6 digits.";
+            saveButton.title = "Item HSN must have at least 6 digits.";
         }
     }
 

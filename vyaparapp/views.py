@@ -492,10 +492,10 @@ def item_create(request):
   sid = request.session.get('staff_id')
   staff =  staff_details.objects.get(id=sid)
   cmp = company.objects.get(id=staff.company.id)
-
+  allmodules=modules_list.objects.get(company=cmp)
   # item_units = UnitModel.objects.filter(user=request.user.id)
   item_units = UnitModel.objects.filter(company = cmp) #updated - shemeem
-  return render(request,'company/item_create.html',{'item_units':item_units,'company':cmp, 'staff':staff})
+  return render(request,'company/item_create.html',{'item_units':item_units,'company':cmp, 'staff':staff, 'allmodules' : allmodules})
 
 # @login_required(login_url='login')
 def items_list(request,pk):
@@ -504,8 +504,6 @@ def items_list(request,pk):
     staff =  staff_details.objects.get(id=sid)
     cmp = company.objects.get(id=staff.company.id)
 
-    # get_company_id_using_user_id = company.objects.get(user=request.user.id)
-    # all_items = ItemModel.objects.filter(company=get_company_id_using_user_id.id)
     all_items = ItemModel.objects.filter(company=cmp) #updated - shemeem
 
     if pk == 0:
@@ -518,6 +516,7 @@ def items_list(request,pk):
     transactions = TransactionModel.objects.filter(company = cmp,item=first_item.id).order_by('-trans_created_date')
 
     check_var = 0
+
     if all_items == None or all_items == '' or first_item == None or first_item == '' or transactions == None or transactions == '':
       return render(request,'company/items_create_first_item.html')
     return render(request,'company/items_list.html',{'all_items':all_items,'first_item':first_item,'transactions':transactions,'company':cmp, 'staff':staff, 'allmodules' : allmodules})
@@ -567,16 +566,28 @@ def item_create_new(request):
                           item_at_price=item_at_price,
                           item_date=item_date,
                           item_min_stock_maintain=item_min_stock_maintain)
-    item_data.save()
-    # print(f'user : {user}\ncompany_user_data {company_user_data}')
-    # print(f'item_name : {item_name}\nitem_hsn : {item_hsn}\nitem_unit : {item_unit}\nitem_taxable : {item_taxable}\n')
-    # print(f'item_gst : {item_gst}\nitem_igst : {item_igst}\nitem_sale_price : {item_sale_price}\nitem_purchase_price : {item_purchase_price}\n')
-    # print(f'item_opening_stock : {item_opening_stock}\nitem_at_price : {item_at_price}\nitem_date : {item_date}\nitem_min_stock_maintain : {item_min_stock_maintain}\n')
-    print(f"----------\n\n\n")
+  
     if request.POST.get('save_and_next'):
+      if ItemModel.objects.filter(item_name=item_name, item_hsn=item_hsn).exists():
+        messages.error(request, 'Item with the same item name and HSN  number already exists.')
+      elif ItemModel.objects.filter(item_name=item_name).exists():
+        messages.error(request, 'An item can have one HSN Number.')
+      elif ItemModel.objects.filter(item_hsn=item_hsn).exists():
+        messages.error(request, 'Item with the same HSN  number already exists.')
+      else:
+        item_data.save()
       return redirect('item_create')
+    
     elif request.POST.get('save'):
-      return redirect('items_list',pk=item_data.id)
+      if ItemModel.objects.filter(item_name=item_name, item_hsn=item_hsn).exists():
+        messages.error(request, 'Item with the same item name and HSN  number already exists.')
+      elif ItemModel.objects.filter(item_name=item_name).exists():
+        messages.error(request, 'An item can have one HSN Number.')
+      elif ItemModel.objects.filter(item_hsn=item_hsn).exists():
+        messages.error(request, 'Item with the same HSN  number already exists.')
+      else:
+        item_data.save()
+      return redirect('items_list',pk=0)
   return redirect('item_create')
 
 
