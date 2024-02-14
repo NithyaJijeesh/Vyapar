@@ -284,7 +284,7 @@
                         
                         <p class="tb fw-bolder fs-4">{{ first_item.item_name|upper }}</p>
                         
-                        <button class="btn btn-primary bg-gradient fs-2"data-bs-toggle="modal" data-bs-target="#myModal1" 
+                        <button class="btn btn-primary bg-gradient fs-2 removefields"data-bs-toggle="modal" data-bs-target="#myModal1" 
                         hx-get="{% url 'item_get_details_for_modal_target' first_item.id %}"
                         hx-trigger="click delay:0s"
                         hx-target="#item_get_details_for_modal_target">
@@ -376,8 +376,8 @@
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             TYPE
-                                            <a class="extra text-dark " onclick="filterDropdown(1)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
-                                            <div class="dropdown-content" id="dropdownContent1">
+                                            <a class="extra text-dark removefields" onclick="filterDropdown(1)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                            <div class="dropdown-content removefields" id="dropdownContent1">
                                                 <label for="filterInput1" style="color: black; text-align: left;">Equal To</label>
                                                 <input type="text" id="filterInput1"  /><br>
                                                 <a class="btn btn-info" onclick="cleardropdown(1)">Clear</a> 
@@ -386,8 +386,8 @@
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             INVOICE
-                                            <a class="extra text-dark" onclick="filterDropdown(2)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
-                                            <div class="dropdown-content" id="dropdownContent2">
+                                            <a class="extra text-dark removefields" onclick="filterDropdown(2)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                            <div class="dropdown-content removefields" id="dropdownContent2">
                                                 <label for="filterInput2" style="color: black; text-align: left;">Equal To</label>
                                                 <input type="text" id="filterInput2"  /><br>
                                                 <a class="btn btn-info" onclick="cleardropdown(2)">Clear</a> 
@@ -396,8 +396,8 @@
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             NAME
-                                            <a class="extra text-dark" onclick="filterDropdown(3)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
-                                            <div class="dropdown-content" id="dropdownContent3">
+                                            <a class="extra text-dark removefields" onclick="filterDropdown(3)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                            <div class="dropdown-content removefields" id="dropdownContent3">
                                                 <label for="filterInput3" style="color: black; text-align: left;">Equal To</label>
                                                 <input type="date" id="filterInput3"  /><br>
                                                 <a class="btn btn-info" onclick="cleardropdown(3)">Clear</a> 
@@ -406,8 +406,8 @@
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             DATE
-                                            <a class="extra text-dark" onclick="filterDropdown(4)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
-                                            <div class="dropdown-content" id="dropdownContent4">
+                                            <a class="extra text-dark removefields" onclick="filterDropdown(4)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                            <div class="dropdown-content removefields" id="dropdownContent4">
                                                 <label for="filterInput4" style="color: black; text-align: left;">Equal To</label>
                                                 <input type="text" id="filterInput4"  /><br>
                                                 <a class="btn btn-info" onclick="cleardropdown(4)">Clear</a> 
@@ -416,8 +416,8 @@
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             QUANTITY
-                                            <a class="extra text-dark" onclick="filterDropdown(5)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
-                                            <div class="dropdown-content" id="dropdownContent5">
+                                            <a class="extra text-dark removefields" onclick="filterDropdown(5)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
+                                            <div class="dropdown-content removefields" id="dropdownContent5">
                                                 <label for="filterInput5" style="color: black; text-align: left;">Equal To</label>
                                                 <input type="text" id="filterInput5" /><br>
                                                 <a class="btn btn-info" onclick="cleardropdown(5)">Clear</a> 
@@ -427,8 +427,8 @@
                                         
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             PRICE 
-                                            &nbsp; <a onclick="filterDropdown(6)"><i class="fa fa-filter" aria-hidden="true"></i></a>
-                                            <div class="dropdown-content" id="dropdownContent6">
+                                            &nbsp; <a class="extra text-dark removefields" onclick="filterDropdown(6)"><i class="fa fa-filter" aria-hidden="true"></i></a>
+                                            <div class="dropdown-content removefields" id="dropdownContent6">
                                                 <label for="filterInput6" style="color: black; text-align: left;">Equal To</label>
                                                 <input type="text" id="filterInput6" /><br>
                                                 <a class="btn btn-info" onclick="cleardropdown(6)">Clear</a> 
@@ -437,8 +437,8 @@
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             STATUS
-                                            &nbsp; <a onclick="filterDropdown(7)"><i class="fa fa-filter" aria-hidden="true"></i></a>
-                                            <div class="dropdown-content" id="dropdownContent7">
+                                            &nbsp; <a class=" extra text-dark removefields" onclick="filterDropdown(7)"><i class="fa fa-filter" aria-hidden="true"></i></a>
+                                            <div class="dropdown-content removefields" id="dropdownContent7">
                                                 <label for="filterInput7" style="color: black; text-align: left;">Equal To</label>
                                                 <input type="text" id="filterInput7" /><br>
                                                 <a class="btn btn-info" onclick="cleardropdown(7)">Clear</a> 
@@ -447,8 +447,8 @@
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             ACTION
-                                            &nbsp; <a onclick="filterDropdown(8)"><i class="fa fa-filter" aria-hidden="true"></i></a>
-                                            <div class="dropdown-content" id="dropdownContent8">
+                                            &nbsp; <a class="extra text-dark removefields" onclick="filterDropdown(8)"><i class="fa fa-filter" aria-hidden="true"></i></a>
+                                            <div class="dropdown-content removefields" id="dropdownContent8">
                                                 <label for="filterInput8" style="color: black; text-align: left;">Equal To</label>
                                                 <input type="text" id="filterInput8" /><br>
                                                 <a class="btn btn-info" onclick="cleardropdown(8)">Clear</a> 
@@ -457,8 +457,8 @@
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
                                             BY
-                                            &nbsp; <a onclick="filterDropdown(9)"><i class="fa fa-filter" aria-hidden="true"></i></a>
-                                            <div class="dropdown-content" id="dropdownContent9">
+                                            &nbsp; <a class="extra text-dark removefields" onclick="filterDropdown(9)"><i class="fa fa-filter" aria-hidden="true"></i></a>
+                                            <div class="dropdown-content removefields" id="dropdownContent9">
                                                 <label for="filterInput9" style="color: black; text-align: left;">Equal To</label>
                                                 <input type="text" id="filterInput9" /><br>
                                                 <a class="btn btn-info" onclick="cleardropdown(9)">Clear</a> 
@@ -590,15 +590,59 @@
 
 
 <script>
+    // function exportToExcel() {
+    //     $('.hide_table_text_v').text('')
+    //     $('.hide_table_text_d').text('')
+    //     const table = document.getElementById('myTable');
+    //     const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+    //     XLSX.writeFile(wb, "table_data.xlsx");
+    //     $('.hide_table_text_v').html('<span class="fa fa-eye pe-2 tg"></span> View / Edit')
+    //     $('.hide_table_text_d').html('<span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete')
+    // }
+
     function exportToExcel() {
-        $('.hide_table_text_v').text('')
-        $('.hide_table_text_d').text('')
-        const table = document.getElementById('myTable');
-        const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-        XLSX.writeFile(wb, "table_data.xlsx");
-        $('.hide_table_text_v').html('<span class="fa fa-eye pe-2 tg"></span> View / Edit')
-        $('.hide_table_text_d').html('<span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete')
+        
+        $('.hide_table_text_v').text('');
+        $('.hide_table_text_d').text('');
+        $('.hide_table_text_i').text('');
+        $('.hide_table_text_in').text('');
+
+        // Create a copy of the table for export and remove unwanted columns
+        const originalTable = document.getElementById('myTable');
+        const exportTable = originalTable.cloneNode(true);
+
+        const headerRow = exportTable.querySelector('thead tr');
+        const columnsToRemove = ["#"];
+        
+        for (let i = 0; i < columnsToRemove.length; i++) {
+            const columnIndex = Array.from(headerRow.children).findIndex(cell => cell.innerText.trim() === columnsToRemove[i]);
+            if (columnIndex !== -1) {
+                headerRow.children[columnIndex].remove();
+                for (const row of exportTable.querySelectorAll('tbody tr')) {
+                    row.children[columnIndex].remove();
+                }
+            }
+            const dropdownContent = cell.querySelector('.dropdown-content');
+            if (dropdownContent) {
+                dropdownContent.remove();
+                const filterIcon = cell.querySelector('.fa-filter');
+                if (filterIcon) {
+                    filterIcon.remove();
+                }
+            }
+        }
+        // Export the modified table to Excel
+        const wb = XLSX.utils.table_to_book(exportTable, { sheet: "Item Details" });
+        console.log(wb);
+        XLSX.writeFile(wb, "Item.xlsx");
+
+        // Update the displayed text
+        $('.hide_table_text_v').html('<span class="fa fa-eye pe-2 tg"></span> View / Edit');
+        $('.hide_table_text_d').html('<span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete');
+        $('.hide_table_text_i').html('#');
+        $('.hide_table_text_in').html('&#8226;');
     }
+
     $(document).ready(function() {
         $("#search_input1").on("keyup", function() {
             var value = $(this).val().toLowerCase();
@@ -738,6 +782,67 @@
             window.location = $(this).data("href");
         });
     });
+
+
+    $(document).ready(function ($) {
+        $(document).on('click', '#pdflink', function (event) {
+            event.preventDefault();
+            var element = document.getElementById('item_get_detail_target');
+            var elementClone = element.cloneNode(true);
+
+            // Remove the specific sections from the cloned element
+            var elementsToRemove = elementClone.querySelectorAll('.removefields');
+            elementsToRemove.forEach(function (el) {
+                el.remove();
+            });
+            
+            var opt =
+            {
+                margin: 1,
+                filename: 'Item - '+ '{{ first_item.item_name|upper }}' + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait', }
+            };
+            html2pdf().set(opt).from(elementClone).save();
+        });
+    });
+
+    function printfunction(){
+        var element = document.getElementById('item_get_detail_target');
+        var elementClone = element.cloneNode(true);
+
+        var elementsToRemove = elementClone.querySelectorAll('.removefields');
+        elementsToRemove.forEach(function (el) {
+            el.remove();
+        });
+        var filterElements = elementClone.querySelectorAll('.fa-filter, .dropdown-content');
+        filterElements.forEach(function (el) {
+            el.style.display = 'none'; // Hide filter-related elements
+        });
+        var rows = elementClone.querySelectorAll('.table tr');
+        rows.forEach(function (row) {
+            var lastColumn = row.lastElementChild;
+            lastColumn.parentNode.removeChild(lastColumn); // Remove last column
+        });
+
+        var printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Item Details</title>');
+        printWindow.document.write('<link rel="stylesheet" href="{% static "assets/css/styles.min.css" %}" />');
+        printWindow.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />');
+        printWindow.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">');
+        printWindow.document.write('  <link rel="shortcut icon" type="image/png" href="{% static "assets/images/logos/favicon.png" %}" />');
+        printWindow.document.write('<style>');
+        printWindow.document.write(document.body.querySelector('style').innerHTML); // Copy existing styles
+        printWindow.document.write('</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.body.appendChild(elementClone);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+            
+        printWindow.print();
+        
+    }
 </script>
 
 {% endblock  %}
