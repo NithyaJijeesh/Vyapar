@@ -132,6 +132,17 @@ class ItemModel(models.Model):
     item_date = models.DateField()
     item_min_stock_maintain = models.PositiveBigIntegerField(default=0)
 
+class Item_History(models.Model):
+    Item = models.ForeignKey(ItemModel,on_delete=models.CASCADE)
+    staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
+    CHOICES = [
+        ('Created', 'Created'),
+        ('Updated', 'Updated'),
+    ]
+    action = models.CharField(max_length=20, choices=CHOICES)
+    transactiondate = models.DateField(auto_now=True)
+
 class UnitModel(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(company,on_delete= models.CASCADE,null=True,blank=True)
@@ -238,8 +249,6 @@ class PurchaseBillTransactionHistory(models.Model):
     action = models.CharField(max_length=20, choices=CHOICES)
     transactiondate = models.DateField(auto_now=True)
 
-
-    
     
 # ==============delivery challan & Estimate ============shemeem --start=======
 

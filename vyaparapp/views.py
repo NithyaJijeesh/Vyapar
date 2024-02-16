@@ -45,6 +45,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from itertools import zip_longest
 from openpyxl.styles import Font
+import math
 
 # Create your views here.
 def home(request):
@@ -499,7 +500,7 @@ def item_create(request):
 
 # @login_required(login_url='login')
 def items_list(request,pk):
-  try:
+  # try:
     sid = request.session.get('staff_id')
     staff =  staff_details.objects.get(id=sid)
     cmp = company.objects.get(id=staff.company.id)
@@ -510,18 +511,32 @@ def items_list(request,pk):
       first_item = all_items.filter().first()
     else:
       first_item = all_items.get(id=pk)
+
+    item_history= Item_History.objects.filter(
+      Item= first_item,
+      company=cmp
+    ).values('Item', 'action' , 'staff__first_name' , 'staff__last_name').last()
+
     allmodules= modules_list.objects.get(company=staff.company,status='New')
     transactions = None
     # transactions = TransactionModel.objects.filter(user=request.user.id,item=first_item.id).order_by('-trans_created_date')
     transactions = TransactionModel.objects.filter(company = cmp,item=first_item.id).order_by('-trans_created_date')
 
-    check_var = 0
+    context = {
+                'first_item':first_item,
+                'transactions':transactions,
+                'company':cmp, 
+                'staff':staff, 
+                'allmodules' : allmodules, 
+                'all_items' : all_items , 
+                'Item_History' : item_history
+              }
 
     if all_items == None or all_items == '' or first_item == None or first_item == '' or transactions == None or transactions == '':
-      return render(request,'company/items_create_first_item.html')
-    return render(request,'company/items_list.html',{'all_items':all_items,'first_item':first_item,'transactions':transactions,'company':cmp, 'staff':staff, 'allmodules' : allmodules})
-  except:
-    return render(request,'company/items_create_first_item.html', {'first_item':first_item,'transactions':transactions,'company':cmp, 'staff':staff, 'allmodules' : allmodules, 'all_items' : all_items})
+      return render(request,'company/items_create_first_item.html', context)
+    return render(request,'company/items_list.html',context)
+  # except:
+  #   return render(request,'company/items_create_first_item.html', context)
 
 # @login_required(login_url='login')
 def item_create_new(request):
@@ -576,6 +591,7 @@ def item_create_new(request):
         messages.error(request, 'Item with the same HSN  number already exists.')
       else:
         item_data.save()
+        Item_History.objects.create(Item = item_data,company=cmp,staff=staff,action='Created').save()
       return redirect('item_create')
     
     elif request.POST.get('save'):
@@ -587,6 +603,8 @@ def item_create_new(request):
         messages.error(request, 'Item with the same HSN  number already exists.')
       else:
         item_data.save()
+        Item_History.objects.create(Item = item_data,company=cmp,staff=staff,action='Created').save()
+
       return redirect('items_list',pk=0)
   return redirect('item_create')
 
@@ -689,9 +707,23 @@ def item_update(request,pk):
     item_data.item_min_stock_maintain = item_min_stock_maintain
 
     item_data.save()
+    Item_History.objects.create(Item = item_data,company=cmp,staff=staff,action='Updated').save()
     print('\nupdated')
   # return redirect('item_view_or_edit',pk)
   return redirect('items_list',pk=item_data.id)
+
+
+def item_histories(request,id):
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
+  cmp = company.objects.get(id=staff.company.id)   
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+  getitem = ItemModel.objects.get(id=id,company=cmp)
+  item_histories= Item_History.objects.filter(Item=getitem,company=cmp)
+  allmodules= modules_list.objects.get(company=staff.company,status='New')
+
+  context = {'staff':staff,'allmodules':allmodules,'item_history': item_histories,'getitem': getitem,}
+  return render(request,'company/item_history.html',context)
 
   
 # @login_required(login_url='login')
@@ -876,7 +908,7 @@ def add_parties(request):
   staff =  staff_details.objects.get(id=sid)
   cmp = company.objects.get(id=staff.company.id)
   tod = date.today()
-  allmodules= modules_list.objects.get(company=staff.company,status='New')
+  allmodules= modules_list.objects.get(company=cmp,status='New')
 
 
   return render(request, 'company/add_parties.html',{'staff':staff, 'tod' : tod , 'allmodules' : allmodules})
@@ -1144,24 +1176,24 @@ def import_parties(request):
           current_date = date.today() if 'nan' else datetime.strptime(str(row.get('Current Date')), '%Y-%m-%d').date()
 
           party_obj = party(
-              party_name = party_name, 
-              contact = contact,
-              gst_no = '' if 'nan' else str(row.get('GST No.', '')),
-              gst_type = '' if 'nan' else row.get('GST Type', ''),
-              email = '' if 'nan' else row.get('Email'),
-              state = '' if 'nan' else row.get('Supply State', ''),
-              address =  '' if 'nan' else row.get('Billing Address', ''),
-              openingbalance = 0 if 'nan' else row.get('Opening Balance'),
-              payment ='' if 'nan' else row.get('Payment', ''),
-              creditlimit = '' if 'nan' else row.get('Credit Limit'),
-              current_date = current_date,
-              End_date = current_date,
-              additionalfield1 = '' if 'nan' else row.get('Additional Field 1', ''),
-              additionalfield2 = '' if 'nan' else row.get('Additional Field 2', ''),
-              additionalfield3 = '' if 'nan' else row.get('Additional Field 3', ''),
-              current_balance = 0 if 'nan' else row.get('Opening Balance'),
-              user = staff.company.user,
-              company = staff.company
+              party_name=party_name,
+              contact=contact,
+              gst_no='' if isinstance(row.get('GST No.'), float) and math.isnan(row.get('GST No.')) else str(row.get('GST No.', '')),
+              gst_type='' if isinstance(row.get('GST Type'), float) and math.isnan(row.get('GST Type')) else row.get('GST Type', ''),
+              email='' if isinstance(row.get('Email'), float) and math.isnan(row.get('Email')) else row.get('Email', ''),
+              state='' if isinstance(row.get('Supply State'), float) and math.isnan(row.get('Supply State')) else row.get('Supply State', ''),
+              address='' if isinstance(row.get('Billing Address'), float) and math.isnan(row.get('Billing Address')) else row.get('Billing Address', ''),
+              openingbalance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
+              payment='' if isinstance(row.get('Payment'), float) and math.isnan(row.get('Payment')) else row.get('Payment', ''),
+              creditlimit='' if isinstance(row.get('Credit Limit'), float) and math.isnan(row.get('Credit Limit')) else row.get('Credit Limit', ''),
+              current_date=current_date,
+              End_date=current_date,
+              additionalfield1='' if isinstance(row.get('Additional Field 1'), float) and math.isnan(row.get('Additional Field 1')) else row.get('Additional Field 1', ''),
+              additionalfield2='' if isinstance(row.get('Additional Field 2'), float) and math.isnan(row.get('Additional Field 2')) else row.get('Additional Field 2', ''),
+              additionalfield3='' if isinstance(row.get('Additional Field 3'), float) and math.isnan(row.get('Additional Field 3')) else row.get('Additional Field 3', ''),
+              current_balance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
+              user=staff.company.user,
+              company=staff.company
           )
 
           if not party_name or not contact or contact == " ":
@@ -2374,7 +2406,6 @@ def view_purchasebill(request):
   if not pbill:
     context = {'staff':staff, 'allmodules':allmodules}
     return render(request,'company/purchasebillempty.html',context)
-  
   context = {'staff':staff,'allmodules':allmodules,'pbill':pbill}
   return render(request,'company/purchasebilllist.html',context)
 

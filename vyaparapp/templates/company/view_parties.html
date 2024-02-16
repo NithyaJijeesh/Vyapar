@@ -570,6 +570,13 @@
             }
         }
 
+        const dropdownContents = exportTable.querySelectorAll('.dropdown-content');
+        dropdownContents.forEach(content => content.remove());
+
+        // Remove filter icons
+        const filterIcons = exportTable.querySelectorAll('.fa-filter');
+        filterIcons.forEach(icon => icon.remove());
+
         // Export the modified table to Excel
         const wb = XLSX.utils.table_to_book(exportTable, { sheet: "Party Details" });
         XLSX.writeFile(wb, "Party.xlsx");

@@ -375,7 +375,7 @@
                                             # 
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                            TYPE
+                                            <span id = "toShow">TYPE</span>
                                             <a class="extra text-dark removefields" onclick="filterDropdown(1)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content removefields" id="dropdownContent1">
                                                 <label for="filterInput1" style="color: black; text-align: left;">Equal To</label>
@@ -385,7 +385,7 @@
                                             </div>
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                            INVOICE
+                                            <span id = "toShow">INVOICE</span>
                                             <a class="extra text-dark removefields" onclick="filterDropdown(2)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content removefields" id="dropdownContent2">
                                                 <label for="filterInput2" style="color: black; text-align: left;">Equal To</label>
@@ -395,7 +395,7 @@
                                             </div>
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                            NAME
+                                            <span id = "toShow">NAME</span>
                                             <a class="extra text-dark removefields" onclick="filterDropdown(3)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content removefields" id="dropdownContent3">
                                                 <label for="filterInput3" style="color: black; text-align: left;">Equal To</label>
@@ -405,7 +405,8 @@
                                             </div>
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                            DATE
+                                            <span id = "toShow">DATE</span>
+
                                             <a class="extra text-dark removefields" onclick="filterDropdown(4)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content removefields" id="dropdownContent4">
                                                 <label for="filterInput4" style="color: black; text-align: left;">Equal To</label>
@@ -415,7 +416,7 @@
                                             </div>
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                            QUANTITY
+                                            <span id = "toShow">QUANTITY</span>
                                             <a class="extra text-dark removefields" onclick="filterDropdown(5)">&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content removefields" id="dropdownContent5">
                                                 <label for="filterInput5" style="color: black; text-align: left;">Equal To</label>
@@ -426,7 +427,8 @@
                                         </th>
                                         
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                            PRICE 
+                                            <span id = "toShow">PRICE</span>
+ 
                                             &nbsp; <a class="extra text-dark removefields" onclick="filterDropdown(6)"><i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content removefields" id="dropdownContent6">
                                                 <label for="filterInput6" style="color: black; text-align: left;">Equal To</label>
@@ -436,7 +438,8 @@
                                             </div>
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                            STATUS
+                                            <span class = "toShow">STATUS</span>
+
                                             &nbsp; <a class=" extra text-dark removefields" onclick="filterDropdown(7)"><i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content removefields" id="dropdownContent7">
                                                 <label for="filterInput7" style="color: black; text-align: left;">Equal To</label>
@@ -446,7 +449,8 @@
                                             </div>
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                            ACTION
+                                            <span id = "toShow">ACTION</span>
+
                                             &nbsp; <a class="extra text-dark removefields" onclick="filterDropdown(8)"><i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content removefields" id="dropdownContent8">
                                                 <label for="filterInput8" style="color: black; text-align: left;">Equal To</label>
@@ -456,7 +460,8 @@
                                             </div>
                                         </th>
                                         <th class="bg-secondary text-dark align-middle px-1"  style="white-space: nowrap;">
-                                            BY
+                                            <span id = "toShow">BY</span>
+
                                             &nbsp; <a class="extra text-dark removefields" onclick="filterDropdown(9)"><i class="fa fa-filter" aria-hidden="true"></i></a>
                                             <div class="dropdown-content removefields" id="dropdownContent9">
                                                 <label for="filterInput9" style="color: black; text-align: left;">Equal To</label>
@@ -478,8 +483,8 @@
                                         <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_date|date:"d-m-Y" }}</td>
                                         <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_opening_stock }}</td>
                                         <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_at_price }}</td>
-                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
-                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ Item_History.action }}</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ Item_History.staff__first_name }} {{ Item_History.staff__last_name }}</td>
                                         <td class="text-center  px-0" style="white-space: nowrap;"></td>
                                         <td class="px-0 pt-3 m-0 text-center " style="white-space: nowrap;">
                                             <div class="btn-group mb-1">
@@ -488,7 +493,7 @@
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_view_or_edit' first_item.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
-                                                    <li><a class="dropdown-item fw-bold tb hide_table_text_v" href=""><span class="fa fa-history pe-2 th"></span> History</a></li>
+                                                    <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_histories' first_item.id %}"><span class="fa fa-history pe-2 th"></span> History</a></li>
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href=""><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
                                                 </ul>
                                             </div>
@@ -515,7 +520,7 @@
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_view_or_edit' first_item.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
-                                                    <li><a class="dropdown-item fw-bold tb hide_table_text_v" href=""><span class="fa fa-history pe-2 th"></span> History</a></li>
+                                                    <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_histories' first_item.id %}"><span class="fa fa-history pe-2 th"></span> History</a></li>
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href=""><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
                                                 </ul>
                                             </div>
@@ -590,15 +595,6 @@
 
 
 <script>
-    // function exportToExcel() {
-    //     $('.hide_table_text_v').text('')
-    //     $('.hide_table_text_d').text('')
-    //     const table = document.getElementById('myTable');
-    //     const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-    //     XLSX.writeFile(wb, "table_data.xlsx");
-    //     $('.hide_table_text_v').html('<span class="fa fa-eye pe-2 tg"></span> View / Edit')
-    //     $('.hide_table_text_d').html('<span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete')
-    // }
 
     function exportToExcel() {
         
@@ -612,8 +608,9 @@
         const exportTable = originalTable.cloneNode(true);
 
         const headerRow = exportTable.querySelector('thead tr');
+        console.log(headerRow);
         const columnsToRemove = ["#"];
-        
+       
         for (let i = 0; i < columnsToRemove.length; i++) {
             const columnIndex = Array.from(headerRow.children).findIndex(cell => cell.innerText.trim() === columnsToRemove[i]);
             if (columnIndex !== -1) {
@@ -622,15 +619,14 @@
                     row.children[columnIndex].remove();
                 }
             }
-            const dropdownContent = cell.querySelector('.dropdown-content');
-            if (dropdownContent) {
-                dropdownContent.remove();
-                const filterIcon = cell.querySelector('.fa-filter');
-                if (filterIcon) {
-                    filterIcon.remove();
-                }
-            }
         }
+        const dropdownContents = exportTable.querySelectorAll('.dropdown-content');
+        dropdownContents.forEach(content => content.remove());
+
+        // Remove filter icons
+        const filterIcons = exportTable.querySelectorAll('.fa-filter');
+        filterIcons.forEach(icon => icon.remove());
+
         // Export the modified table to Excel
         const wb = XLSX.utils.table_to_book(exportTable, { sheet: "Item Details" });
         console.log(wb);

@@ -102,6 +102,7 @@ urlpatterns = [
     path('item_transaction_view_or_edit/<int:pk>/<int:tran>', views.item_transaction_view_or_edit, name='item_transaction_view_or_edit'),
     path('update_adjusted_transaction/<int:pk>/<int:tran>', views.update_adjusted_transaction, name='update_adjusted_transaction'),
     path('item_delete_open_stk/<int:pk>',views.item_delete_open_stk,name='item_delete_open_stk'),
+    path('item_histories/<int:id>', views.item_histories, name='item_histories'),
 
     path('bank_create',views.bank_create,name='bank_create'),
     path('banks_list/<int:pk>',views.banks_list,name='banks_list'),
