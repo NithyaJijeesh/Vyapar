@@ -797,6 +797,8 @@ def ajust_quantity(request,pk):
                                         trans_qty=trans_qty,
                                         trans_current_qty=trans_current_qty,
                                         trans_adjusted_qty=trans_adjusted_qty,)
+    
+    Item_History.objects.create(Item = item,company=cmp,staff=staff,action='Updated').save()
     transaction_data.save()
   return redirect('items_list',pk=item.id)
 

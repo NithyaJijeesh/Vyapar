@@ -1,4 +1,5 @@
 <!-- create by athul -->
+<!--updated by Nithya-->
 
 {% extends 'company/src/html/base.html' %}
 {% load social_share %}
@@ -483,9 +484,9 @@
                                         <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_date|date:"d-m-Y" }}</td>
                                         <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_opening_stock }}</td>
                                         <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_at_price }}</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
                                         <td class="text-center  px-0" style="white-space: nowrap;">{{ Item_History.action }}</td>
                                         <td class="text-center  px-0" style="white-space: nowrap;">{{ Item_History.staff__first_name }} {{ Item_History.staff__last_name }}</td>
-                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
                                         <td class="px-0 pt-3 m-0 text-center " style="white-space: nowrap;">
                                             <div class="btn-group mb-1">
                                                 <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
@@ -511,8 +512,8 @@
                                         <td class="text-center  px-0" style="white-space: nowrap;">{{ i.trans_qty }}</td>
                                         <td class="text-center  px-0" style="white-space: nowrap;">{{ first_item.item_at_price }}</td>
                                         <td class="text-center  px-0" style="white-space: nowrap;"></td>
-                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
-                                        <td class="text-center  px-0" style="white-space: nowrap;"></td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ Item_History.action }}</td>
+                                        <td class="text-center  px-0" style="white-space: nowrap;">{{ Item_History.staff__first_name }} {{ Item_History.staff__last_name }}</td>
                                         <td class="px-0 pt-3 m-0 text-center " style="white-space: nowrap;">
                                             <div class="btn-group mb-1">
                                                 <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
@@ -770,6 +771,86 @@
         dropdownContent.classList.toggle("show");
     }
 
+    function cleardropdown(index){
+        if(index == 0){
+            document.getElementById('filterInput'+index).value = '';
+        }else{
+            document.getElementById('filterInput'+index).value = null;
+        }
+    }
+
+    function filterDropdown(index) {
+        var dropdownContent = document.getElementById('dropdownContent' + index);
+        var isVisible = dropdownContent.style.display === 'block';
+        var allDropdowns = document.querySelectorAll('.dropdown-content');
+        allDropdowns.forEach(function (dropdown) {
+            dropdown.style.display = 'none';
+        });
+        dropdownContent.style.display = isVisible ? 'none' : 'block';
+    }
+
+    function filterTable(index) {
+        var input;
+        document.getElementById('dropdownContent' + index).style.display = 'none';
+        if (index === 3) {
+            input = document.getElementById('filterInput' + index).value;
+            
+        } else {
+            input = document.getElementById('filterInput' + index).value.toUpperCase();
+        }
+        var table = document.getElementById('myTable');
+        var rows = table.getElementsByTagName('tr');
+        var isEmpty = true;
+        for (var i = 0; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var cell = cells[index];
+            if (cell) {
+                var textValue = cell.textContent || cell.innerText;
+                
+                if (index === 1 | index === 2|index === 4 | index === 5 | index === 6 | index === 7 |index === 8 |index === 9) {
+                    if (textValue.toUpperCase().includes(input)) {
+                        rows[i].style.display = 'table-row';
+                        isEmpty = false;
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                } else if (index === 3) {
+                    if (input==''){
+                        rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                    }else{
+                        dateval  = textValue.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                        inputval  = input.replace(/(\d{2})-(\d{2})-(\d{2})/, "$2-$1-$3");
+                        const formattedDate = formatDateString(input);
+                        if (dateval === formattedDate) {
+                            rows[i].style.display = 'table-row';
+                            isEmpty = false;
+                        } else {
+                            rows[i].style.display = 'none';
+                        }
+                    }
+                }
+                // } else if (index === 4 | index === 5 | index === 6 | index === 7) {
+                //     if (textValue.toUpperCase().includes(input)) {
+                //         rows[i].style.display = 'table-row';
+                //         isEmpty = false;
+                //     } else {
+                //         rows[i].style.display = 'none';
+                //     }
+                // }
+            }
+        }
+        // emptyMessage.style.display = isEmpty ? 'block' : 'none';
+        // calculatetotal()
+    }
+    function formatDateString(inputDate) {
+        const parsedDate = new Date(inputDate);
+        const day = parsedDate.getDate();
+        const month = parsedDate.getMonth() + 1;
+        const year = parsedDate.getFullYear();
+        const formattedDate = `${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}-${year}`;
+        return formattedDate;
+    }
 
     $(document).ready(function() {
         // Add click event to the rows with the "clickable-row" class
