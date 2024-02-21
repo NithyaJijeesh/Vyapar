@@ -252,7 +252,7 @@
                                                     
                                                     <ul class="dropdown-menu">
                                                         <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_view_or_edit' i.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
-                                                        <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href=""><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
+                                                        <li><a class="dropdown-item fw-bold tb" type="button" onclick="confirm_delete({{ i.id }})"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
                                                     </ul>
                                                 </div>
                                             </td>
@@ -495,7 +495,7 @@
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_view_or_edit' first_item.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_histories' first_item.id %}"><span class="fa fa-history pe-2 th"></span> History</a></li>
-                                                    <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href=""><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
+                                                    <li><a class="dropdown-item fw-bold tb hide_table_text_d" onclick="item_open_stk_delete({{ first_item.id }})"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -522,7 +522,7 @@
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_view_or_edit' first_item.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_histories' first_item.id %}"><span class="fa fa-history pe-2 th"></span> History</a></li>
-                                                    <li><a class="dropdown-item fw-bold tb hide_table_text_d"  href=""><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
+                                                    <li><button type="button" onclick="delete_transaction({{ i.id }})" class="dropdown-item fw-bold tb hide_table_text_d" href=""><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</button></li>
                                                 </ul>
                                             </div>
                                         </td>

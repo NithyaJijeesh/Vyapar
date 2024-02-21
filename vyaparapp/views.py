@@ -611,10 +611,32 @@ def item_create_new(request):
 
 # @login_required(login_url='login')
 def item_delete(request,pk):
-  # get_company_id_using_user_id = company.objects.get(user=request.user.id)
+  sid = request.session.get('staff_id')
+  staff = staff_details.objects.get(id=sid)
   item_to_delete = ItemModel.objects.get(id=pk)
-  item_to_delete.delete()
+
+  # item_to_delete.delete()
   return redirect('items_list',pk=0)
+
+  # sid = request.session.get('staff_id')
+  #   staff = staff_details.objects.get(id=sid)
+  #   Party = party.objects.get(id=id)
+
+  #   # List of models to check
+  #   models_to_check1 = [PurchaseBill, PurchaseOrder, SalesInvoice, purchasedebit, PaymentOut,PaymentIn, CreditNote]
+  #   models_to_check2 = [Estimate, DeliveryChallan]
+  #   # Check conditions for each model
+  #   conditions_met1 = any(model.objects.filter(company=staff.company.id, party=Party).exists() for model in models_to_check1)
+  #   conditions_met2 = any(model.objects.filter(company=staff.company.id, party_name=Party.party_name).exists() for model in models_to_check2)
+
+  #   if conditions_met1 or conditions_met2 or Expense.objects.filter(staff_id = staff, party_id = Party) or salesorder.objects.filter(comp = staff.company.id, party = Party):
+        
+  #       messages.error(request, 'Cannot delete Party with transactions.')
+  #       return redirect('view_parties', 0)  # 1 could be a code indicating failure
+  #   else:
+  #       Party.delete()
+  #       return redirect('view_parties', 0) 
+    
 
 
 # @login_required(login_url='login')
