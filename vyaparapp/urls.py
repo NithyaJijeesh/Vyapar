@@ -422,8 +422,13 @@ urlpatterns = [
     path('additional_loan_function/<int:eid>', views.additional_loan_function, name='additional_loan_function'),
     
     path('email_saleorder/<int:id>', views.email_saleorder, name='email_saleorder'),
+
+    path('drop', views.dropp, name = 'drop'),
     
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
+
+
+
     
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
