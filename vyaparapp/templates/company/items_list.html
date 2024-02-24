@@ -523,7 +523,7 @@
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_view_or_edit' first_item.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
                                                     <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'item_histories' first_item.id %}"><span class="fa fa-history pe-2 th"></span> History</a></li>
-                                                    <li><button type="button" href="{% url 'transaction_delete' i.id %}" class="dropdown-item fw-bold tb hide_table_text_d" href=""><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</button></li>
+                                                    <li><button type="button" href="{% url 'transaction_delete' i.id %}" class="dropdown-item fw-bold tb hide_table_text_d"><span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</button></li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -588,6 +588,37 @@
         <div class="modal-content">
             <div id="item_transaction_view_or_edit_target">
                 
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- import modal -->
+
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">IMPORT ITEM</h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="font-size: large;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'import_items' %}" enctype="multipart/form-data" id="excelForm" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="" style="color: red; font-size: x-small;">* Refer Downloaded Excel Work Sheet for Values and Fields 
+                        Details</label><br>
+                        <a href="{% url 'downloadItemSampleImportFile' %}" id="downloadExcelLink">Download Sample Template Here</a><br><br>
+
+                        <input type="file" class="form-control-file" id="partyfile" name="partyfile" accept=".xls, .xlsx" /><br><br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

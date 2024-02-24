@@ -824,7 +824,7 @@ def ajust_quantity(request,pk):
 
 # @login_required(login_url='login')
 def transaction_delete(request,pk):
-  transaction = TransactionModel.objects.get(id=pk)
+  transaction = TransactionModel.objects.get(id=pk),k
   print(transaction)
   item = ItemModel.objects.get(id=transaction.item_id)
   print(item)
@@ -921,6 +921,125 @@ def item_delete_open_stk(request,pk):
   return redirect('items_list',pk=item.id)
   
 # ========================================   ASHIKH V U (END) ======================================================
+
+
+# ---------------Nithya-------import party-----------------
+
+def downloadItemSampleImportFile(request):
+    
+    party_table_data = [['Party Name','Contact','Email','GST No.','GST Type','Supply State','Billing Address','Opening Balance','Payment','Current Date','Credit Limit','Additional Field 1','Additional Field 2','Additional Field 3'],['Check GSTType, Supply States, Payment Sheet for details. And remove this row for add party details']]
+    details_table_data = [
+          ['GST Type','Registered Party', 'Unregistered or Consumer', 'Registered Business or Composition'],
+          ['Supply State','Andaman and Nicobar Islands','Andhra Pradhesh','Arunachal Pradesh','Assam','Bihar','Chandigarh','Chhattisgarh',
+           'Dadra and Nagar Haveli','Daman and Diu','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jammu and Kashmir','Jharkhand',
+           'Karnataka','Kerala','Ladakh','Lakshadweep','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha',
+           'Pondicherry','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Other Territory'],
+          ['Payment','To Pay', 'To Recieve'],
+          ['GST Number Format','32AAQFR1222B1ZS'],
+          ['Email Format','abc@example.com'],
+          ['Conatct Format', '7890555444']
+    ]  
+    wb = Workbook()
+
+    sheet1 = wb.active
+    sheet1.title = 'Sample Party Details'
+    sheet2 = wb.create_sheet(title='GSTType, Supply States, Payment')
+
+    # Populate the sheets with data
+    for row in party_table_data:
+        sheet1.append(row)
+
+    transposed_data = list(zip_longest(*details_table_data))
+    for row in transposed_data:
+      sheet2.append(row)
+
+
+    bold_headers = ['Party Name','Contact','Email','GST No.','GST Type','Supply State','Billing Address','Opening Balance','Payment','Current Date','Credit Limit','Additional Field 1','Additional Field 2','Additional Field 3','GST Number Format','Email Format','Conatct Format']
+    for col_num, header in enumerate(party_table_data[0], start=1):
+        if header in bold_headers:
+            sheet1.cell(row=1, column=col_num).font = Font(bold=True)
+
+    for col_num, header in enumerate(transposed_data[0], start=1):
+        if header in bold_headers:
+            sheet2.cell(row=1, column=col_num).font = Font(bold=True)
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=party_sample_file.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+def import_items(request):
+    
+    if request.method == 'POST':
+
+      staff_id = request.session['staff_id']
+      staff =  staff_details.objects.get(id=staff_id)
+      cmp = company.objects.get(id=staff.company.id)
+      file = request.FILES['partyfile']
+
+      df = pd.read_excel(file)
+
+      errors = []
+      count_rows = 0
+
+      try:    
+        for index, row in df.iterrows():
+          count_rows +=1
+
+          party_name = row.get('Party Name').capitalize()
+          contact = str(row.get('Contact'))
+
+          phone_pattern = re.compile(r'^\d{10}$')
+          contact = contact if phone_pattern.match(contact) else None
+
+          current_date = date.today() if 'nan' else datetime.strptime(str(row.get('Current Date')), '%Y-%m-%d').date()
+
+          party_obj = party(
+              party_name=party_name,
+              contact=contact,
+              gst_no='' if isinstance(row.get('GST No.'), float) and math.isnan(row.get('GST No.')) else str(row.get('GST No.', '')),
+              gst_type='' if isinstance(row.get('GST Type'), float) and math.isnan(row.get('GST Type')) else row.get('GST Type', ''),
+              email='' if isinstance(row.get('Email'), float) and math.isnan(row.get('Email')) else row.get('Email', ''),
+              state='' if isinstance(row.get('Supply State'), float) and math.isnan(row.get('Supply State')) else row.get('Supply State', ''),
+              address='' if isinstance(row.get('Billing Address'), float) and math.isnan(row.get('Billing Address')) else row.get('Billing Address', ''),
+              openingbalance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
+              payment='' if isinstance(row.get('Payment'), float) and math.isnan(row.get('Payment')) else row.get('Payment', ''),
+              creditlimit='' if isinstance(row.get('Credit Limit'), float) and math.isnan(row.get('Credit Limit')) else row.get('Credit Limit', ''),
+              current_date=current_date,
+              End_date=current_date,
+              additionalfield1='' if isinstance(row.get('Additional Field 1'), float) and math.isnan(row.get('Additional Field 1')) else row.get('Additional Field 1', ''),
+              additionalfield2='' if isinstance(row.get('Additional Field 2'), float) and math.isnan(row.get('Additional Field 2')) else row.get('Additional Field 2', ''),
+              additionalfield3='' if isinstance(row.get('Additional Field 3'), float) and math.isnan(row.get('Additional Field 3')) else row.get('Additional Field 3', ''),
+              current_balance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
+              user=staff.company.user,
+              company=staff.company
+          )
+
+          if not party_name or not contact or contact == " ":
+            messages.error(request, f'Row "{count_rows}" :Please Enter Party Name and Contact Number.')
+          else:
+            
+            if party.objects.filter(contact=contact).exists(): 
+              if party.objects.filter(party_name=party_name, contact=contact).exists():
+                messages.error(request, f'Row "{count_rows}" :Party with the same party name "{party_name}"  and contact number "{contact}" already exists.')
+              else:
+                messages.error(request, f'Row "{count_rows}" :Party with the same contact number "{contact}" already exists.')
+            else:
+              party_obj.save() 
+              party_history.objects.create(party = party_obj,company=staff.company,staff=staff,action='Created').save()
+
+        party_final = party.objects.filter(company=cmp).last()
+        return redirect('view_parties', party_final.id)
+      
+      except Exception as e:
+          error_message = f"Error in row {index + 1}: {e}"
+          errors.append(error_message)
+          return redirect('view_parties', 0)
+    return redirect('view_parties', 0)
+
 
 #_________________Parties(new)_______________Antony Tom_________
 
