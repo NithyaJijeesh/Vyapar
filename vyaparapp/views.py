@@ -927,26 +927,22 @@ def item_delete_open_stk(request,pk):
 
 def downloadItemSampleImportFile(request):
     
-    party_table_data = [['Party Name','Contact','Email','GST No.','GST Type','Supply State','Billing Address','Opening Balance','Payment','Current Date','Credit Limit','Additional Field 1','Additional Field 2','Additional Field 3'],['Check GSTType, Supply States, Payment Sheet for details. And remove this row for add party details']]
+    item_table_data = [['Item Name','HSN','Unit','Tax Type','GST Rate','IGST Rate','Sales Price','Purchase Price','Opening Stock','At Price','Date','Minimum Stock to Maintain'],['Check  Unit, Tax Type, GST Rate and IGST Rate sheet for details . And remove this row for add party details']]
     details_table_data = [
-          ['GST Type','Registered Party', 'Unregistered or Consumer', 'Registered Business or Composition'],
-          ['Supply State','Andaman and Nicobar Islands','Andhra Pradhesh','Arunachal Pradesh','Assam','Bihar','Chandigarh','Chhattisgarh',
-           'Dadra and Nagar Haveli','Daman and Diu','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jammu and Kashmir','Jharkhand',
-           'Karnataka','Kerala','Ladakh','Lakshadweep','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha',
-           'Pondicherry','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Other Territory'],
-          ['Payment','To Pay', 'To Recieve'],
-          ['GST Number Format','32AAQFR1222B1ZS'],
-          ['Email Format','abc@example.com'],
-          ['Conatct Format', '7890555444']
+          
+          ['Unit','NOS','BOX','PACKET'],
+          ['Tax Type','Taxable', 'Non Taxable'],
+          ['GST Rate','GST0[0%]','GST3[3%]','GST5[5%]','GST12[12%]','GST13[18%]','GST28[28%]'],
+          ['IGST Rate','IGST0[0%]','IGST3[3%]','IGST5[5%]','IGST12[12%]','IGST13[18%]','IGST28[28%]'],
     ]  
     wb = Workbook()
 
     sheet1 = wb.active
-    sheet1.title = 'Sample Party Details'
-    sheet2 = wb.create_sheet(title='GSTType, Supply States, Payment')
+    sheet1.title = 'Sample Item Details'
+    sheet2 = wb.create_sheet(title=' Unit, Tax Type, GST Rate and IGST Rate')
 
     # Populate the sheets with data
-    for row in party_table_data:
+    for row in item_table_data:
         sheet1.append(row)
 
     transposed_data = list(zip_longest(*details_table_data))
@@ -954,8 +950,8 @@ def downloadItemSampleImportFile(request):
       sheet2.append(row)
 
 
-    bold_headers = ['Party Name','Contact','Email','GST No.','GST Type','Supply State','Billing Address','Opening Balance','Payment','Current Date','Credit Limit','Additional Field 1','Additional Field 2','Additional Field 3','GST Number Format','Email Format','Conatct Format']
-    for col_num, header in enumerate(party_table_data[0], start=1):
+    bold_headers = ['Item Name','HSN','Unit','Tax Type','GST Rate','IGST Rate','Sales Price','Purchase Price','Opening Stock','At Price','Date','Minimum Stock to Maintain']
+    for col_num, header in enumerate(item_table_data[0], start=1):
         if header in bold_headers:
             sheet1.cell(row=1, column=col_num).font = Font(bold=True)
 
@@ -964,7 +960,7 @@ def downloadItemSampleImportFile(request):
             sheet2.cell(row=1, column=col_num).font = Font(bold=True)
     # Create a response with the Excel file
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename=party_sample_file.xlsx'
+    response['Content-Disposition'] = 'attachment; filename=item_sample_file.xlsx'
 
     # Save the workbook to the response
     wb.save(response)
@@ -978,7 +974,7 @@ def import_items(request):
       staff_id = request.session['staff_id']
       staff =  staff_details.objects.get(id=staff_id)
       cmp = company.objects.get(id=staff.company.id)
-      file = request.FILES['partyfile']
+      file = request.FILES['itemfile']
 
       df = pd.read_excel(file)
 
@@ -989,17 +985,17 @@ def import_items(request):
         for index, row in df.iterrows():
           count_rows +=1
 
-          party_name = row.get('Party Name').capitalize()
-          contact = str(row.get('Contact'))
+          item_name = row.get('Item Name').capitalize()
+          hsn = str(row.get('HSN'))
 
-          phone_pattern = re.compile(r'^\d{10}$')
-          contact = contact if phone_pattern.match(contact) else None
+          # phone_pattern = re.compile(r'^\d{10}$')
+          # contact = contact if phone_pattern.match(contact) else None
 
-          current_date = date.today() if 'nan' else datetime.strptime(str(row.get('Current Date')), '%Y-%m-%d').date()
+          current_date = date.today() if 'nan' else datetime.strptime(str(row.get('Date')), '%Y-%m-%d').date()
 
           party_obj = party(
-              party_name=party_name,
-              contact=contact,
+              party_name= '' if isinstance(row.get('Item Name'), float) and math.isnan(row.get('Item Name')) else str(row.get('Item Name', '')),
+              contact= '' if isinstance(row.get('HSN'), float) and math.isnan(row.get('HSN')) else str(row.get('HSN', '')),
               gst_no='' if isinstance(row.get('GST No.'), float) and math.isnan(row.get('GST No.')) else str(row.get('GST No.', '')),
               gst_type='' if isinstance(row.get('GST Type'), float) and math.isnan(row.get('GST Type')) else row.get('GST Type', ''),
               email='' if isinstance(row.get('Email'), float) and math.isnan(row.get('Email')) else row.get('Email', ''),
