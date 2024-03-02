@@ -927,7 +927,7 @@ def item_delete_open_stk(request,pk):
 
 def downloadItemSampleImportFile(request):
     
-    item_table_data = [['Item Name','HSN','Unit','Tax Type','GST Rate','IGST Rate','Sales Price','Purchase Price','Opening Stock','At Price','Date','Minimum Stock to Maintain'],['Check  Unit, Tax Type, GST Rate and IGST Rate sheet for details . And remove this row for add party details']]
+    item_table_data = [['Item Name','HSN','Unit','Tax Type','GST Rate','IGST Rate','Sales Price','Purchase Price','Opening Stock','At Price','Date','Minimum Stock to Maintain'],['Check  Unit, Tax Type, GST Rate and IGST Rate sheet for details . And remove this row for add item details']]
     details_table_data = [
           
           ['Unit','NOS','BOX','PACKET'],
@@ -939,7 +939,7 @@ def downloadItemSampleImportFile(request):
 
     sheet1 = wb.active
     sheet1.title = 'Sample Item Details'
-    sheet2 = wb.create_sheet(title=' Unit, Tax Type, GST Rate and IGST Rate')
+    sheet2 = wb.create_sheet(title=' Unit, Tax Type, GST and IGST')
 
     # Populate the sheets with data
     for row in item_table_data:
@@ -973,7 +973,7 @@ def import_items(request):
 
       staff_id = request.session['staff_id']
       staff =  staff_details.objects.get(id=staff_id)
-      cmp = company.objects.get(id=staff.company.id)
+      comp = company.objects.get(id=staff.company.id)
       file = request.FILES['itemfile']
 
       df = pd.read_excel(file)
@@ -988,53 +988,51 @@ def import_items(request):
           item_name = row.get('Item Name').capitalize()
           hsn = str(row.get('HSN'))
 
-          # phone_pattern = re.compile(r'^\d{10}$')
-          # contact = contact if phone_pattern.match(contact) else None
-
           current_date = date.today() if 'nan' else datetime.strptime(str(row.get('Date')), '%Y-%m-%d').date()
 
-          party_obj = party(
+          item_obj = party(
               party_name= '' if isinstance(row.get('Item Name'), float) and math.isnan(row.get('Item Name')) else str(row.get('Item Name', '')),
               contact= '' if isinstance(row.get('HSN'), float) and math.isnan(row.get('HSN')) else str(row.get('HSN', '')),
-              gst_no='' if isinstance(row.get('GST No.'), float) and math.isnan(row.get('GST No.')) else str(row.get('GST No.', '')),
-              gst_type='' if isinstance(row.get('GST Type'), float) and math.isnan(row.get('GST Type')) else row.get('GST Type', ''),
-              email='' if isinstance(row.get('Email'), float) and math.isnan(row.get('Email')) else row.get('Email', ''),
-              state='' if isinstance(row.get('Supply State'), float) and math.isnan(row.get('Supply State')) else row.get('Supply State', ''),
-              address='' if isinstance(row.get('Billing Address'), float) and math.isnan(row.get('Billing Address')) else row.get('Billing Address', ''),
-              openingbalance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
-              payment='' if isinstance(row.get('Payment'), float) and math.isnan(row.get('Payment')) else row.get('Payment', ''),
-              creditlimit='' if isinstance(row.get('Credit Limit'), float) and math.isnan(row.get('Credit Limit')) else row.get('Credit Limit', ''),
-              current_date=current_date,
-              End_date=current_date,
-              additionalfield1='' if isinstance(row.get('Additional Field 1'), float) and math.isnan(row.get('Additional Field 1')) else row.get('Additional Field 1', ''),
-              additionalfield2='' if isinstance(row.get('Additional Field 2'), float) and math.isnan(row.get('Additional Field 2')) else row.get('Additional Field 2', ''),
-              additionalfield3='' if isinstance(row.get('Additional Field 3'), float) and math.isnan(row.get('Additional Field 3')) else row.get('Additional Field 3', ''),
-              current_balance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
+              unit='' if isinstance(row.get('GST No.'), float) and math.isnan(row.get('GST No.')) else str(row.get('GST No.', '')),
+              # gst_type='' if isinstance(row.get('GST Type'), float) and math.isnan(row.get('GST Type')) else row.get('GST Type', ''),
+              # email='' if isinstance(row.get('Email'), float) and math.isnan(row.get('Email')) else row.get('Email', ''),
+              # state='' if isinstance(row.get('Supply State'), float) and math.isnan(row.get('Supply State')) else row.get('Supply State', ''),
+              # address='' if isinstance(row.get('Billing Address'), float) and math.isnan(row.get('Billing Address')) else row.get('Billing Address', ''),
+              # openingbalance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
+              # payment='' if isinstance(row.get('Payment'), float) and math.isnan(row.get('Payment')) else row.get('Payment', ''),
+              # creditlimit='' if isinstance(row.get('Credit Limit'), float) and math.isnan(row.get('Credit Limit')) else row.get('Credit Limit', ''),
+              # current_date=current_date,
+              # End_date=current_date,
+              # additionalfield1='' if isinstance(row.get('Additional Field 1'), float) and math.isnan(row.get('Additional Field 1')) else row.get('Additional Field 1', ''),
+              # additionalfield2='' if isinstance(row.get('Additional Field 2'), float) and math.isnan(row.get('Additional Field 2')) else row.get('Additional Field 2', ''),
+              # additionalfield3='' if isinstance(row.get('Additional Field 3'), float) and math.isnan(row.get('Additional Field 3')) else row.get('Additional Field 3', ''),
+              # current_balance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
               user=staff.company.user,
               company=staff.company
           )
 
-          if not party_name or not contact or contact == " ":
-            messages.error(request, f'Row "{count_rows}" :Please Enter Party Name and Contact Number.')
-          else:
+        #   if not party_name or not contact or contact == " ":
+        #     messages.error(request, f'Row "{count_rows}" :Please Enter Party Name and Contact Number.')
+        #   else:
             
-            if party.objects.filter(contact=contact).exists(): 
-              if party.objects.filter(party_name=party_name, contact=contact).exists():
-                messages.error(request, f'Row "{count_rows}" :Party with the same party name "{party_name}"  and contact number "{contact}" already exists.')
-              else:
-                messages.error(request, f'Row "{count_rows}" :Party with the same contact number "{contact}" already exists.')
-            else:
-              party_obj.save() 
-              party_history.objects.create(party = party_obj,company=staff.company,staff=staff,action='Created').save()
+        #     if party.objects.filter(contact=contact).exists(): 
+        #       if party.objects.filter(party_name=party_name, contact=contact).exists():
+        #         messages.error(request, f'Row "{count_rows}" :Party with the same party name "{party_name}"  and contact number "{contact}" already exists.')
+        #       else:
+        #         messages.error(request, f'Row "{count_rows}" :Party with the same contact number "{contact}" already exists.')
+        #     else:
+        #       party_obj.save() 
+        #       party_history.objects.create(party = party_obj,company=staff.company,staff=staff,action='Created').save()
 
-        party_final = party.objects.filter(company=cmp).last()
-        return redirect('view_parties', party_final.id)
+        # party_final = party.objects.filter(company=cmp).last()
+        # return redirect('items_list', party_final.id)
+        return redirect('items_list', 0)
       
       except Exception as e:
           error_message = f"Error in row {index + 1}: {e}"
           errors.append(error_message)
-          return redirect('view_parties', 0)
-    return redirect('view_parties', 0)
+          return redirect('items_list', 0)
+    return redirect('items_list', 0)
 
 
 #_________________Parties(new)_______________Antony Tom_________
