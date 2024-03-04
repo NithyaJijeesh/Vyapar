@@ -974,6 +974,7 @@ def import_items(request):
       staff_id = request.session['staff_id']
       staff =  staff_details.objects.get(id=staff_id)
       comp = company.objects.get(id=staff.company.id)
+
       file = request.FILES['itemfile']
 
       df = pd.read_excel(file)
@@ -985,48 +986,61 @@ def import_items(request):
         for index, row in df.iterrows():
           count_rows +=1
 
-          item_name = row.get('Item Name').capitalize()
-          hsn = str(row.get('HSN'))
+          itemname = row.get('Item Name').capitalize()
+          itemhsn = str(row.get('HSN'))
 
           current_date = date.today() if 'nan' else datetime.strptime(str(row.get('Date')), '%Y-%m-%d').date()
+          print('' if isinstance(row.get('Item Name'), float) and math.isnan(row.get('Item Name')) else str(row.get('Item Name', '')))
+          print('' if isinstance(row.get('HSN'), float) and math.isnan(row.get('HSN')) else str(row.get('HSN', '')))
+          print('' if isinstance(row.get('Unit'), float) and math.isnan(row.get('Unit')) else str(row.get('Unit', '')))
+          print('' if isinstance(row.get('Tax Type'), float) and math.isnan(row.get('Tax Type')) else row.get('Tax Type', ''))
+          print('' if isinstance(row.get('GST Rate'), float) and math.isnan(row.get('GST Rate')) else row.get('GST Rate', ''))
+          print('' if isinstance(row.get('IGST Rate'), float) and math.isnan(row.get('IGST Rate')) else row.get('IGST Rate', ''))
+          print('' if isinstance(row.get('Sales Price'), float) and math.isnan(row.get('Sales Price')) else row.get('Sales Price', ''))
+          print('' if isinstance(row.get('Purchase Price'), float) and math.isnan(row.get('Purchase Price')) else row.get('Purchase Price', ''))
+          print('' if isinstance(row.get('Opening Stock'), float) and math.isnan(row.get('Opening Stock')) else row.get('Opening Stock', ''))
+          print('' if isinstance(row.get('At Price'), float) and math.isnan(row.get('At Price')) else row.get('At Price', ''))
+          print(current_date)
+          print('' if isinstance(row.get('Minimum Stock to Maintain'), float) and math.isnan(row.get('Minimum Stock to Maintain')) else row.get('Minimum Stock to Maintain', ''))
+          print(staff.company.user)
+          print(comp)
+          print('pp')
 
-          item_obj = party(
-              party_name= '' if isinstance(row.get('Item Name'), float) and math.isnan(row.get('Item Name')) else str(row.get('Item Name', '')),
-              contact= '' if isinstance(row.get('HSN'), float) and math.isnan(row.get('HSN')) else str(row.get('HSN', '')),
-              unit='' if isinstance(row.get('GST No.'), float) and math.isnan(row.get('GST No.')) else str(row.get('GST No.', '')),
-              # gst_type='' if isinstance(row.get('GST Type'), float) and math.isnan(row.get('GST Type')) else row.get('GST Type', ''),
-              # email='' if isinstance(row.get('Email'), float) and math.isnan(row.get('Email')) else row.get('Email', ''),
-              # state='' if isinstance(row.get('Supply State'), float) and math.isnan(row.get('Supply State')) else row.get('Supply State', ''),
-              # address='' if isinstance(row.get('Billing Address'), float) and math.isnan(row.get('Billing Address')) else row.get('Billing Address', ''),
-              # openingbalance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
-              # payment='' if isinstance(row.get('Payment'), float) and math.isnan(row.get('Payment')) else row.get('Payment', ''),
-              # creditlimit='' if isinstance(row.get('Credit Limit'), float) and math.isnan(row.get('Credit Limit')) else row.get('Credit Limit', ''),
-              # current_date=current_date,
-              # End_date=current_date,
-              # additionalfield1='' if isinstance(row.get('Additional Field 1'), float) and math.isnan(row.get('Additional Field 1')) else row.get('Additional Field 1', ''),
-              # additionalfield2='' if isinstance(row.get('Additional Field 2'), float) and math.isnan(row.get('Additional Field 2')) else row.get('Additional Field 2', ''),
-              # additionalfield3='' if isinstance(row.get('Additional Field 3'), float) and math.isnan(row.get('Additional Field 3')) else row.get('Additional Field 3', ''),
-              # current_balance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
-              user=staff.company.user,
-              company=staff.company
+          item_obj = ItemModel(
+            # item_name= '' if isinstance(row.get('Item Name'), float) and math.isnan(row.get('Item Name')) else str(row.get('Item Name', '')),
+            # item_hsn= '' if isinstance(row.get('HSN'), float) and math.isnan(row.get('HSN')) else str(row.get('HSN', '')),
+            # item_unit='' if isinstance(row.get('Unit'), float) and math.isnan(row.get('Unit')) else str(row.get('Unit', '')),
+            # item_taxable='' if isinstance(row.get('Tax Type'), float) and math.isnan(row.get('Tax Type')) else row.get('Tax Type', ''),
+            # item_gst='' if isinstance(row.get('GST Rate'), float) and math.isnan(row.get('GST Rate')) else row.get('GST Rate', ''),
+            # item_igst ='' if isinstance(row.get('IGST Rate'), float) and math.isnan(row.get('IGST Rate')) else row.get('IGST Rate', ''),
+            # item_sales_price='' if isinstance(row.get('Sales Price'), float) and math.isnan(row.get('Sales Price')) else row.get('Sales Price', ''),
+            # item_purchase_price='' if isinstance(row.get('Purchase Price'), float) and math.isnan(row.get('Purchase Price')) else row.get('Purchase Price', ''),
+            # item_opening_stock='' if isinstance(row.get('Opening Stock'), float) and math.isnan(row.get('Opening Stock')) else row.get('Opening Stock', ''),
+            # item_at_price='' if isinstance(row.get('At Price'), float) and math.isnan(row.get('At Price')) else row.get('At Price', ''),
+            item_date=current_date,
+            # item_min_stock_maintain ='' if isinstance(row.get('Minimum Stock to Maintain'), float) and math.isnan(row.get('Minimum Stock to Maintain')) else row.get('Minimum Stock to Maintain', ''),
+            user= staff.company.user,
+            company=comp
           )
+          item_obj.save()
+          Item_History.objects.create(Item = item_obj,company=comp,staff=staff,action='Created').save()
+          print('ll')
+          # if ItemModel.objects.filter(item_name=itemname, item_hsn=itemhsn).exists():
+          #   print('itemhsn')
+          #   messages.error(request, 'Item with the same item name and HSN  number already exists.')
+          # elif ItemModel.objects.filter(item_name=itemname).exists():
+          #   print("item")
+          #   messages.error(request, 'An item can have one HSN Number.')
+          # elif ItemModel.objects.filter(item_hsn=itemhsn).exists():
+          #   print("ihsn")
+          #   messages.error(request, 'Item with the same HSN  number already exists.')
+          # else:
+          #   print('gg')
+          #   item_obj.save()
+          #   Item_History.objects.create(Item = item_obj,company=comp,staff=staff,action='Created').save()
 
-        #   if not party_name or not contact or contact == " ":
-        #     messages.error(request, f'Row "{count_rows}" :Please Enter Party Name and Contact Number.')
-        #   else:
-            
-        #     if party.objects.filter(contact=contact).exists(): 
-        #       if party.objects.filter(party_name=party_name, contact=contact).exists():
-        #         messages.error(request, f'Row "{count_rows}" :Party with the same party name "{party_name}"  and contact number "{contact}" already exists.')
-        #       else:
-        #         messages.error(request, f'Row "{count_rows}" :Party with the same contact number "{contact}" already exists.')
-        #     else:
-        #       party_obj.save() 
-        #       party_history.objects.create(party = party_obj,company=staff.company,staff=staff,action='Created').save()
-
-        # party_final = party.objects.filter(company=cmp).last()
-        # return redirect('items_list', party_final.id)
-        return redirect('items_list', 0)
+        item_final = ItemModel.objects.filter(company=comp).last()
+        return redirect('items_list', item_final.id)
       
       except Exception as e:
           error_message = f"Error in row {index + 1}: {e}"
@@ -1312,30 +1326,29 @@ def import_parties(request):
           current_date = date.today() if 'nan' else datetime.strptime(str(row.get('Current Date')), '%Y-%m-%d').date()
 
           party_obj = party(
-              party_name=party_name,
-              contact=contact,
-              gst_no='' if isinstance(row.get('GST No.'), float) and math.isnan(row.get('GST No.')) else str(row.get('GST No.', '')),
-              gst_type='' if isinstance(row.get('GST Type'), float) and math.isnan(row.get('GST Type')) else row.get('GST Type', ''),
-              email='' if isinstance(row.get('Email'), float) and math.isnan(row.get('Email')) else row.get('Email', ''),
-              state='' if isinstance(row.get('Supply State'), float) and math.isnan(row.get('Supply State')) else row.get('Supply State', ''),
-              address='' if isinstance(row.get('Billing Address'), float) and math.isnan(row.get('Billing Address')) else row.get('Billing Address', ''),
-              openingbalance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
-              payment='' if isinstance(row.get('Payment'), float) and math.isnan(row.get('Payment')) else row.get('Payment', ''),
-              creditlimit='' if isinstance(row.get('Credit Limit'), float) and math.isnan(row.get('Credit Limit')) else row.get('Credit Limit', ''),
-              current_date=current_date,
-              End_date=current_date,
-              additionalfield1='' if isinstance(row.get('Additional Field 1'), float) and math.isnan(row.get('Additional Field 1')) else row.get('Additional Field 1', ''),
-              additionalfield2='' if isinstance(row.get('Additional Field 2'), float) and math.isnan(row.get('Additional Field 2')) else row.get('Additional Field 2', ''),
-              additionalfield3='' if isinstance(row.get('Additional Field 3'), float) and math.isnan(row.get('Additional Field 3')) else row.get('Additional Field 3', ''),
-              current_balance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
-              user=staff.company.user,
-              company=staff.company
+            party_name=party_name,
+            contact=contact,
+            gst_no='' if isinstance(row.get('GST No.'), float) and math.isnan(row.get('GST No.')) else str(row.get('GST No.', '')),
+            gst_type='' if isinstance(row.get('GST Type'), float) and math.isnan(row.get('GST Type')) else row.get('GST Type', ''),
+            email='' if isinstance(row.get('Email'), float) and math.isnan(row.get('Email')) else row.get('Email', ''),
+            state='' if isinstance(row.get('Supply State'), float) and math.isnan(row.get('Supply State')) else row.get('Supply State', ''),
+            address='' if isinstance(row.get('Billing Address'), float) and math.isnan(row.get('Billing Address')) else row.get('Billing Address', ''),
+            openingbalance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
+            payment='' if isinstance(row.get('Payment'), float) and math.isnan(row.get('Payment')) else row.get('Payment', ''),
+            creditlimit='' if isinstance(row.get('Credit Limit'), float) and math.isnan(row.get('Credit Limit')) else row.get('Credit Limit', ''),
+            current_date=current_date,
+            End_date=current_date,
+            additionalfield1='' if isinstance(row.get('Additional Field 1'), float) and math.isnan(row.get('Additional Field 1')) else row.get('Additional Field 1', ''),
+            additionalfield2='' if isinstance(row.get('Additional Field 2'), float) and math.isnan(row.get('Additional Field 2')) else row.get('Additional Field 2', ''),
+            additionalfield3='' if isinstance(row.get('Additional Field 3'), float) and math.isnan(row.get('Additional Field 3')) else row.get('Additional Field 3', ''),
+            current_balance=0 if isinstance(row.get('Opening Balance'), float) and math.isnan(row.get('Opening Balance')) else row.get('Opening Balance', ''),
+            user=staff.company.user,
+            company=staff.company
           )
 
           if not party_name or not contact or contact == " ":
             messages.error(request, f'Row "{count_rows}" :Please Enter Party Name and Contact Number.')
           else:
-            
             if party.objects.filter(contact=contact).exists(): 
               if party.objects.filter(party_name=party_name, contact=contact).exists():
                 messages.error(request, f'Row "{count_rows}" :Party with the same party name "{party_name}"  and contact number "{contact}" already exists.')
