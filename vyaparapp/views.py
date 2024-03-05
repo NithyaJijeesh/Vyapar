@@ -500,7 +500,7 @@ def item_create(request):
 
 # @login_required(login_url='login')
 def items_list(request,pk):
-  # try:
+  try:
     sid = request.session.get('staff_id')
     staff =  staff_details.objects.get(id=sid)
     cmp = company.objects.get(id=staff.company.id)
@@ -509,8 +509,9 @@ def items_list(request,pk):
 
     if pk == 0:
       first_item = all_items.filter().first()
-    else:
+    elif pk != 0:
       first_item = all_items.get(id=pk)
+    print(first_item)
 
     item_history= Item_History.objects.filter(
       Item= first_item,
@@ -520,7 +521,8 @@ def items_list(request,pk):
     allmodules= modules_list.objects.get(company=staff.company,status='New')
     transactions = None
     # transactions = TransactionModel.objects.filter(user=request.user.id,item=first_item.id).order_by('-trans_created_date')
-    transactions = TransactionModel.objects.filter(company = cmp,item=first_item.id).order_by('-trans_created_date')
+    if first_item:
+      transactions = TransactionModel.objects.filter(company = cmp,item=first_item.id).order_by('-trans_created_date')
 
     context = {
                 'first_item':first_item,
@@ -535,8 +537,8 @@ def items_list(request,pk):
     if all_items == None or all_items == '' or first_item == None or first_item == '' or transactions == None or transactions == '':
       return render(request,'company/items_create_first_item.html', context)
     return render(request,'company/items_list.html',context)
-  # except:
-  #   return render(request,'company/items_create_first_item.html', context)
+  except:
+    return render(request,'company/items_create_first_item.html', context)
 
 # @login_required(login_url='login')
 def item_create_new(request):
@@ -804,7 +806,6 @@ def ajust_quantity(request,pk):
 
     trans_adjusted_qty= request.POST.get('adjusted_qty')
     trans_current_qty = request.POST.get('item_qty')
-    print(f'the quantity : {trans_current_qty}')
     item.item_current_stock = trans_adjusted_qty
     item.save()
     transaction_data = TransactionModel(user=user,
@@ -825,20 +826,10 @@ def ajust_quantity(request,pk):
 # @login_required(login_url='login')
 def transaction_delete(request,pk):
   transaction = TransactionModel.objects.get(id=pk),k
-  print(transaction)
   item = ItemModel.objects.get(id=transaction.item_id)
-  print(item)
-  print(transaction.trans_type)
   if transaction.trans_type=='add stock':
-    print('add')
     item.item_current_stock = item.item_current_stock - transaction.trans_qty
-    print(item.item_name)
-    print(item.item_current_stock)
-    print(item.item_current_stock)
-    print(transaction.trans_qty)
-    print(item.item_current_stock - transaction.trans_qty)
   else:
-    print('reduce')
     item.item_current_stock = item.item_current_stock + transaction.trans_qty
   item.save()
   transaction.delete()
@@ -884,19 +875,13 @@ def update_adjusted_transaction(request,pk,tran):
     trans_current_qty = request.POST.get('item_qty')
     if transaction.trans_type == 'reduce stock':
       if trans_type == 'reduce stock':
-        print('reduce to reduce')
         item.item_current_stock = item.item_current_stock - (int(trans_qty)  - transaction.trans_qty)
       else:
-        print('reduce to add')
-        print(f'{trans_qty}-{transaction.trans_qty}={((int(trans_qty)  - transaction.trans_qty))}')
         item.item_current_stock = item.item_current_stock + transaction.trans_qty + int(trans_qty)
     else:
       if trans_type == 'reduce stock':
-        print('add to red')
         item.item_current_stock = item.item_current_stock - (int(trans_qty)  + transaction.trans_qty)
       else:
-        print('add to add')
-        print(f'{trans_qty}-{transaction.trans_qty}={((int(trans_qty)  - transaction.trans_qty))}')
         item.item_current_stock = item.item_current_stock - transaction.trans_qty + int(trans_qty)
     # item.item_opening_stock = adjusted_qty
     item.save()
@@ -923,7 +908,7 @@ def item_delete_open_stk(request,pk):
 # ========================================   ASHIKH V U (END) ======================================================
 
 
-# ---------------Nithya-------import party-----------------
+# ---------------Nithya-------import item-----------------
 
 def downloadItemSampleImportFile(request):
     
@@ -941,7 +926,6 @@ def downloadItemSampleImportFile(request):
     sheet1.title = 'Sample Item Details'
     sheet2 = wb.create_sheet(title=' Unit, Tax Type, GST and IGST')
 
-    # Populate the sheets with data
     for row in item_table_data:
         sheet1.append(row)
 
@@ -949,104 +933,80 @@ def downloadItemSampleImportFile(request):
     for row in transposed_data:
       sheet2.append(row)
 
-
     bold_headers = ['Item Name','HSN','Unit','Tax Type','GST Rate','IGST Rate','Sales Price','Purchase Price','Opening Stock','At Price','Date','Minimum Stock to Maintain']
     for col_num, header in enumerate(item_table_data[0], start=1):
-        if header in bold_headers:
-            sheet1.cell(row=1, column=col_num).font = Font(bold=True)
+      if header in bold_headers:
+        sheet1.cell(row=1, column=col_num).font = Font(bold=True)
 
     for col_num, header in enumerate(transposed_data[0], start=1):
-        if header in bold_headers:
-            sheet2.cell(row=1, column=col_num).font = Font(bold=True)
-    # Create a response with the Excel file
+      if header in bold_headers:
+        sheet2.cell(row=1, column=col_num).font = Font(bold=True)
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=item_sample_file.xlsx'
-
-    # Save the workbook to the response
     wb.save(response)
-
     return response
 
+
 def import_items(request):
+  if request.method == 'POST':
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    comp = company.objects.get(id=staff.company.id)
+
+    file = request.FILES['itemfile']
+    df = pd.read_excel(file)
+
+    errors = []
+    count_rows = 0
+
+    try:    
+      for index, row in df.iterrows():
+        count_rows +=1
+
+        item_name = '' if isinstance(row.get('Item Name'), float) and math.isnan(row.get('Item Name')) else str(row.get('Item Name', '')).capitalize()
+        hsn = '' if isinstance(row.get('HSN'), float) and math.isnan(row.get('HSN')) else str(row.get('HSN', ''))
+        current_date = date.today() if 'nan' else datetime.strptime(str(row.get('Date')), '%Y-%m-%d').date()
+
+        item_obj = ItemModel(
+          item_name= item_name,
+          item_hsn = hsn,
+          item_unit = '' if isinstance(row.get('Unit'), float) and math.isnan(row.get('Unit')) else str(row.get('Unit', '')),
+          item_taxable = '' if isinstance(row.get('Tax Type'), float) and math.isnan(row.get('Tax Type')) else row.get('Tax Type', ''),
+          item_gst = '' if isinstance(row.get('GST Rate'), float) and math.isnan(row.get('GST Rate')) else row.get('GST Rate', ''),
+          item_igst = '' if isinstance(row.get('IGST Rate'), float) and math.isnan(row.get('IGST Rate')) else row.get('IGST Rate', ''),
+          item_sale_price = '' if isinstance(row.get('Sales Price'), float) and math.isnan(row.get('Sales Price')) else row.get('Sales Price', ''),
+          item_purchase_price = '' if isinstance(row.get('Purchase Price'), float) and math.isnan(row.get('Purchase Price')) else row.get('Purchase Price', ''),
+          item_opening_stock = 0 if isinstance(row.get('Opening Stock'), float) and math.isnan(row.get('Opening Stock')) else row.get('Opening Stock', ''),
+          item_current_stock = 0 if isinstance(row.get('Opening Stock'), float) and math.isnan(row.get('Opening Stock')) else row.get('Opening Stock', ''),
+          item_at_price = 0 if isinstance(row.get('At Price'), float) and math.isnan(row.get('At Price')) else row.get('At Price', ''),
+          item_date = current_date,
+          item_min_stock_maintain = 0 if isinstance(row.get('Minimum Stock to Maintain'), float) and math.isnan(row.get('Minimum Stock to Maintain')) else row.get('Minimum Stock to Maintain', ''),
+          user= staff.company.user,
+          company=comp,
+        )
+
+        if not item_name or not hsn or hsn == " ":
+          messages.error(request, f'Row "{count_rows}" :Please Enter Item Name and HSN Number.')
+        else:
+          if ItemModel.objects.filter(item_name=item_name, item_hsn=hsn).exists():
+            messages.error(request, 'Item with the same item name and HSN  number already exists.')
+          elif ItemModel.objects.filter(item_name=item_name).exists():
+            messages.error(request, 'An item can have one HSN Number.')
+          elif ItemModel.objects.filter(item_hsn=hsn).exists():
+            messages.error(request, 'Item with the same HSN  number already exists.')
+          else:
+            item_obj.save()
+            Item_History.objects.create(Item = item_obj,company=staff.company,staff=staff,action='Created').save()
+
+      item_final = ItemModel.objects.filter(company=comp).last()
+      return redirect('items_list', item_final.id)
     
-    if request.method == 'POST':
-
-      staff_id = request.session['staff_id']
-      staff =  staff_details.objects.get(id=staff_id)
-      comp = company.objects.get(id=staff.company.id)
-
-      file = request.FILES['itemfile']
-
-      df = pd.read_excel(file)
-
-      errors = []
-      count_rows = 0
-
-      try:    
-        for index, row in df.iterrows():
-          count_rows +=1
-
-          itemname = row.get('Item Name').capitalize()
-          itemhsn = str(row.get('HSN'))
-
-          current_date = date.today() if 'nan' else datetime.strptime(str(row.get('Date')), '%Y-%m-%d').date()
-          print('' if isinstance(row.get('Item Name'), float) and math.isnan(row.get('Item Name')) else str(row.get('Item Name', '')))
-          print('' if isinstance(row.get('HSN'), float) and math.isnan(row.get('HSN')) else str(row.get('HSN', '')))
-          print('' if isinstance(row.get('Unit'), float) and math.isnan(row.get('Unit')) else str(row.get('Unit', '')))
-          print('' if isinstance(row.get('Tax Type'), float) and math.isnan(row.get('Tax Type')) else row.get('Tax Type', ''))
-          print('' if isinstance(row.get('GST Rate'), float) and math.isnan(row.get('GST Rate')) else row.get('GST Rate', ''))
-          print('' if isinstance(row.get('IGST Rate'), float) and math.isnan(row.get('IGST Rate')) else row.get('IGST Rate', ''))
-          print('' if isinstance(row.get('Sales Price'), float) and math.isnan(row.get('Sales Price')) else row.get('Sales Price', ''))
-          print('' if isinstance(row.get('Purchase Price'), float) and math.isnan(row.get('Purchase Price')) else row.get('Purchase Price', ''))
-          print('' if isinstance(row.get('Opening Stock'), float) and math.isnan(row.get('Opening Stock')) else row.get('Opening Stock', ''))
-          print('' if isinstance(row.get('At Price'), float) and math.isnan(row.get('At Price')) else row.get('At Price', ''))
-          print(current_date)
-          print('' if isinstance(row.get('Minimum Stock to Maintain'), float) and math.isnan(row.get('Minimum Stock to Maintain')) else row.get('Minimum Stock to Maintain', ''))
-          print(staff.company.user)
-          print(comp)
-          print('pp')
-
-          item_obj = ItemModel(
-            # item_name= '' if isinstance(row.get('Item Name'), float) and math.isnan(row.get('Item Name')) else str(row.get('Item Name', '')),
-            # item_hsn= '' if isinstance(row.get('HSN'), float) and math.isnan(row.get('HSN')) else str(row.get('HSN', '')),
-            # item_unit='' if isinstance(row.get('Unit'), float) and math.isnan(row.get('Unit')) else str(row.get('Unit', '')),
-            # item_taxable='' if isinstance(row.get('Tax Type'), float) and math.isnan(row.get('Tax Type')) else row.get('Tax Type', ''),
-            # item_gst='' if isinstance(row.get('GST Rate'), float) and math.isnan(row.get('GST Rate')) else row.get('GST Rate', ''),
-            # item_igst ='' if isinstance(row.get('IGST Rate'), float) and math.isnan(row.get('IGST Rate')) else row.get('IGST Rate', ''),
-            # item_sales_price='' if isinstance(row.get('Sales Price'), float) and math.isnan(row.get('Sales Price')) else row.get('Sales Price', ''),
-            # item_purchase_price='' if isinstance(row.get('Purchase Price'), float) and math.isnan(row.get('Purchase Price')) else row.get('Purchase Price', ''),
-            # item_opening_stock='' if isinstance(row.get('Opening Stock'), float) and math.isnan(row.get('Opening Stock')) else row.get('Opening Stock', ''),
-            # item_at_price='' if isinstance(row.get('At Price'), float) and math.isnan(row.get('At Price')) else row.get('At Price', ''),
-            item_date=current_date,
-            # item_min_stock_maintain ='' if isinstance(row.get('Minimum Stock to Maintain'), float) and math.isnan(row.get('Minimum Stock to Maintain')) else row.get('Minimum Stock to Maintain', ''),
-            user= staff.company.user,
-            company=comp
-          )
-          item_obj.save()
-          Item_History.objects.create(Item = item_obj,company=comp,staff=staff,action='Created').save()
-          print('ll')
-          # if ItemModel.objects.filter(item_name=itemname, item_hsn=itemhsn).exists():
-          #   print('itemhsn')
-          #   messages.error(request, 'Item with the same item name and HSN  number already exists.')
-          # elif ItemModel.objects.filter(item_name=itemname).exists():
-          #   print("item")
-          #   messages.error(request, 'An item can have one HSN Number.')
-          # elif ItemModel.objects.filter(item_hsn=itemhsn).exists():
-          #   print("ihsn")
-          #   messages.error(request, 'Item with the same HSN  number already exists.')
-          # else:
-          #   print('gg')
-          #   item_obj.save()
-          #   Item_History.objects.create(Item = item_obj,company=comp,staff=staff,action='Created').save()
-
-        item_final = ItemModel.objects.filter(company=comp).last()
-        return redirect('items_list', item_final.id)
-      
-      except Exception as e:
-          error_message = f"Error in row {index + 1}: {e}"
-          errors.append(error_message)
-          return redirect('items_list', 0)
-    return redirect('items_list', 0)
+    except Exception as e:
+      error_message = f"Error in row {index + 1}: {e}"
+      errors.append(error_message)
+      return redirect('items_list', 0)
+    
+  return redirect('items_list', 0)
 
 
 #_________________Parties(new)_______________Antony Tom_________
@@ -1301,7 +1261,7 @@ def downloadPartySampleImportFile(request):
 
 def import_parties(request):
     
-    if request.method == 'POST':
+  if request.method == 'POST':
 
       staff_id = request.session['staff_id']
       staff =  staff_details.objects.get(id=staff_id)
@@ -1357,7 +1317,6 @@ def import_parties(request):
             else:
               party_obj.save() 
               party_history.objects.create(party = party_obj,company=staff.company,staff=staff,action='Created').save()
-
         party_final = party.objects.filter(company=cmp).last()
         return redirect('view_parties', party_final.id)
       
@@ -1365,7 +1324,7 @@ def import_parties(request):
           error_message = f"Error in row {index + 1}: {e}"
           errors.append(error_message)
           return redirect('view_parties', 0)
-    return redirect('view_parties', 0)
+  return redirect('view_parties', 0)
 
 
 #End
