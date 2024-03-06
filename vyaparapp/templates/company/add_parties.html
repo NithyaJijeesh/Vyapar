@@ -256,9 +256,20 @@
                                                                 <input type="email" class="form-control border-secondary" id="partyemail" name="partyemail" style="color: black; background-color: white;" placeholder="Enter Email" >
                                                             </div>
                                                         </div>
+
+                                                        <div class="text-start mt-5">
+                                                            <button id="gstnxt" class="btn btn-primary bg-gradient" type="button">NEXT</button>
+                                                        </div>
         
                                                     </div>
                                                 </div>
+                                                {% comment %} <div class="row">
+                                                    <div class="col-md-1 mt-4"></div>
+                                                    <div class="col-md-5 mt-3 d-flex" style="margin-left:5vh">
+                                                        <input type="submit" class="btn btn-primary bg-gradient save-button" name="save_and_new" value="Save & New">
+                                                        <input type="submit" class="btn btn-primary bg-gradient save-button" name="save" value="Save">
+                                                    </div>
+                                                </div> {% endcomment %}
                                             </div>
             
                                             <div id="credittemp"style="background-color: rgba(144, 211, 117, 0.098);" hidden>
@@ -293,9 +304,21 @@
                                                                 <input type="date" class="form-control border-secondary" id="partydate" name="partydate" style="color: black; background-color: white;"  value="{{tod | date:'Y-m-d'}}">
                                                             </div>
                                                         </div>
+
+                                                        <div class="text-start mt-5">
+                                                            <button id="creditnxt" class="btn btn-primary bg-gradient me-3" type="button">NEXT</button>
+                                                            <button id="creditprev" class="btn btn-primary bg-gradient" type="button">PREVIOUS</button>
+                                                        </div>
         
                                                     </div>
                                                 </div>
+                                                {% comment %} <div class="row">
+                                                    <div class="col-md-1 mt-4"></div>
+                                                    <div class="col-md-5 mt-3 d-flex" style="margin-left:5vh">
+                                                        <input type="submit" class="btn btn-primary bg-gradient save-button" name="save_and_new" value="Save & New">
+                                                        <input type="submit" class="btn btn-primary bg-gradient save-button" name="save" value="Save">
+                                                    </div>
+                                                </div> {% endcomment %}
                                             </div>
         
                                             <div id="fieldtemp"style="background-color: rgba(144, 211, 117, 0.098);" hidden>
@@ -316,18 +339,25 @@
                                                                 <input type="text" class="form-control border-secondary" id="additional3" name="additional3" style="color: black; background-color: white;">
                                                             </div>
                                                         </div>
+                                                        <div class="text-start mt-5">
+                                                            <button id="fieldprev" class="btn btn-primary bg-gradient  me-3" type="button">PREVIOUS</button>
+                                                            <input type="submit" class="btn btn-primary bg-gradient save-button" name="save_and_new" value="SAVE & NEW">
+                                                            <input type="submit" class="btn btn-primary bg-gradient save-button" name="save" value="SAVE">
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                                {% comment %} <div class="row">
+                                                    <div class="col-md-1 mt-4"></div>
+                                                    <div class="col-md-5 mt-3 d-flex" style="margin-left:5vh">
+                                                        <input type="submit" class="btn btn-primary bg-gradient save-button" name="save_and_new" value="Save & New">
+                                                        <input type="submit" class="btn btn-primary bg-gradient save-button" name="save" value="Save">
+                                                    </div>
+                                                </div> {% endcomment %}
+                                            
+                                    </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-1 mt-4"></div>
-                                        <div class="col-md-5 mt-3 d-flex" style="margin-left:5vh">
-                                            <input type="submit" class="btn btn-primary bg-gradient save-button" name="save_and_new" value="Save & New">
-                                            <input type="submit" class="btn btn-primary bg-gradient save-button" name="save" value="Save">
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                                                          
                         </div>
@@ -542,7 +572,24 @@
         })
     })
 
+    $(document).ready(function(){
+            $('#gstnxt').on('click',function(){
+                $('#credithead').click()
+            })
 
+            $('#creditnxt').on('click',function(){
+                $('#fieldhead').click()
+            })
+        })
+
+        $(document).ready(function(){
+            $('#fieldprev').on('click',function(){
+                $('#credithead').click()
+            })
+            $('#creditprev').on('click',function(){
+                $('#gsthead').click()
+            })
+        })
 
         function toggleSection(sectionId) {
             // Get all the fieldsets

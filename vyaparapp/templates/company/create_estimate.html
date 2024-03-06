@@ -2,9 +2,7 @@
 {% extends 'company/src/html/base.html' %}
 {% block content %}
 {% load static %}
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" /> -->
-<style>
+    <style>
     ::-webkit-scrollbar{
         display: none
     }
@@ -343,7 +341,7 @@
 
 
 <!-- new unit modal -->
-<div class="modal fade" id="newUnitModal" tabindex="-1" aria-labelledby="newUnitModalLabel" aria-hidden="true">
+{% comment %} <div class="modal fade" id="newUnitModal" tabindex="-1" aria-labelledby="newUnitModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -371,7 +369,61 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> {% endcomment %}
+
+
+
+
+  <div class="modal fade" id="newUnitModal" tabindex="-1" aria-labelledby="newUnitModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-l">
+    <div class="modal-content">
+
+        <div class="modal-body">
+            <form autocomplete="off" id="unit_form" > 
+                {% csrf_token %}
+                <div class="position-relative">
+                    <div class="position-absolute end-0">
+                      <div class="d-flex pt-3 pe-3">
+                        {% comment %} <span class="fa fa-cog fs-5 tb p-1 pe-3"></span> {% endcomment %}
+                        <a href="#" data-bs-dismiss="modal"><span class="fa fa-times fs-5 tb p-1"></span></a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg-light p-4 rounded">
+                      <div>
+                        <h5><strong class="fw-bolder">ADD UNIT</strong></h5> <br/>
+                        <div class="mb-3 d-flex">
+                            {% comment %} <label for="recipient-name" class="col-form-label">UNIT</label> {% endcomment %}
+                            <input type="text" class="form-control border-dark text-uppercase" id="item_unit_name_id" placeholder="ENTER UNIT NAME HERE.." name="item_unit_name" required>
+                            </div>
+                            <div class="m-0 text-center">
+                            <label for="message-text" class="col-form-label  text-secondary fw-lighter">Example : PCS/BOX/LITER</label>
+                            <!-- <textarea class="form-control" id="message-text"></textarea> -->
+                            </div>
+                      </div>
+                   
+                                  <div class="text-start mt-5">
+                                    <button id="modal_cls_btn" type="button" class="btn btn-secondary ps-5 pe-5" data-bs-toggle="modal" data-bs-target="#newItem">Close</button>
+                                    <button id="submit_unit_creation" class="btn btn-primary bg-gradient" type="button" data-bs-dismiss="modal">SAVE</button>
+                                  </div>
+                              </div>
+                              <div  class="col-sm-12 col-md-1">
+
+                              </div>
+                              
+                            </div>
+                          </div>
+                           
+                      </div>
+                    </div>
+                  </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+
   <!-- modal end -->
   
 
@@ -379,17 +431,14 @@
 <div class="modal fade" id="newItem">
 <div class="modal-dialog modal-xl">
     <div class="modal-content">
-        <!-- <div class="modal-header">
-            <h3 class="m-3">ADD ITEM</h3>
-            <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
-        </div> -->
+
         <div class="modal-body">
             <form autocomplete="off" id="newItemForm" class="new_item_form"> 
                 {% csrf_token %}
                 <div class="position-relative">
                     <div class="position-absolute end-0">
                       <div class="d-flex pt-3 pe-3">
-                        <span class="fa fa-cog fs-5 tb p-1 pe-3"></span>
+                        {% comment %} <span class="fa fa-cog fs-5 tb p-1 pe-3"></span> {% endcomment %}
                         <a href="#" data-bs-dismiss="modal"><span class="fa fa-times fs-5 tb p-1"></span></a>
                       </div>
                     </div>
@@ -409,8 +458,10 @@
                       
                       <div class="d-flex">
                         <input style="color: black;" class="form-control border-dark fw-bolder" type="text" placeholder="ITEM NAME" autocomplete="off" name="item_name" id="item_name" required>
-                        <input style="color: black;" class="form-control border-dark ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" id="item_hsn" required>
-                        <select style="color: black;" class="form-control ms-2 border-dark bg-light me-2" id="item_unit_value" name="item_unit" required>
+                        <input style="color: black;" class="form-control border-dark ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" id="item_hsn" required oninput="validateInput()">
+                        <span id="hsn-validation" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"></span>
+
+                        <select class="form-control ms-2 border-dark bg-light me-2 fw-bolder text-uppercase" id="item_unit_value" name="item_unit" required>
                           <option value="">Select a unit</option>
                           <option value="NOS">NOS</option>
                           <option value="BOX">BOX</option>
@@ -532,7 +583,7 @@
                                   <div class="d-flex">
                                     <div class="w-50 me-3">
                                       <label class="tb fw-bold" for="date_">DATE</label><br>
-                                      <input style="color: black;background-color: white" id="date_" class="form-control fw-normal border-secondary  fs-3" type="date" placeholder=""required name="item_date">
+                                      <input style="color: black;background-color: white" id="date_" class="form-control fw-normal border-secondary  fs-3" type="date" placeholder="" name="item_date">
                                     </div>
                                     <div class="w-50">
                                       <label class="tb fw-bold" for="at_price">MINIMUM STOCK TO MAINTAIN</label><br>
@@ -791,12 +842,6 @@
             },
             type : 'POST',
             success: function(data) {
-                // $("#party_address").addClass('d-block');
-                // $("#party_contact").addClass('d-block');
-                // $("#party_balance").addClass('d-block');
-                // $("#party_address").removeClass('d-none');
-                // $("#party_contact").removeClass('d-none');
-                // $("#party_balance").removeClass('d-none');
 
                 var json_data = JSON.parse(data);
                 for (key in json_data) {
@@ -983,6 +1028,36 @@
         
         calc();
     });
+
+    function validateInput() {
+        // Get the value entered by the user
+        var inputValue = document.getElementById("item_hsn").value;
+        console.log("Input value:", inputValue);
+        const validationLabel = document.getElementById("gstno-validation");
+        const saveAndNextButton = document.getElementById("save_and_next");
+        const saveButton = document.getElementById("save");
+
+        if (inputValue.length >= 6) {
+          console.log("Input value is valid.");
+            // Display a checkmark
+            validationLabel.innerHTML = "&#10004;"; // Checkmark symbol
+            validationLabel.style.color = "green";
+            saveAndNextButton.disabled = false;
+            saveButton.disabled = false;
+            saveAndNextButton.removeAttribute("title");
+            saveButton.removeAttribute("title");
+
+        } else {
+            // Display a cross mark
+            console.log("Input value is not valid.");
+            validationLabel.innerHTML = "&#10060;"; // Cross mark symbol
+            validationLabel.style.color = "red";
+            saveAndNextButton.disabled = true;
+            saveButton.disabled = true;
+            saveAndNextButton.title = "Item HSN must have at least 6 digits.";
+            saveButton.title = "Item HSN must have at least 6 digits.";
+        }
+    }
 
 
     $(document).on('click','.clone_row',function(){
@@ -1216,8 +1291,9 @@
         }
     });
 
-    $(document).on("submit","#unit_form",function(e){
+    $(document).on("click","#submit_unit_creation",function(e){
         e.preventDefault();
+        console.log($("#item_unit_name_id").val());
         $.ajax({
             
             type : 'POST',
@@ -1230,7 +1306,9 @@
                 
             },
             
-            success: function() {
+            success: function(response) {
+                console.log(response);
+                document.getElementById("unit_form").reset();
                 
             },
             
@@ -1247,7 +1325,7 @@
     $(document).on("click", "#saveItem", function(){
         $.ajax({
             type : 'POST',
-            url:"{% url 'addNewItem' %}",
+            url:"{% url 'addEstItem' %}",
             data:{
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 item_name : $('#item_name').val(),
@@ -1370,17 +1448,7 @@
       $('#prc_').click()
     })
   })
-  // $(document).ready(function(){
-  //   $('#prc_').on('click',function(){
-  //     alert('asdsad')
-  //   })
-  // })
-  // $(document).ready(function(){
-  //   $('#prc_').on('click',function(){
-  //     alert('asdsad')
-  //   })
-  // })
-  // page loading end
+
   $('#opn_stock_').on('keyup click',function(){
     if($(this).val()>'0')
     {

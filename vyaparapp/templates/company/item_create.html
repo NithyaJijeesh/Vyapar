@@ -98,7 +98,7 @@
                           <div style="position: relative;">
                             <input style="color: black;" class="form-control border-secondary ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" id="item_hsn" required oninput="validateInput()">
                             <span id="validd" hidden></span>
-                            <span id="gstno-validation" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"></span>
+                            <span id="hsn-validation" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"></span>
                           </div>
                         </div>
                         <div class="col-md-4 d-flex">
@@ -295,7 +295,7 @@
         // Get the value entered by the user
         var inputValue = document.getElementById("item_hsn").value;
         console.log("Input value:", inputValue);
-        const validationLabel = document.getElementById("gstno-validation");
+        const validationLabel = document.getElementById("hsn-validation");
         const saveAndNextButton = document.getElementById("save_and_next");
         const saveButton = document.getElementById("save");
 
@@ -307,7 +307,7 @@
             saveAndNextButton.disabled = false;
             saveButton.disabled = false;
             saveAndNextButton.removeAttribute("title");
-        saveButton.removeAttribute("title");
+            saveButton.removeAttribute("title");
 
         } else {
             // Display a cross mark

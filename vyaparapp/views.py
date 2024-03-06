@@ -665,7 +665,7 @@ def item_unit_create(request):
     item_unit_name = request.POST.get('item_unit_name')
     unit_data = UnitModel(user=cmp.user,company=cmp,unit_name=item_unit_name)
     unit_data.save()
-  return JsonResponse({'message':'asdasd'})
+  return JsonResponse({'message':'success'})
 
   
 # @login_required(login_url='login')
@@ -1064,7 +1064,7 @@ def save_parties(request):
     if request.method == 'POST':
         staff_id = request.session['staff_id']
         staff =  staff_details.objects.get(id=staff_id)
-        
+        allmodules= modules_list.objects.get(company=staff.company,status='New')
             #updated by Nithya
 
         party_name = request.POST['partyname'].capitalize()
@@ -1084,10 +1084,10 @@ def save_parties(request):
         additionalfield2 = request.POST.get('additional2')
         additionalfield3 = request.POST.get('additional3')
 
-        context  = {'staff' : staff, 'tod' : date.today()}
+        context  = {'staff' : staff, 'tod' : date.today(),'allmodules' : allmodules}
        
-        if ( not party_name ):
-          return render(request, 'add_parties.html',context)
+        # if ( not party_name ):
+        #   return render(request, 'company/add_parties.html',context)
 
         part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
                        creditlimit=creditlimit,current_date=current_date, current_balance = balance, End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
@@ -2993,7 +2993,70 @@ def delivery_challan(request):
       'staff':staff, 'company':com,'allmodules':allmodules, 'challan':challan,
     }
     return render(request, 'company/delivery_challan.html',context)
-    
+  
+def addEstItem(request):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    staff =  staff_details.objects.get(id=staff_id)
+    com =  company.objects.get(id = staff.company.id)
+
+    if request.method=='POST':
+      company_user_data = com
+      item_name = request.POST.get('item_name')
+      item_hsn = request.POST.get('item_hsn')
+      item_unit = request.POST.get('item_unit')
+      item_taxable = request.POST.get('item_taxable')
+      item_gst = request.POST.get('item_gst')
+      item_igst = request.POST.get('item_igst')
+      item_sale_price = 0 if request.POST.get('item_sale_price') is '' or None else request.POST.get('item_sale_price')
+      item_purchase_price = 0 if request.POST.get('item_purchase_price') is '' or None else request.POST.get('item_purchase_price')
+      item_opening_stock = request.POST.get('item_opening_stock')
+      item_current_stock = item_opening_stock
+      if item_opening_stock == '' or None :
+        item_opening_stock = 0
+        item_current_stock = 0
+      item_at_price = request.POST.get('item_at_price')
+      if item_at_price == '' or None:
+        item_at_price =0
+      item_date = date.today() if request.POST.get('item_date') == "" or None  else request.POST.get('item_date')
+
+      item_min_stock_maintain = request.POST.get('item_min_stock_maintain')
+      if item_min_stock_maintain == ''  or None:
+        item_min_stock_maintain = 0
+
+      item_data = ItemModel(company=company_user_data,
+        item_name=item_name,
+        item_hsn=item_hsn,
+        item_unit=item_unit,
+        item_taxable=item_taxable,
+        item_gst=item_gst,
+        item_igst=item_igst,
+        item_sale_price=item_sale_price,
+        item_purchase_price=item_purchase_price,
+        item_opening_stock=item_opening_stock,
+        item_current_stock=item_current_stock,
+        item_at_price=item_at_price,
+        item_date=item_date,
+        item_min_stock_maintain=item_min_stock_maintain
+      )
+      if ItemModel.objects.filter(item_name=item_name, item_hsn=item_hsn).exists():
+        print('Item with the same item name and HSN  number already exists.')
+        messages.error(request, 'Item with the same item name and HSN  number already exists.')
+      elif ItemModel.objects.filter(item_name=item_name).exists():
+        print('An item can have one HSN Number.')
+        messages.error(request, 'An item can have one HSN Number.')
+      elif ItemModel.objects.filter(item_hsn=item_hsn).exists():
+        print('Item with the same HSN  number already exists.')
+        messages.error(request, 'Item with the same HSN  number already exists.')
+      else:
+        print('yes')
+        item_data.save()
+        Item_History.objects.create(Item = item_data,company=com,staff=staff,action='Created').save()
+
+      return JsonResponse({'status':True})
+
 
 def create_estimate(request):
   if 'staff_id' in request.session:
@@ -4710,8 +4773,8 @@ def addNewItem(request):
       item_taxable = request.POST.get('item_taxable')
       item_gst = request.POST.get('item_gst')
       item_igst = request.POST.get('item_igst')
-      item_sale_price = request.POST.get('item_sale_price')
-      item_purchase_price = request.POST.get('item_purchase_price')
+      item_sale_price = 0 if request.POST.get('item_sale_price') is '' or None else request.POST.get('item_sale_price')
+      item_purchase_price = 0 if request.POST.get('item_purchase_price') is '' or None else request.POST.get('item_purchase_price')
       item_opening_stock = request.POST.get('item_opening_stock')
       item_current_stock = item_opening_stock
       if item_opening_stock == '' or None :
