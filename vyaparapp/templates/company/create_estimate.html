@@ -135,7 +135,7 @@
                 <div class="col text-center pb-2" style="border-bottom: 3px solid rgba(0, 0, 0, 0.548);"><a class="fw-bolder fs-4 text-dark" href="#">NEW ESTIMATE</a></div>
             </div>
         </div>
-
+             
         <div class="row pt-0 m-0 mt-3">
             <div class="card p-0 bg-light bs">
                 <form action="{% url 'createNewEstimate' %}" method="post" class="form">
@@ -438,7 +438,6 @@
                 <div class="position-relative">
                     <div class="position-absolute end-0">
                       <div class="d-flex pt-3 pe-3">
-                        {% comment %} <span class="fa fa-cog fs-5 tb p-1 pe-3"></span> {% endcomment %}
                         <a href="#" data-bs-dismiss="modal"><span class="fa fa-times fs-5 tb p-1"></span></a>
                       </div>
                     </div>
@@ -453,6 +452,9 @@
                           <label id="lbl2" class="form-check-label fw-bolder" for="flexSwitchCheckChecked">SERVICES</label>
                         </div>
                       </div>
+                      {% for message in messages %}
+                        <div class="alert alert-danger text-center" role="alert">{{ message }}</div>
+                      {% endfor %}
                     <br>
                     <div id="main_form_div">
                       
@@ -460,7 +462,11 @@
                         <input style="color: black;" class="form-control border-dark fw-bolder" type="text" placeholder="ITEM NAME" autocomplete="off" name="item_name" id="item_name" required>
                         <input style="color: black;" class="form-control border-dark ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" id="item_hsn" required oninput="validateInput()">
                         <span id="hsn-validation" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"></span>
-
+                            {% comment %} <div style="position: relative;">
+                                                        <input style="color: black;" class="form-control border-secondary ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" id="item_hsn" required oninput="validateInput()">
+                                                        <span id="validd" hidden></span>
+                                                        <span id="hsn-validation" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"></span>
+                                                    </div> {% endcomment %}
                         <select class="form-control ms-2 border-dark bg-light me-2 fw-bolder text-uppercase" id="item_unit_value" name="item_unit" required>
                           <option value="">Select a unit</option>
                           <option value="NOS">NOS</option>
@@ -1034,28 +1040,18 @@
         var inputValue = document.getElementById("item_hsn").value;
         console.log("Input value:", inputValue);
         const validationLabel = document.getElementById("gstno-validation");
-        const saveAndNextButton = document.getElementById("save_and_next");
-        const saveButton = document.getElementById("save");
 
         if (inputValue.length >= 6) {
           console.log("Input value is valid.");
             // Display a checkmark
             validationLabel.innerHTML = "&#10004;"; // Checkmark symbol
             validationLabel.style.color = "green";
-            saveAndNextButton.disabled = false;
-            saveButton.disabled = false;
-            saveAndNextButton.removeAttribute("title");
-            saveButton.removeAttribute("title");
 
         } else {
             // Display a cross mark
             console.log("Input value is not valid.");
             validationLabel.innerHTML = "&#10060;"; // Cross mark symbol
             validationLabel.style.color = "red";
-            saveAndNextButton.disabled = true;
-            saveButton.disabled = true;
-            saveAndNextButton.title = "Item HSN must have at least 6 digits.";
-            saveButton.title = "Item HSN must have at least 6 digits.";
         }
     }
 
@@ -1323,32 +1319,52 @@
     });
 
     $(document).on("click", "#saveItem", function(){
-        $.ajax({
-            type : 'POST',
-            url:"{% url 'addEstItem' %}",
-            data:{
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                item_name : $('#item_name').val(),
-                item_hsn : $('#item_hsn').val(),
-                item_unit : $('#item_unit_value').val(),
-                item_taxable : $('#taxable_result').val(),
-                item_gst : $('#item_gst').val(),
-                item_igst : $('#item_igst').val(),
-                item_sale_price : $('#sal_price').val(),
-                item_purchase_price : $('#pur_price').val(),
-                item_opening_stock : $("#opn_stock_").val(),
-                item_at_price : $('#at_price').val(),
-                item_date : $('#date_').val(),
-                item_min_stock_maintain : $('#item_min_stock_maintain').val(),
 
-            },
-            
-            success: function(response) {
-                console.log("success")
-                document.getElementById("newItemForm").reset();
-                reloadItems();
-            },
-        });        
+        $('.error-message').remove();
+
+        var itemName = $('#item_name').val().trim();
+        var itemHsn = $('#item_hsn').val().trim();
+        var itemUnit = $('#item_unit_value').val().trim();
+        var taxable = $('input[name="item_tax_result"]:checked').val();
+        var salesPrice = $('#sal_price').val().trim();
+        var purchasePrice = $('#pur_price').val().trim();
+        var taxresult = 'taxable_result'
+        if (itemName && itemHsn && itemUnit && taxable && salesPrice && purchasePrice) {
+            $.ajax({
+                type : 'POST',
+                url:"{% url 'addEstItem' %}",
+                data:{
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    item_name : $('#item_name').val(),
+                    item_hsn : $('#item_hsn').val(),
+                    item_unit : $('#item_unit_value').val(),
+                    item_taxable : $('#taxable_result').val(),
+                    item_gst : $('#item_gst').val(),
+                    item_igst : $('#item_igst').val(),
+                    item_sale_price : $('#sal_price').val(),
+                    item_purchase_price : $('#pur_price').val(),
+                    item_opening_stock : $("#opn_stock_").val(),
+                    item_at_price : $('#at_price').val(),
+                    item_date : $('#date_').val(),
+                    item_min_stock_maintain : $('#item_min_stock_maintain').val(),
+
+                },
+                
+                success: function(response) {
+                    console.log("success")
+                    document.getElementById("newItemForm").reset();
+                    reloadItems();
+                },
+            });    
+        }
+        else{
+            if (!itemName) $('#item_name').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item name.</div></div>');
+            if (!itemHsn) $('#item_hsn').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item HSN.</div></div>');
+            if (!itemUnit) $('#item_unit_value').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select item unit.</div></div>');
+            if (!taxable) $('#item_tax_1').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select taxable or non-taxable.</div></div>');
+            if (!salesPrice) $('#sal_price').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter sales price.</div></div>');
+            if (!purchasePrice) $('#pur_price').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter purchase price.</div></div>');
+        }    
     });
 
     function reloadItems() {
