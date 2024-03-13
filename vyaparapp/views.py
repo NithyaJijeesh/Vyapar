@@ -3044,18 +3044,22 @@ def addEstItem(request):
       if ItemModel.objects.filter(item_name=item_name, item_hsn=item_hsn).exists():
         print('Item with the same item name and HSN  number already exists.')
         messages.error(request, 'Item with the same item name and HSN  number already exists.')
+        val = 0
       elif ItemModel.objects.filter(item_name=item_name).exists():
         print('An item can have one HSN Number.')
+        val = 0
         messages.error(request, 'An item can have one HSN Number.')
       elif ItemModel.objects.filter(item_hsn=item_hsn).exists():
         print('Item with the same HSN  number already exists.')
+        val = 0
         messages.error(request, 'Item with the same HSN  number already exists.')
       else:
         print('yes')
         item_data.save()
+        val = 1
         Item_History.objects.create(Item = item_data,company=com,staff=staff,action='Created').save()
 
-      return JsonResponse({'status':True})
+      return JsonResponse({'status':True , 'value' : val})
 
 
 def create_estimate(request):
@@ -3073,8 +3077,6 @@ def create_estimate(request):
       items = ItemModel.objects.filter(company = com)
       item_units = UnitModel.objects.filter(company=com)
 
-      # Fetching last bill and assigning upcoming bill no as current + 1
-      # Also check for if any bill is deleted and bill no is continuos w r t the deleted bill
       latest_bill = Estimate.objects.filter(company = com).order_by('-id').first()
 
       if latest_bill:

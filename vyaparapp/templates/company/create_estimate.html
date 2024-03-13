@@ -453,7 +453,7 @@
                         </div>
                       </div>
                       {% for message in messages %}
-                        <div class="alert alert-danger text-center" role="alert">{{ message }}</div>
+                        <div class="alert alert-danger text-center bg-none" role="alert">{{ message }}</div>
                       {% endfor %}
                     <br>
                     <div id="main_form_div">
@@ -495,11 +495,7 @@
                                     style="color: gray;" >PRICING</a></div>
                                 <div id="stk_" class="col text-center pb-2" ><a class="fw-bolder fs-4"
                                     style="color: gray;" >STOCKS</a></div>
-                                <!-- <div id="" class="col text-center pb-2"><a class="fw-bolder fs-4"
-                                    style="color: gray;" >FIELD3</a></div>
-                                <div id="" class="col text-center pb-2"><a class="fw-bolder fs-4"
-                                    style="color: gray;" >FIELD4</a></div> -->
-                              </div>
+                                </div>
                             </div>
                           </div>
 
@@ -514,7 +510,7 @@
                                     <label style="user-select: none;" class="fs-4 tb" for="item_tax_1">Taxable</label>
                                     <input id="item_tax_1" class="me-3" type="radio" name="item_tax_result" required>
                                     <label style="user-select: none;" class="fs-4 tb" for="item_tax_2">Non Taxable</label>
-                                    <input id="item_tax_2" type="radio" name="item_tax_result" required>
+                                    <input id="item_tax_2" type="radio" name="item_tax_result" required checked>
                                     <input id="taxable_result" type="text" name="item_taxable" hidden>
                                   </div>
                                   <br>
@@ -598,7 +594,7 @@
                                   </div>
                                   <div class="text-start mt-5">
                                     <button id="prev_btn" class="btn btn-primary bg-gradient  me-3" type="button">PREVIOUS</button>
-                                    <button id="saveItem" class="btn btn-primary bg-gradient" type="button" data-bs-dismiss="modal" name="save" value="save">SAVE</button>
+                                    <button id="saveItem" class="btn btn-primary bg-gradient" type="button" name="save" value="save">SAVE</button>
                                   </div>
                               </div>
                               <div  class="col-sm-12 col-md-1">
@@ -1351,16 +1347,26 @@
                 },
                 
                 success: function(response) {
-                    console.log("success")
-                    document.getElementById("newItemForm").reset();
-                    reloadItems();
+                    console.log(response.value);
+                    if(response.value == 1){
+                        console.log("success")
+                        document.getElementById("newItemForm").reset();
+                        $('#newItem').modal('hide');
+                        reloadItems();
+                    }
+                    else{
+                        console.log("failed")
+                        $('#newItemForm')[0].reset(); // Reset form
+                        $('#newItem').modal('show');
+                        reloadItems();
+                    }
                 },
             });    
         }
         else{
-            if (!itemName) $('#item_name').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item name.</div></div>');
+            if (!itemName) $('#item_name').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter Item Name.</div></div>');
             if (!itemHsn) $('#item_hsn').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item HSN.</div></div>');
-            if (!itemUnit) $('#item_unit_value').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select item unit.</div></div>');
+            if (!itemUnit) $('#item_unit_value').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select item Unit.</div></div>');
             if (!taxable) $('#item_tax_1').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select taxable or non-taxable.</div></div>');
             if (!salesPrice) $('#sal_price').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter sales price.</div></div>');
             if (!purchasePrice) $('#pur_price').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter purchase price.</div></div>');
