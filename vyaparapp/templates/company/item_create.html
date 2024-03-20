@@ -41,6 +41,10 @@
   select option:hover{
     background-color: black;
   }
+
+  #item_unit_value, #modal_closing {
+    height: 38px; /* Adjust the height as needed */
+  }
 </style>
 
 <div class="body-wrapper">
@@ -104,19 +108,18 @@
                         <div class="col-md-4 d-flex">
                             
                           <select class="form-control ms-2 border-dark bg-light me-2 fw-bolder text-uppercase" id="item_unit_value" name="item_unit" required>
-                          <option value="">Select a unit</option>
-                          <option value="NOS">NOS</option>
-                          <option value="BOX">BOX</option>
-                          <option value="PACKET">PACKET</option>
-                          {% if item_units %}
-                            {% for i in item_units %}
-                            <option value="{{ i.unit_name|upper }}">{{ i.unit_name|upper }}</option>
-                            {% endfor %}
-                          {% endif %}
-                          <option id="load_new_unit" hidden value=""></option>
-                        </select>
+                            <option value="">Select a unit</option>
+                            <option value="NOS">NOS</option>
+                            <option value="BOX">BOX</option>
+                            <option value="PACKET">PACKET</option>
+                            {% if item_units %}
+                              {% for i in item_units %}
+                              <option value="{{ i.unit_name|upper }}">{{ i.unit_name|upper }}</option>
+                              {% endfor %}
+                            {% endif %}
+                            <option id="load_new_unit" hidden value=""></option>
+                          </select>
                           <button id="modal_closing" type="button" class="btn bg-warning" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo"><span class="fa fa-plus"></span></button>
-
                         </div>
                       </div>
                       <div>
@@ -129,10 +132,6 @@
                                     style="color: gray;" >PRICING</a></div>
                                 <div id="stk_" class="col text-center pb-2" ><a class="fw-bolder fs-4"
                                     style="color: gray;" >STOCKS</a></div>
-                                <!-- <div id="" class="col text-center pb-2"><a class="fw-bolder fs-4"
-                                    style="color: gray;" >FIELD3</a></div>
-                                <div id="" class="col text-center pb-2"><a class="fw-bolder fs-4"
-                                    style="color: gray;" >FIELD4</a></div> -->
                               </div>
                             </div>
                           </div>
@@ -303,10 +302,9 @@
         var salesPrice = $('#sal_price').val();
         var purchasePrice = $('#pur_price').val();
 
-            if (!itemName) $('#item_name').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item name.</div></div>');
-            if (!itemHsn) $('#item_hsn').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item HSN.</div></div>');
-            if (!itemUnit) $('#item_unit_value').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select item unit.</div></div>');
-            if (!taxable) $('#item_tax_1').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select taxable or non-taxable.</div></div>');
+            if (!itemName) $('#item_name').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item name.</div></div>');
+            if (!itemHsn) $('#item_hsn').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item HSN.</div></div>');
+            // if (!itemUnit) $('#new').after('<div class="error-container"><div class="error-message" style="color:red;">Please select item unit.</div></div>');
             if (!salesPrice) $('#sal_price').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter sales price.</div></div>');
             if (!purchasePrice) $('#pur_price').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter purchase price.</div></div>');
 
@@ -325,10 +323,9 @@
         var salesPrice = $('#sal_price').val();
         var purchasePrice = $('#pur_price').val();
 
-            if (!itemName) $('#item_name').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item name.</div></div>');
-            if (!itemHsn) $('#item_hsn').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item HSN.</div></div>');
-            if (!itemUnit) $('#item_unit_value').parent().after('<div class="error-message" style="color:red;">Please select item unit.</div>');
-            if (!taxable) $('#item_tax_1').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select taxable or non-taxable.</div></div>');
+            if (!itemName) $('#item_name').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item name.</div></div>');
+            if (!itemHsn) $('#item_hsn').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item HSN.</div></div>');
+            // if (!itemUnit) $('#new').after('<div class="error-message" style="color:red;">Please select item unit.</div>');
             if (!salesPrice) $('#sal_price').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter sales price.</div></div>');
             if (!purchasePrice) $('#pur_price').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter purchase price.</div></div>');
 

@@ -118,6 +118,10 @@
         color: #007bff;
     }
 
+    #item_unit_value, #modal_closing {
+        height: 38px; /* Adjust the height as needed */
+    }
+
 </style>
 <div class="body-wrapper">
     <div class="container-fluid">
@@ -341,20 +345,21 @@
 
 
 <!-- new unit modal -->
-{% comment %} <div class="modal fade" id="newUnitModal" tabindex="-1" aria-labelledby="newUnitModalLabel" aria-hidden="true">
+<!-- modal start -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="newUnitModalLabel">ADD UNIT</h1>
-          <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#newItem" aria-label="Close"></button>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">ADD UNIT</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body mb-1 pb-1">
           <!-- <form class="mb-0" action="{% url 'item_unit_create' %}" method="POST"></form> -->
-          <form class="mb-0" id="unit_form">
+          <form class="mb-0" action="" method="POST" id="unit_form">
             {% csrf_token %}
             <div class="mb-3">
               <label for="recipient-name" class="col-form-label">UNIT</label>
-              <input type="text" class="form-control border-dark text-uppercase" id="item_unit_name_id" placeholder="ENTER UNIT HERE.." name="item_unit_name" required>
+              <input type="text" class="form-control border-dark" id="item_unit_name_id" placeholder="ENTER UNIT HERE.." name="item_unit_name" required>
             </div>
             <div class="m-0 text-center">
               <label for="message-text" class="col-form-label  text-secondary fw-lighter">Example : PCS/BOX/LITER</label>
@@ -364,66 +369,12 @@
           </form>
         </div>
         <div class="modal-footer d-flex justify-content-center mt-1">
-          <button id="modal_cls_btn" type="button" class="btn btn-secondary ps-5 pe-5" data-bs-toggle="modal" data-bs-target="#newItem">Close</button>
+          <button id="modal_cls_btn" type="button" class="btn btn-secondary ps-5 pe-5" data-bs-dismiss="modal">Close</button>
           <button id="add_btn_" type="button" class="btn btn-primary ps-5 pe-5" onclick="submit_unit_creation_fn()">ADD</button>
         </div>
       </div>
     </div>
-  </div> {% endcomment %}
-
-
-
-
-  <div class="modal fade" id="newUnitModal" tabindex="-1" aria-labelledby="newUnitModalLabel" aria-hidden="true">
-<div class="modal-dialog modal-l">
-    <div class="modal-content">
-
-        <div class="modal-body">
-            <form autocomplete="off" id="unit_form" > 
-                {% csrf_token %}
-                <div class="position-relative">
-                    <div class="position-absolute end-0">
-                      <div class="d-flex pt-3 pe-3">
-                        {% comment %} <span class="fa fa-cog fs-5 tb p-1 pe-3"></span> {% endcomment %}
-                        <a href="#" data-bs-dismiss="modal"><span class="fa fa-times fs-5 tb p-1"></span></a>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="bg-light p-4 rounded">
-                      <div>
-                        <h5><strong class="fw-bolder">ADD UNIT</strong></h5> <br/>
-                        <div class="mb-3 d-flex">
-                            {% comment %} <label for="recipient-name" class="col-form-label">UNIT</label> {% endcomment %}
-                            <input type="text" class="form-control border-dark text-uppercase" id="item_unit_name_id" placeholder="ENTER UNIT NAME HERE.." name="item_unit_name" required>
-                            </div>
-                            <div class="m-0 text-center">
-                            <label for="message-text" class="col-form-label  text-secondary fw-lighter">Example : PCS/BOX/LITER</label>
-                            <!-- <textarea class="form-control" id="message-text"></textarea> -->
-                            </div>
-                      </div>
-                   
-                                  <div class="text-start mt-5">
-                                    <button id="modal_cls_btn" type="button" class="btn btn-secondary ps-5 pe-5" data-bs-toggle="modal" data-bs-target="#newItem">Close</button>
-                                    <button id="submit_unit_creation" class="btn btn-primary bg-gradient" type="button" data-bs-dismiss="modal">SAVE</button>
-                                  </div>
-                              </div>
-                              <div  class="col-sm-12 col-md-1">
-
-                              </div>
-                              
-                            </div>
-                          </div>
-                           
-                      </div>
-                    </div>
-                  </div>
-            </form>
-        </div>
-    </div>
-</div>
-</div>
-
-
+  </div>
   <!-- modal end -->
   
 
@@ -457,32 +408,35 @@
                       {% endfor %}
                     <br>
                     <div id="main_form_div">
-                      
-                      <div class="d-flex">
-                        <input style="color: black;" class="form-control border-dark fw-bolder" type="text" placeholder="ITEM NAME" autocomplete="off" name="item_name" id="item_name" required>
-                        <input style="color: black;" class="form-control border-dark ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" id="item_hsn" required oninput="validateInput()">
-                        <span id="hsn-validation" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"></span>
-                            {% comment %} <div style="position: relative;">
-                                                        <input style="color: black;" class="form-control border-secondary ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" id="item_hsn" required oninput="validateInput()">
-                                                        <span id="validd" hidden></span>
-                                                        <span id="hsn-validation" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"></span>
-                                                    </div> {% endcomment %}
-                        <select class="form-control ms-2 border-dark bg-light me-2 fw-bolder text-uppercase" id="item_unit_value" name="item_unit" required>
-                          <option value="">Select a unit</option>
-                          <option value="NOS">NOS</option>
-                          <option value="BOX">BOX</option>
-                          <option value="PACKET">PACKET</option>
-                          {% if item_units %}
-                            {% for i in item_units %}
-                            <option value="{{ i.unit_name|upper }}">{{ i.unit_name|upper }}</option>
-                            {% endfor %}
-                          {% endif %}
-                          <option id="load_new_unit" hidden value=""></option>
-                        </select>
-                        <!-- <button class="btn bg-warning"><span class="fa fa-plus"></span></button> -->
-                        
-                        <button id="modal_closing" type="button" class="btn bg-warning" data-bs-toggle="modal" data-bs-target="#newUnitModal" data-bs-whatever="@mdo"><span class="fa fa-plus"></span></button>
-                        
+                        <div class="row" style="margin-left: -1vh;">
+                            <div class="col-md-4">
+                              <input style="color: black;" class="form-control border-secondary fw-bolder" type="text" placeholder="ITEM NAME" autocomplete="off" name="item_name" id="item_name" required>
+    
+                            </div>
+                            <div class="col-md-4">
+                              <div style="position: relative;">
+                                <input style="color: black;" class="form-control border-secondary ms-2 fw-bolder" type="number" placeholder="ITEM HSN" name="item_hsn" id="item_hsn" oninput="validateInput()" required>
+                                <span id="validd" hidden></span>
+                                <span id="hsn-validation" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"></span>
+                              </div>
+                            </div>
+                            <div class="col-md-4 d-flex">
+                                
+                              <select class="form-control ms-2 border-dark bg-light me-2 fw-bolder text-uppercase" id="item_unit_value" name="item_unit" required>
+                                <option value="">Select a unit</option>
+                                <option value="NOS">NOS</option>
+                                <option value="BOX">BOX</option>
+                                <option value="PACKET">PACKET</option>
+                                {% if item_units %}
+                                  {% for i in item_units %}
+                                  <option value="{{ i.unit_name|upper }}">{{ i.unit_name|upper }}</option>
+                                  {% endfor %}
+                                {% endif %}
+                                <option id="load_new_unit" hidden value=""></option>
+                              </select>
+                              <button id="modal_closing" type="button" class="btn bg-warning" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo"><span class="fa fa-plus"></span></button>
+                            </div>
+                          </div>
                       </div>
                     
                       <div>
@@ -1364,10 +1318,10 @@
             });    
         }
         else{
-            if (!itemName) $('#item_name').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter Item Name.</div></div>');
-            if (!itemHsn) $('#item_hsn').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item HSN.</div></div>');
-            if (!itemUnit) $('#item_unit_value').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select item Unit.</div></div>');
-            if (!taxable) $('#item_tax_1').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select taxable or non-taxable.</div></div>');
+            if (!itemName) $('#item_name').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter Item Name.</div></div>');
+            if (!itemHsn) $('#item_hsn').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter item HSN.</div></div>');
+            // if (!itemUnit) $('#item_unit_value').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select item Unit.</div></div>');
+            // if (!taxable) $('#item_tax_1').parent().after('<div class="error-container"><div class="error-message" style="color:red;">Please select taxable or non-taxable.</div></div>');
             if (!salesPrice) $('#sal_price').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter sales price.</div></div>');
             if (!purchasePrice) $('#pur_price').after('<div class="error-container"><div class="error-message" style="color:red;">Please enter purchase price.</div></div>');
         }    
@@ -1396,6 +1350,37 @@
             console.error(xhr.responseText);
             }
         });
+    }
+
+
+    function validateInput() {
+        // Get the value entered by the user
+        var inputValue = document.getElementById("item_hsn").value;
+        console.log("Input value:", inputValue);
+        const validationLabel = document.getElementById("hsn-validation");
+        //const saveAndNextButton = document.getElementById("save_and_next");
+        //const saveButton = document.getElementById("save");
+
+        if (inputValue.length >= 6) {
+          console.log("Input value is valid.");
+            // Display a checkmark
+            validationLabel.innerHTML = "&#10004;"; // Checkmark symbol
+            validationLabel.style.color = "green";
+            //saveAndNextButton.disabled = false;
+            //saveButton.disabled = false;
+            //saveAndNextButton.removeAttribute("title");
+            //saveButton.removeAttribute("title");
+
+        } else {
+            // Display a cross mark
+console.log("Input value is not valid.");
+            validationLabel.innerHTML = "&#10060;"; // Cross mark symbol
+            validationLabel.style.color = "red";
+            //saveAndNextButton.disabled = true;
+            //saveButton.disabled = true;
+            //saveAndNextButton.title = "Item HSN must have at least 6 digits.";
+            //saveButton.title = "Item HSN must have at least 6 digits.";
+        }
     }
 
   $(document).ready(function () {
