@@ -591,13 +591,11 @@
                                 </div>
                               </div>
                             
-                            <div class="card-body bg-light">
+                            <div class="bg-light p-4 rounded">
                                 <h5><strong class="fw-bolder">ADD PARTY</strong></h5>
                                 {% for message in messages %}
                                     <div class="alert alert-danger text-center" role="alert">{{ message }}</div>
                                 {% endfor %}
-                                <div class="bg-light bs p-4 rounded mb-5">
-                                    <div id="main_form_div">
                                         <div class="row" style="margin-left: -1vh;">
                                             <div class="col-md-4">
                                                 <!-- <label class="col-form-label" for="partyname" style="color: black;">Party Name</label> -->
@@ -651,7 +649,7 @@
 
                                                                 
                                                                 <label class="col-form-label mt-4" style="color: black;">GST TYPE</label>
-                                                                <select class="form-control border-secondary bg-light me-2 fw-bolder text-uppercase" id="modalgsttype" name="gsttype" style="color: black; background-color: white;">
+                                                                <select class="form-control border-secondary bg-light me-2 fw-bolder text-uppercase" id="gst" name="gsttype" style="color: black; background-color: white;">
                                                                     <option selected value="" hidden>Select</option>
                                                                     <option value="Registered Party">Registered Party</option>
                                                                     <option value="Unregistered or Consumer">Unregistered or Consumer</option>
@@ -659,7 +657,7 @@
                                                                 </select>
         
                                                                 <label class="col-form-label mt-4" for="company" style="color: black;">SUPPLY STATE</label>
-                                                                <select class="form-control border-secondary bg-light me-2 fw-bolder text-uppercase" name="splystate" id="splystate">
+                                                                <select class="form-control border-secondary bg-light me-2 fw-bolder text-uppercase" name="splystate" id="state">
                                                                     <option value="" selected hidden>Select</option>
                                                                     <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islands</option>
                                                                     <option value="Andhra Pradesh">Andhra Pradesh</option>
@@ -703,14 +701,14 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label class="col-form-label mt-4" style="color: black;">BILLING ADDRESS</label>
-                                                                <textarea class="form-control border-secondary" name="baddress" id="baddress" rows="6" type="text" style="color: black; background-color: white;" placeholder="Address Here"></textarea>
+                                                                <textarea class="form-control border-secondary" name="baddress" id="partyAddress" rows="6" type="text" style="color: black; background-color: white;" placeholder="Address Here"></textarea>
                                                             </div>
                                                         </div>
         
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <label class="col-form-label mt-4" for="partyemail" style="color: black;">EMAIL</label>
-                                                                <input type="email" class="form-control border-secondary" id="partyemail" name="partyemail" style="color: black; background-color: white;" placeholder="Enter Email" >
+                                                                <input type="email" class="form-control border-secondary" id="email" name="partyemail" style="color: black; background-color: white;" placeholder="Enter Email" >
                                                             </div>
                                                         </div>
 
@@ -731,7 +729,7 @@
                                                             <div class="col-md-6">
                                                                 <label class="col-form-label" style="color: black;" for="openbalance">OPENING BALANCE  &nbsp; &nbsp;  </label>   &nbsp;&nbsp;&nbsp;
                                                               
-                                                                <input type="number" class="form-control border-secondary" id="openbalance"  name="openbalance" style="color: black; background-color: white;" value="0">
+                                                                <input type="number" class="form-control border-secondary" id="balance"  name="openbalance" style="color: black; background-color: white;" value="0">
                                                                 <label class="col-form-label" style="color: black;">To Pay</label> &nbsp; &nbsp; 
                                                                 <input type="radio" class="radio-input border-secondary" id="toPayRadio" name="paymentType" value="To Pay"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                                                                 <label class="col-form-label" style="color: black;">To Receive</label> &nbsp; &nbsp;
@@ -743,7 +741,7 @@
                                                                     <input type="checkbox" id="toggle">
                                                                     <span class="slider round"></span>
                                                                 </label>
-                                                                <input type="number" class="form-control border-secondary" id="crd_lmt"   name="crd_lmt" style="color: black; background-color: white; display: none;">
+                                                                <input type="number" class="form-control border-secondary" id="credit_limit"   name="crd_lmt" style="color: black; background-color: white; display: none;">
                                                                 
                                                             </div>
                                                            
@@ -752,7 +750,7 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <label class="col-form-label mt-4" style="color: black;">DATE</label>
-                                                                <input type="date" class="form-control border-secondary" id="partydate" name="partydate" style="color: black; background-color: white;"  value="{{tod | date:'Y-m-d'}}">
+                                                                <input type="date" class="form-control border-secondary" id="" name="current-date" style="color: black; background-color: white;"  value="{{tod | date:'Y-m-d'}}">
                                                             </div>
                                                         </div>
 
@@ -773,28 +771,29 @@
                                                         <div class="row mt-4">
                                                             <div class="col-md-4">
                                                                 <label class="col-form-label" style="color: black;">ADDITIONAL FIELD 1</label>
-                                                                <input type="text" class="form-control border-secondary" id="additional1" name="additional1" style="color: black; background-color: white;">
+                                                                <input type="text" class="form-control border-secondary" id="additionalfield1" name="additional1" style="color: black; background-color: white;">
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <label class="col-form-label" style="color: black;">ADDITIONAL FIELD 2</label>
-                                                                <input type="text" class="form-control border-secondary" id="additional2" name="additional2" style="color: black; background-color: white;">
+                                                                <input type="text" class="form-control border-secondary" id="additionalfield2" name="additional2" style="color: black; background-color: white;">
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <label class="col-form-label" style="color: black;">ADDITIONAL FIELD 3</label>
-                                                                <input type="text" class="form-control border-secondary" id="additional3" name="additional3" style="color: black; background-color: white;">
+                                                                <input type="text" class="form-control border-secondary" id="additionalfield3" name="additional3" style="color: black; background-color: white;">
                                                             </div>
                                                         </div>
                                                         <div class="text-start mt-5">
                                                             <button id="fieldprev" class="btn btn-primary bg-gradient  me-3" type="button">PREVIOUS</button>
-                                                            <input type="submit" class="btn btn-primary bg-gradient save-button" name="save_and_new" value="SAVE & NEW">
-                                                            <input type="submit" class="btn btn-primary bg-gradient save-button" name="save" value="SAVE">
+                                                            <!-- <input type="submit" class="btn btn-primary bg-gradient save-button" name="save" value="SAVE"> -->
+                                                            <input type="button" id="saveParty" class="btn btn-primary bg-gradient me-3" data-bs-dismiss="modal" name="save" value="SAVE">
+
                                                         </div>
                                                     </div>
                                                 </div>
                                               
                                             
-                                    </div>
-                                        </div>
+                                    <!-- </div> -->
+                                        <!-- </div> -->
                                     </div>
                                     
                                 </div>
@@ -934,7 +933,7 @@
             
                     
                     <div class="col-md-5 mt-4">
-                        <input type="button" id="saveParty" class="btn btn-primary save-button" data-bs-dismiss="modal" name="save" value="Save">
+                        <input type="button"  class="btn btn-primary save-button" data-bs-dismiss="modal" name="save" value="Save">
                     </div> -->
                 
                 </form>
@@ -951,6 +950,165 @@
 
 
 <script>
+    // page loading start
+    $(document).ready(function(){
+        $('#item_tax_2').on('click',function(){
+        if($(this).prop('checked'))
+        {
+            $('#taxable_hide').attr('hidden',true)
+        }
+        })
+    })
+    $(document).ready(function(){
+        $('#prc_').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+        $('#stk_ a').removeClass('text-dark')
+        $('#prc_ a').addClass('text-dark')
+        $('#stk_').css({'border-bottom': 'none'})
+        $('#pricing_template').attr('hidden',false)
+
+
+        $('#prc_').on('click',function(){
+        $(this).css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+        $('#stk_ a').removeClass('text-dark')
+        $('#prc_ a').addClass('text-dark')
+        $('#stk_').css({'border-bottom': 'none'})
+        $('#pricing_template').attr('hidden',false)
+        $('#stock_template').attr('hidden',true)
+        })
+    })
+    $(document).ready(function(){
+        $('#stk_').on('click',function(){
+        $('#stk_').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+        $('#prc_ a').removeClass('text-dark')
+        $('#stk_ a').addClass('text-dark')
+        $('#prc_').css({'border-bottom': 'none'})
+        $('#pricing_template').attr('hidden',true)
+        $('#stock_template').attr('hidden',false)
+        })
+    })
+    $(document).ready(function(){
+        $('#next_btn').on('click',function(){
+        $('#stk_').click()
+        })
+    })
+    $(document).ready(function(){
+        $('#prev_btn').on('click',function(){
+        $('#prc_').click()
+        })
+    })
+
+    $('#opn_stock_').on('keyup click',function(){
+        if($(this).val()>'0')
+        {
+        $('#at_price_div').css({'visibility':'visible',
+                                'transition':'all 0.2s linear'})
+        }
+        else{
+        $('#at_price_div').css({'visibility':'hidden',
+                                'transition':'all 0.2s linear'})
+        $('#at_price').val('')
+        }
+    })
+    $(document).ready(function(){
+        $('#item_tax_1').on('click',function(){
+        $('#taxable_result').val('Taxable')
+        })
+    })
+    $(document).ready(function(){
+        $('#item_tax_2').on('click',function(){
+        $('#taxable_result').val('Non Taxable')
+        })
+    })
+    function submit_unit_creation_fn()
+    {
+        $('#submit_unit_creation').click()
+    }
+    //   ---------------------------------end of item modal tabs----------------------
+
+    // ------------------------------starts party tabs---------------------
+
+    $(document).ready(function(){
+        $('#gsthead').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+        $('#gsthead a').addClass('text-dark')
+        $('#gsttemp').attr('hidden',false)
+        $('#credithead').css({'border-bottom': 'none'})
+        $('#credithead a').removeClass('text-dark')
+        $('#fieldhead').css({'border-bottom': 'none'})
+        $('#fieldhead a').removeClass('text-dark')
+
+        $('#gsthead').on('click',function(){
+            $(this).css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+            $('#gsthead a').addClass('text-dark')
+            $('#gsttemp').attr('hidden',false)
+            $('#credithead').css({'border-bottom': 'none'})
+            $('#credithead a').removeClass('text-dark')
+            $('#credittemp').attr('hidden',true)
+            $('#fieldhead').css({'border-bottom': 'none'})
+            $('#fieldtemp a').removeClass('text-dark')
+            $('#fieldtemp').attr('hidden',true)
+        })
+
+        $('#credithead').on('click',function(){
+            $('#credithead').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+            $('#credithead a').addClass('text-dark')
+            $('#credittemp').attr('hidden',false)
+            $('#gsthead').css({'border-bottom': 'none'})
+            $('#gsthead a').removeClass('text-dark')
+            $('#gsttemp').attr('hidden',true)
+            $('#fieldhead').css({'border-bottom': 'none'})
+            $('#fieldhead a').removeClass('text-dark')
+            $('#fieldtemp').attr('hidden',true)
+        })
+
+        $('#fieldhead').on('click',function(){
+            $('#fieldhead').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
+            $('#fieldhead a').addClass('text-dark')
+            $('#fieldtemp').attr('hidden',false)
+            $('#gsthead').css({'border-bottom': 'none'})
+            $('#gsthead a').removeClass('text-dark')
+            $('#gsttemp').attr('hidden',true)
+            $('#credithead').css({'border-bottom': 'none'})
+            $('#credithead a').removeClass('text-dark')
+            $('#credittemp').attr('hidden',true)
+        })
+    })
+
+    $(document).ready(function(){
+        $('#gstnxt').on('click',function(){
+            $('#credithead').click()
+        })
+
+        $('#creditnxt').on('click',function(){
+            $('#fieldhead').click()
+        })
+    })
+
+    $(document).ready(function(){
+        $('#fieldprev').on('click',function(){
+            $('#credithead').click()
+        })
+        $('#creditprev').on('click',function(){
+            $('#gsthead').click()
+        })
+    })
+
+
+    $(document).ready(function () {
+        $("#toggle").change(function () {
+            if (this.checked) {
+                $("#credit_limit").show();
+            } else {
+                $("#credit_limit").hide();
+            }
+        });
+    })
+
+
+
+    // --------------------------------end of party moadl tabs-----------------------
+
+
+
     $(document).ready(function () {
         $('#party').selectize({
             sortField: 'value'
@@ -1629,79 +1787,7 @@ console.log("Input value is not valid.");
       }
     })
   })
-  // page loading start
-  $(document).ready(function(){
-    $('#item_tax_2').on('click',function(){
-      if($(this).prop('checked'))
-      {
-        $('#taxable_hide').attr('hidden',true)
-      }
-    })
-  })
-  $(document).ready(function(){
-    $('#prc_').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
-    $('#stk_ a').removeClass('text-dark')
-    $('#prc_ a').addClass('text-dark')
-    $('#stk_').css({'border-bottom': 'none'})
-    $('#pricing_template').attr('hidden',false)
-
-
-    $('#prc_').on('click',function(){
-      $(this).css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
-      $('#stk_ a').removeClass('text-dark')
-      $('#prc_ a').addClass('text-dark')
-      $('#stk_').css({'border-bottom': 'none'})
-      $('#pricing_template').attr('hidden',false)
-      $('#stock_template').attr('hidden',true)
-    })
-  })
-  $(document).ready(function(){
-    $('#stk_').on('click',function(){
-      $('#stk_').css({'border-bottom': '3px solid rgba(0, 0, 0, 0.548)'})
-      $('#prc_ a').removeClass('text-dark')
-      $('#stk_ a').addClass('text-dark')
-      $('#prc_').css({'border-bottom': 'none'})
-      $('#pricing_template').attr('hidden',true)
-      $('#stock_template').attr('hidden',false)
-    })
-  })
-  $(document).ready(function(){
-    $('#next_btn').on('click',function(){
-      $('#stk_').click()
-    })
-  })
-  $(document).ready(function(){
-    $('#prev_btn').on('click',function(){
-      $('#prc_').click()
-    })
-  })
-
-  $('#opn_stock_').on('keyup click',function(){
-    if($(this).val()>'0')
-    {
-      $('#at_price_div').css({'visibility':'visible',
-                              'transition':'all 0.2s linear'})
-    }
-    else{
-      $('#at_price_div').css({'visibility':'hidden',
-                              'transition':'all 0.2s linear'})
-      $('#at_price').val('')
-    }
-  })
-  $(document).ready(function(){
-    $('#item_tax_1').on('click',function(){
-      $('#taxable_result').val('Taxable')
-    })
-  })
-  $(document).ready(function(){
-    $('#item_tax_2').on('click',function(){
-      $('#taxable_result').val('Non Taxable')
-    })
-  })
-  function submit_unit_creation_fn()
-  {
-    $('#submit_unit_creation').click()
-  }
+  
   // set today start
   $(document).ready(function(){
         var currentDate = new Date();
