@@ -122,7 +122,338 @@
         height: 38px; /* Adjust the height as needed */
     }
 
+
+    .card-body{
+        box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.397);
+        border-radius: 1vh;
+    }
+
+    #tab_logic{
+        margin-left: 10px;
+        width: 98%;
+    }
+
+    #tab_logic thead th{
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        background-color: rgba(0, 195, 255, 0.205);
+    }
+    #tab_logic tbody td{
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+    }
+
+   
+
+    .addnewrow:hover{
+        background-color: violet;
+    }
+
+    .selectize-input {
+        height: 5vh;
+        border-color: #54B4D3;
+        border-radius: 5px;
+    }
+
+    .option:hover {
+        background-color: #3B71CA;
+        color: white;
+    }   
+
+
+
 </style>
+
+<div class="body-wrapper">
+    <br><br><br>
+    <div class="row p-0 m-0">
+        <div class="col-12  p-0 m-0">
+            <div class=" bg-light bg-light pb-0 mb-0 p-2" style="height:100%;width:100%">
+                <div class="d-flex justify-content-center pt-4">
+                    <a href="" id="b1" class="btn  text-white"
+                        style="margin-right: 10px; background-color: rgb(252, 3, 3,0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                        Add Sale <i class="fa fa-plus"></i>
+                    </a>
+                    <a href="{% url 'add_purchasebill' %}" id="b2" class="btn  text-white"
+                        style="margin-right: 10px;background-color: rgba(3, 161, 252, 0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                        Add Purchase <i class="fa fa-plus"></i>
+                    </a>
+                    <a href="" id="b3" class="btn text-primary"
+                        style="border-radius: 20px;border: 1px solid rgb(40, 12, 222);background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                        Add More <i class="fa fa-plus"></i>
+                    </a>
+                </div>
+                <p></p>
+  
+                <form action="{% url 'createNewEstimate' %}" method="post" enctype="multipart/form-data" class="form">
+                    {% csrf_token %}
+                    <div class="page-content">
+                        <div class="card radius-15">
+                            <div class="card-body bg-light">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h5><strong class="fw-bolder">ADD ESTIMATE</strong></h5>
+                                    </div>
+                                    <div class="col-md-7"></div>
+                                    <div class="col-md-1">
+                                        <a href="javascript:window.history.back();" style="text-align: right; font-size: large; color: black; margin-left: 8vh;">
+                                            <i class="fa fa-times mt-3" aria-hidden="true"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div id="customer_div" style="margin-left: .1px; margin-right: .51px;">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label class="col-form-label">PARTY</label>
+                                            <div class="d-flex">
+                                                <select name="party_name" id="party" class="form-control fw-bolder border-secondary" required>
+                                                    <option value="" selected hidden>Select Party</option>
+                                                    {% for p in parties %}
+                                                    <option value="{{p.id}}">{{p.party_name}}</option>
+                                                    {% endfor %}
+                                                </select> &nbsp;&nbsp;&nbsp;
+                                                <button type="button" class="btn bg-warning ms-1" data-bs-target="#newParty" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                            <div class="party_balance mt-0 d-none" id="party_balance">
+                                                <label for="p_bal">Balance: </label>
+                                                <span id="p_bal" class="fs-3 fw-bold">0</span>
+                                                <input type="text" name="p_state" id="p_state" value="" hidden>
+                                                <input type="text" name="c_state" id="c_state" value="{{company.state}}" hidden>
+                                            </div>
+                                            <div id="phonediv">
+                                                <label class="col-form-label" >CONTACT </label>
+                                                <input class="form-control border-secondary" name="contact"  id="p_contact" autocomplete="off" style="color: black;background-color: white;" readonly>
+                                            </div>
+
+                                            
+
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div id="daddressdiv" >
+                                                <label class="col-form-label">BILLING ADDRESS</label>
+                                                <textarea class="form-control border-secondary mb-3" name="address" id="bill_address" rows="6" type="text" style="color: black;background-color: white;" readonly></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4" >
+                                            <label for="reference_number" class="col-form-label">REF NO.</label>
+                                            <input class="form-control fw-bolder border-secondary text-dark" id="reference_number" type="text" autocomplete="off" name="ref_no" value="{{ref_no}}" style="color: black;background-color: white;" readonly>
+                                            <!-- <textarea class="form-control border-secondary mb-3" name="bname" id="bname"  rows="6" type="text" style="color: black;background-color: white;" readonly></textarea> -->
+
+                                            <label for="inv_date" class="col-form-label">INVOICE DATE</label>
+                                            <input class="form-control  fw-bolder text-dark border-secondary" id="inv_date" type="date" name="date" style="color: black;background-color: white;" value="{% now 'Y-m-d' %}">
+                                            <!-- <input type="text" class="form-control border-secondary" value="{{bill_no}}"  style="color: black;background-color: white;" readonly> <br> -->
+
+
+                                            <label class="col-form-label ">STATE OF SUPPLY</label>
+                                            <select type="text" class="form-control border-secondary" id="state_of_supply" name="state_supply"  style="color: black;background-color: white;">
+                                                <option value="" selected hidden>Select</option>
+                                                <option value="State">State</option>
+                                                <option value="Other State">Other State</option>
+                                            </select>
+                                            <!-- <label for="state_of_supply" class="col-form-label">STATE OF SUPPLY</label>
+                                            <select name="state_supply" id="state_of_supply" class=" border-secondary" required>
+                                                <option value="state" selected>State</option>
+                                                <option value="other">Other State</option>
+                                            </select> -->
+                                        </div>
+                                    </div>
+                                    <br>
+                                
+                                    <div class="row clearfix">
+                                        <div class="col-md-12 table-responsive-md mt-3">
+                                            <table class="table table-bordered table-hover  mt-3" id="tab_logic" >
+                                                <thead>
+                                                    <tr style="color: black;">
+                                                        <th class="text-center">#</th>
+                                                        <th class="text-center">PRODUCT</th>
+                                                        <th class="text-center">HSN</th>
+                                                        <th class="text-center">QTY</th>
+                                                        <th class="text-center">PRICE</th>
+                                                        <th class="text-center">TAX (%)</th>
+                                                        <th class="text-center">DISCOUNT</th>
+                                                        <th class="text-center">TOTAL</th>
+                                                        <th class="text-center">FIELD</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="items-table-body">
+                                                    <tr id='addr01'>
+                                                        <td class="nnum" style="text-align: center; color: black; width:2%">1</td>
+    
+                                                        <td style="width:21%">
+                                                            <div class="d-flex">
+                                                                <select name='product[]' id="product1" class="form-control border-secondary product"  onchange="changeprd(this.id,this.value)" style="color: black; background-color: white;">
+                                                                    <option value="" selected hidden>Select Product</option>
+                                                                    {% for i in item %}
+                                                                        {% if i.cid_id == cmp.cid %}
+                                                                            <option value="{{ i.id }}" >{{ i.item_name  }} </option>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </select> &nbsp;&nbsp;&nbsp;
+                                                            <button id="modal_closing" type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#newitem" data-bs-whatever="@mdo">
+                                                                <span class="fa fa-plus"></span>
+                                                            </button>
+                                                            </div>
+                                                        </td>
+    
+                                                        <td style="width:12%">
+                                                            <input type="text" name='hsn[]' id="hsn1" class="form-control border-secondary HSNCODE" style="color: black; background-color: white;" readonly />
+                                                        </td>
+    
+                                                        <td style="width:13%">
+                                                            <input type="number" name='qty[]' id="qty1"  class="form-control border-secondary qty mb-1" step=0 min=0 style="color: black; background-color: white;" value=0 />
+                                                        </td>
+                                                    
+                                                        <td style="width:12%">
+                                                            <input type="number" name='price[]' id="unit1" class="form-control border-secondary price" step="0.00" min="0" style="color: black; background-color: white;" value=0 readonly />
+                                                        </td>
+                                                        
+                                                        <td style="width:15%">
+                                                            <input type="text" id="intrataxval1" hidden>
+                                                            <input type="text" id="intertaxval1" hidden>
+                                                            <input type="text" name='tax[]' id="tax1" class="form-control border-secondary tax" style="color: black; background-color: white;" placeholder="GST"  readonly />
+                                                        </td>
+    
+                                                        <td style="width: 10%;">
+                                                            <input type="number" name='discount[]'  placeholder='Enter Discount' id="disc1" value=0 class="form-control border-secondary disc" step=0 min=0 style="  color: black; background-color: white;"  />
+                                                        </td>
+                                    
+                                                        <td style="width:13%">
+                                                            <input type="number" name='total[]' id="total1" class="form-control border-secondary total" value=0 readonly style="color: black; background-color: white;"  />
+                                                        </td>
+                                                        <td hidden><input type="number" name='taxamount1' id="taxamount1" class="form-control border-secondary taxamount" /></td>
+                                                        
+                                                        <td style="width:5%">
+                                                            <button type="button" id="1" class="btn font-weight-bold btn-outline-info clone_row fa fa-clone px-2 my-1 py-1" title="Clone Row" ></button>
+                                                            <br>
+                                                            <button type="button" id="1" class="btn btn-danger remove_row px-2 py-1 mx-1 fa fa-close" title="Remove Row"> </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tr>
+                                                    <td style="border: none;"><a class="btn btn-outline-info ml-1" role="button" id="add" ><span class="fa fa-plus"></span></a></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+    
+                                    <div class="clearfix" style="margin-top:10px">
+                                        <div class="row" style="margin-left: 2vh;" >
+                                            <div class="col-md-5 table-responsive-md mt-3 " id="tab_logic_total" style=" color: black; border: 1px solid rgba(128, 128, 128, 0.6); margin-left: -2vh; background-color: rgba(0, 195, 255, 0.205); ">
+                                                <div class="p-3">
+                                                    <div class="row container-fluid p-2 m-0">
+                                                        <div class="col-sm-4 mt-2"><label class="text-center">Sub Total</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                            <input type="number" step="any" name='subtotal' value=0.00 readonly style="color: black; background-color: white;" class="form-control border-secondary" id="sub_total">
+                                                        </div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+        
+                                                    <div class="row container-fluid p-2 m-0" id="igstdiv">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">IGST</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                            <input type="number" name='igst' step="any" id="igst" value=0.00 readonly style="color: black; background-color: white;" class="form-control border-secondary"/>
+                                                        </div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+                                                
+                                                    <div class="row container-fluid p-2 m-0" style="display: none;" id="cgstdiv">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">CGST</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                            <input type="number" name='cgst' step="any" id="cgst" value=0.00 readonly style="color: black; background-color: white;" class="form-control border-secondary"/>
+                                                        </div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+        
+                                                    <div class="row container-fluid p-2 m-0" style="display: none;" id="sgstdiv">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">SGST</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                        <input type="number" name='sgst' step="any" id="sgst" value=0.00 readonly style="color: black; background-color: white;" class="form-control border-secondary"/>
+                                                        </div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+        
+                                                    <div class="row container-fluid p-2 m-0">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">Tax Amount</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                        <input type="number" step="any" name='taxamount' id="tax_amount" value=0.00 readonly style="color: black; background-color: white;" class="form-control border-secondary"/>
+                                                        </div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+        
+                                                    <div class="row container-fluid p-2 m-0">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">Adjustment</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                        <input type="number" step="any" name='adj' id="adj" value=0.00 class="form-control border-secondary" style="color: black; background-color: white;"/>
+                                                        </div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+                                                    
+                                                    <div class="row container-fluid p-2 m-0">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">Grand Total</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                        <input type="number" name='grandtotal' id="grandtotal" value=0.00 readonly style="color: black; background-color: white;" class="form-control border-secondary"/>
+                                                        </div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row" style="margin-left: 2vh;" > 
+                                            <div class="col-md-5 table-responsive-md mt-3 " id="tab_logic_total" style="color: black; border: 1px solid rgba(128, 128, 128, 0.6); margin-left: -2vh; background-color: rgba(0, 195, 255, 0.205);">
+                                                <div class="p-3">
+                                                    <div class="row container-fluid p-2 m-0">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">Paid Off</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                            <input type="number" step="any" name='advance' id="advance" value=0.00 class="form-control border-secondary" style="color: black; background-color: white;"/>
+                                                        </div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+                                                    <div class="row container-fluid p-2 m-0">
+                                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">Balance</label></div>
+                                                        <div class="col-sm-1 mt-2">:</div>
+                                                        <div class="col-sm-7">
+                                                            <input type="number" name='balance' id="balance" value=0.00 readonly style="color: black; background-color: white;"  class="form-control border-secondary" readonly />
+                                                        </div>
+                                                        <div class="col-sm-4 m-0 p-0"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            
+                                    <div class="row">
+                                        <div class="col-md-1 mt-4"></div>
+                                        <div class="col-md-5 mt-3 d-flex" style="margin-left:5vh">
+                                            <input type="submit" class="btn btn-primary bg-gradient me-3" name="Next" value="SAVE & NEXT"></input> 
+                                            <input type="submit" class="btn btn-primary bg-gradient" name="Save" value="SAVE"></input>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div> 
+
+
+        <!-- -------------------------------------end of estimate---------------------------------- -->
+
+
+        <!-- -------------------------------------------------------estimate old---------------------------------------->
 <div class="body-wrapper">
     <div class="container-fluid">
         <div class="row mb-4 mt-3">
@@ -148,7 +479,7 @@
                         <div class="col-md-4">
                             <label for="party">Party</label>
                             <div class="d-flex py-2">
-                                <select name="party_name" id="party" class="form-control fw-bolder" required>
+                                <select name="party_name_changes" id="party" class="form-control fw-bolder" required>
                                     <option value="">Select Party</option>
                                     {% for p in parties %}
                                     <option value="{{p.id}}">{{p.party_name}}</option>
@@ -156,12 +487,7 @@
                                 </select>
                                 <button type="button" class="btn bg-warning ms-1" data-bs-target="#newParty" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
                             </div>
-                            <div class="party_balance mt-3 d-none" id="party_balance">
-                                <label for="p_bal">Balance: </label>
-                                <span id="p_bal" class="fs-5 fw-bold">0</span>
-                                <input type="text" name="p_state" id="p_state" value="" hidden>
-                                <input type="text" name="c_state" id="c_state" value="{{company.state}}" hidden>
-                            </div>
+                            
                         </div>
                         <div class="col-md-4">
                             <div class="form-group d-none" id="party_contact">
@@ -342,7 +668,6 @@
 
     </div>
 </div> 
-
 
 <!-- new unit modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -579,374 +904,212 @@
             <div class="modal-body">
                 <form autocomplete="off" id="newPartyForm" class="new_party_form"> 
                     {% csrf_token %}
+            <div class="position-relative">
+                <div class="position-absolute end-0">
+                    <div class="d-flex pt-3 pe-3">
+                    <a href="#" data-bs-dismiss="modal"><span class="fa fa-times fs-5 tb p-1"></span></a>
+                </div>
+                </div>
+                </div>
             
-                    <!-- <div class="page-content">
-                        <div class="card radius-15"> -->
-
-                            <div class="position-relative">
-                                <div class="position-absolute end-0">
-                                  <div class="d-flex pt-3 pe-3">
-                                    <a href="#" data-bs-dismiss="modal"><span class="fa fa-times fs-5 tb p-1"></span></a>
-                                </div>
-                                </div>
-                              </div>
-                            
-                            <div class="bg-light p-4 rounded">
-                                <h5><strong class="fw-bolder">ADD PARTY</strong></h5>
-                                {% for message in messages %}
-                                    <div class="alert alert-danger text-center" role="alert">{{ message }}</div>
-                                {% endfor %}
-                                        <div class="row" style="margin-left: -1vh;">
-                                            <div class="col-md-4">
-                                                <!-- <label class="col-form-label" for="partyname" style="color: black;">Party Name</label> -->
-                                                <input type="text" class="form-control border-secondary fw-bolder" id="partyname" name="partyname" style="color: black;" placeholder="PARTY NAME" required>
-
-                                            </div>
-                                            <div class="col-md-4">
-                                                <!-- <label class="col-form-label" style="color: black;">GSTIN</label> -->
-                                                <div style="position: relative; ">
-                                                    <input type="text" class="form-control border-secondary fw-bolder" onchange="validateGSTIN(this)" id="gstno" name="gstno" placeholder="GST NUMBER" style="color: black; width: 100%;">
-                                                    <span id="gstno-validation" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);"></span>
-                                                </div>
-                                                <label style="color: rgb(36, 206, 248);">* 32AAQFR1222B1ZS</label>
-                                            </div>
-                                            <div class="col-md-4">
-                                                
-                                                <!-- <label class="col-form-label" for="partyphno" style="color: black;">Mobile</label> -->
-                                                <div style="position: relative; ">
-                                                    <input type="number" class="form-control border-secondary fw-bolder" id="contact" name="contact" style="color: black;" placeholder="PHONE NUMBER" oninput="validatePhoneNumber(this)" required>
-                                                    <span id="contact-validation" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);"></span>
-                                                </div>
-                            
-                                            </div>
-                                        </div>
-        
-                                        <div>
-                                            <p></p>
-                                            <hr class="p-0 m-0">
-                                            <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
-                                                <div class="">
-                                                    <div class="row pb-0 mb-0">
-                                                        <div id="gsthead" class="col text-center pb-2" >
-                                                            <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >GST & ADDRESS</a>
-                                                        </div>
-                                                        <div id="credithead" class="col text-center pb-2" >
-                                                            <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >CREDIT & BALANCES</a>
-                                                        </div>
-                                                        <div id="fieldhead" class="col text-center pb-2" >
-                                                            <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >ADDITIONAL FIELD</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            <div id="gsttemp" style="background-color: rgba(144, 211, 117, 0.098);">
-                                                <div class="row">
-                                                    <div class="col-sm-12  col-md-1"></div>
-                                                    <div class="col-sm-12 col-md-10 pb-4">
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-
-                                                                
-                                                                <label class="col-form-label mt-4" style="color: black;">GST TYPE</label>
-                                                                <select class="form-control border-secondary bg-light me-2 fw-bolder text-uppercase" id="gst" name="gsttype" style="color: black; background-color: white;">
-                                                                    <option selected value="" hidden>Select</option>
-                                                                    <option value="Registered Party">Registered Party</option>
-                                                                    <option value="Unregistered or Consumer">Unregistered or Consumer</option>
-                                                                    <option value="Registered Business or Combosision">Registered Business or Composition</option>
-                                                                </select>
-        
-                                                                <label class="col-form-label mt-4" for="company" style="color: black;">SUPPLY STATE</label>
-                                                                <select class="form-control border-secondary bg-light me-2 fw-bolder text-uppercase" name="splystate" id="state">
-                                                                    <option value="" selected hidden>Select</option>
-                                                                    <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islands</option>
-                                                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
-                                                                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                                                                    <option value="Assam">Assam</option>
-                                                                    <option value="Bihar">Bihar</option>
-                                                                    <option value="Chandigarh">Chandigarh</option>
-                                                                    <option value="Chhattisgarh">Chhattisgarh</option>
-                                                                    <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
-                                                                    <option value="Daman anad Diu">Daman and Diu</option>
-                                                                    <option value="Delhi">Delhi</option>
-                                                                    <option value="Goa">Goa</option>
-                                                                    <option value="Gujarat">Gujarat</option>
-                                                                    <option value="Haryana">Haryana</option>
-                                                                    <option value="Himachal Pradesh">Himachal Pradesh</option>
-                                                                    <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                                                                    <option value="Jharkhand">Jharkhand</option>
-                                                                    <option value="Karnataka">Karnataka</option>
-                                                                    <option value="Kerala">Kerala</option>
-                                                                    <option value="Ladakh">Ladakh</option>
-                                                                    <option value="Lakshadweep">Lakshadweep</option>
-                                                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
-                                                                    <option value="Maharashtra">Maharashtra</option>
-                                                                    <option value="Manipur">Manipur</option>
-                                                                    <option value="Meghalaya">Meghalaya</option>
-                                                                    <option value="Mizoram">Mizoram</option>
-                                                                    <option value="Nagaland">Nagaland</option>
-                                                                    <option value="Odisha">Odisha</option>
-                                                                    <option value="Pondicherry">Pondicherry</option>
-                                                                    <option value="Punjab">Punjab</option>
-                                                                    <option value="Rajasthan">Rajasthan</option>
-                                                                    <option value="Sikkim">Sikkim</option>
-                                                                    <option value="Tamil Nadu">Tamil Nadu</option>
-                                                                    <option value="Telangana">Telangana</option>
-                                                                    <option value="Tripura">Tripura</option>
-                                                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
-                                                                    <option value="Uttarakhand">Uttarakhand</option>
-                                                                    <option value="West Bengal">West Bengal</option>
-                                                                    <option value="Other Territory">Other Territory</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="col-form-label mt-4" style="color: black;">BILLING ADDRESS</label>
-                                                                <textarea class="form-control border-secondary" name="baddress" id="partyAddress" rows="6" type="text" style="color: black; background-color: white;" placeholder="Address Here"></textarea>
-                                                            </div>
-                                                        </div>
-        
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <label class="col-form-label mt-4" for="partyemail" style="color: black;">EMAIL</label>
-                                                                <input type="email" class="form-control border-secondary" id="email" name="partyemail" style="color: black; background-color: white;" placeholder="Enter Email" >
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="text-start mt-5">
-                                                            <button id="gstnxt" class="btn btn-primary bg-gradient" type="button">NEXT</button>
-                                                        </div>
-        
-                                                    </div>
-                                                </div>
-                                             
-                                            </div>
-            
-                                            <div id="credittemp"style="background-color: rgba(144, 211, 117, 0.098);" hidden>
-                                                <div class="row">
-                                                    <div class="col-sm-12  col-md-1"></div>
-                                                    <div class="col-sm-12 col-md-10 pb-4">
-                                                        <div class="row mt-4">
-                                                            <div class="col-md-6">
-                                                                <label class="col-form-label" style="color: black;" for="openbalance">OPENING BALANCE  &nbsp; &nbsp;  </label>   &nbsp;&nbsp;&nbsp;
-                                                              
-                                                                <input type="number" class="form-control border-secondary" id="balance"  name="openbalance" style="color: black; background-color: white;" value="0">
-                                                                <label class="col-form-label" style="color: black;">To Pay</label> &nbsp; &nbsp; 
-                                                                <input type="radio" class="radio-input border-secondary" id="toPayRadio" name="paymentType" value="To Pay"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                                                                <label class="col-form-label" style="color: black;">To Receive</label> &nbsp; &nbsp;
-                                                                <input type="radio" class="radio-input border-secondary" id="toReceiveRadio" name="paymentType" value="To Receive">
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="col-form-label" style="color: black;" for="crd_lmt">CREDIT LIMIT &nbsp; &nbsp;</label>&nbsp;&nbsp;&nbsp;
-                                                                <label class="switch">
-                                                                    <input type="checkbox" id="toggle">
-                                                                    <span class="slider round"></span>
-                                                                </label>
-                                                                <input type="number" class="form-control border-secondary" id="credit_limit"   name="crd_lmt" style="color: black; background-color: white; display: none;">
-                                                                
-                                                            </div>
-                                                           
-                                                        </div>
-        
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <label class="col-form-label mt-4" style="color: black;">DATE</label>
-                                                                <input type="date" class="form-control border-secondary" id="" name="current-date" style="color: black; background-color: white;"  value="{{tod | date:'Y-m-d'}}">
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="text-start mt-5">
-                                                            <button id="creditnxt" class="btn btn-primary bg-gradient me-3" type="button">NEXT</button>
-                                                            <button id="creditprev" class="btn btn-primary bg-gradient" type="button">PREVIOUS</button>
-                                                        </div>
-        
-                                                    </div>
-                                                </div>
-                                            
-                                            </div>
-        
-                                            <div id="fieldtemp"style="background-color: rgba(144, 211, 117, 0.098);" hidden>
-                                                <div class="row">
-                                                    <div class="col-sm-12  col-md-1"></div>
-                                                    <div class="col-sm-12 col-md-10 pb-4">
-                                                        <div class="row mt-4">
-                                                            <div class="col-md-4">
-                                                                <label class="col-form-label" style="color: black;">ADDITIONAL FIELD 1</label>
-                                                                <input type="text" class="form-control border-secondary" id="additionalfield1" name="additional1" style="color: black; background-color: white;">
-                                                            </div>
-                                                            <div class="col-md-4">
-                                                                <label class="col-form-label" style="color: black;">ADDITIONAL FIELD 2</label>
-                                                                <input type="text" class="form-control border-secondary" id="additionalfield2" name="additional2" style="color: black; background-color: white;">
-                                                            </div>
-                                                            <div class="col-md-4">
-                                                                <label class="col-form-label" style="color: black;">ADDITIONAL FIELD 3</label>
-                                                                <input type="text" class="form-control border-secondary" id="additionalfield3" name="additional3" style="color: black; background-color: white;">
-                                                            </div>
-                                                        </div>
-                                                        <div class="text-start mt-5">
-                                                            <button id="fieldprev" class="btn btn-primary bg-gradient  me-3" type="button">PREVIOUS</button>
-                                                            <!-- <input type="submit" class="btn btn-primary bg-gradient save-button" name="save" value="SAVE"> -->
-                                                            <input type="button" id="saveParty" class="btn btn-primary bg-gradient me-3" data-bs-dismiss="modal" name="save" value="SAVE">
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                              
-                                            
-                                    <!-- </div> -->
-                                        <!-- </div> -->
-                                    </div>
-                                    
-                                </div>
-                                                         
-                        <!-- </div>
-                    </div> -->
-
-            
-                    <!-- <div class="container-fluid">
-                        <div class="col-md-9 row">
+            <div class="bg-light p-4 rounded">
+                <h5><strong class="fw-bolder">ADD PARTY</strong></h5>
+                {% for message in messages %}
+                    <div class="alert alert-danger text-center" role="alert">{{ message }}</div>
+                {% endfor %}
+                        <div class="row" style="margin-left: -1vh;">
                             <div class="col-md-4">
-                                <input type="text" style="background-color: white;" class="form-control" id="partyname" name="partyname" placeholder="Party Name" required>
-                            </div>                
-                            <div class="col-md-4" style="position: relative;">
-                                <input type="text" style="background-color: white;" class="form-control" id="gstno" name="gstno" placeholder="GSTIN" oninput="validateGSTIN(this)">
-                                <span id="gstno-validation" style="position: absolute; right: 14px; top: 8px;"></span>
+                                <input type="text" class="form-control border-secondary fw-bolder" id="partyname" name="partyname" style="color: black;" placeholder="PARTY NAME" required>
+                            </div>
+                            <div class="col-md-4">
+                                <div style="position: relative; ">
+                                    <input type="text" class="form-control border-secondary fw-bolder" onchange="validateGSTIN(this)" id="gstno" name="gstno" placeholder="GST NUMBER" style="color: black; width: 100%;">
+                                    <span id="gstno-validation" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);"></span>
+                                </div>
                                 <label style="color: rgb(36, 206, 248);">* 32AAQFR1222B1ZS</label>
                             </div>
-                            
-                            <div class="col-md-4" style="position: relative;">
-                                <input type="number" style="background-color: white;" class="form-control" id="contact" name="contact" placeholder="Phone Number" oninput="validatePhoneNumber(this)">
-                                <span id="contact-validation" style="position: absolute; right: 15px; top: 8px;"></span>
-                            </div>  
-                            
-                            
-                            <div class="options mt-2">
-                                <a href="javascript:void(0);" onclick="toggleSection('GST')" style="color: black;"><b>GST &
-                                        Address<b></a>
-                                <a href="javascript:void(0);" onclick="toggleSection('Credit')"
-                                    style="color: black; margin-left: 3vw;"><b>Credit & Balances<b></a>
-                                <a href="javascript:void(0);" onclick="toggleSection('additionalfield')"
-                                    style="color: black; margin-left: 3vw;">Aditional Field</a>
+                            <div class="col-md-4">
+                                <div style="position: relative; ">
+                                    <input type="number" class="form-control border-secondary fw-bolder" id="contact" name="contact" style="color: black;" placeholder="PHONE NUMBER" oninput="validatePhoneNumber(this)" required>
+                                    <span id="contact-validation" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);"></span>
+                                </div>
                             </div>
                         </div>
-                        <fieldset id="GST" class="GST">
-                            <div style="background-color: white;" class="col-sm-5"><select class="form-control mt-4 " id="gst" name="gst">
-                                    <option >Select GST Type</option>
-                                    <option >Registered Party</option>
-                                    <option>UnRegistered or Consumer</option>
-                                    <option>Registered Business or Combosision</option>
-                                </select>
+                        <div>
+                            <p></p>
+                            <hr class="p-0 m-0">
+                            <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
+                                <div class="">
+                                    <div class="row pb-0 mb-0">
+                                        <div id="gsthead" class="col text-center pb-2" >
+                                            <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >GST & ADDRESS</a>
+                                        </div>
+                                        <div id="credithead" class="col text-center pb-2" >
+                                            <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >CREDIT & BALANCES</a>
+                                        </div>
+                                        <div id="fieldhead" class="col text-center pb-2" >
+                                            <a class="fw-bolder fs-4" style="color: gray; cursor: pointer;" >ADDITIONAL FIELD</a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div style="background-color: white;" class="col-sm-5"> <select type="text" class="form-control mt-4" id="state" name="state"></div>
-                            <option value="" selected>Choose State</option>
-                            <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads</option>
-                            <option value="Andhra Predhesh">Andhra Predhesh</option>
-                            <option value="Arunachal Predesh">Arunachal Predesh</option>
-                            <option value="Assam">Assam</option>
-                            <option value="Bihar">Bihar</option>
-                            <option value="Chandigarh">Chandigarh</option>
-                            <option value="Chhattisgarh">Chhattisgarh</option>
-                            <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
-                            <option value="Damn anad Diu">Damn anad Diu</option>
-                            <option value="Delhi">Delhi</option>
-                            <option value="Goa">Goa</option>
-                            <option value="Gujarat">Gujarat</option>
-                            <option value="Haryana">Haryana</option>
-                            <option value="Himachal Predesh">Himachal Predesh</option>
-                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                            <option value="Jharkhand">Jharkhand</option>
-                            <option value="Karnataka">Karnataka</option>
-                            <option value="Kerala">Kerala</option>
-                            <option value="Ladakh">Ladakh</option>
-                            <option value="Lakshadweep">Lakshadweep</option>
-                            <option value="Madhya Predesh">Madhya Predesh</option>
-                            <option value="Maharashtra">Maharashtra</option>
-                            <option value="Manipur">Manipur</option>
-                            <option value="Meghalaya">Meghalaya</option>
-                            <option value="Mizoram">Mizoram</option>
-                            <option value="Nagaland">Nagaland</option>
-                            <option value="Odisha">Odisha</option>
-                            <option value="Puducherry">Puducherry</option>
-                            <option value="Punjab">Punjab</option>
-                            <option value="Rajasthan">Rajasthan</option>
-                            <option value="Sikkim">Sikkim</option>
-                            <option value="Tamil Nadu">Tamil Nadu</option>
-                            <option value="Telangana">Telangana</option>
-                            <option value="Tripura">Tripura</option>
-                            <option value="Uttar Predesh">Uttar Predesh</option>
-                            <option value="Uttarakhand">Uttarakhand</option>
-                            <option value="West Bengal">West Bengal</option>
-                            <option value="Other Territory">Other Territory</option>
-                            </select>
-                    </div>
-            
-                    <div class="col-sm-5 ">
-                        <textarea style="background-color: white;" class="form-control mt-4" name="address" id="partyAddress" cols="56" rows="3"
-                            placeholder="&nbsp;Address"></textarea>
-                    </div>
-            
-                    <div class="col-sm-5 ">
-                        <input style="background-color: white;" type="email" class="form-control mt-4" id="email" name="email" placeholder="Email">
-                    </div>
-                    </fieldset>
-            
-                    <fieldset id="Credit" class="Credit" style="display:none;">
-                        <div class="col-sm-5">
-                            <input style="background-color: white;" type="number" class="form-control mt-4" id="balance" name="balance" placeholder="Opening Balance">
+
+                            <div id="gsttemp" style="background-color: rgba(144, 211, 117, 0.098);">
+                                <div class="row">
+                                    <div class="col-sm-12  col-md-1"></div>
+                                    <div class="col-sm-12 col-md-10 pb-4">
+                                        <div class="row">
+                                            <div class="col-md-6">
+
+                                                
+                                                <label class="col-form-label mt-4" style="color: black;">GST TYPE</label>
+                                                <select class="form-control border-secondary bg-light me-2 fw-bolder text-uppercase" id="gst" name="gsttype" style="color: black; background-color: white;">
+                                                    <option selected value="" hidden>Select</option>
+                                                    <option value="Registered Party">Registered Party</option>
+                                                    <option value="Unregistered or Consumer">Unregistered or Consumer</option>
+                                                    <option value="Registered Business or Combosision">Registered Business or Composition</option>
+                                                </select>
+
+                                                <label class="col-form-label mt-4" for="company" style="color: black;">SUPPLY STATE</label>
+                                                <select class="form-control border-secondary bg-light me-2 fw-bolder text-uppercase" name="splystate" id="state">
+                                                    <option value="" selected hidden>Select</option>
+                                                    <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islands</option>
+                                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                                    <option value="Assam">Assam</option>
+                                                    <option value="Bihar">Bihar</option>
+                                                    <option value="Chandigarh">Chandigarh</option>
+                                                    <option value="Chhattisgarh">Chhattisgarh</option>
+                                                    <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
+                                                    <option value="Daman anad Diu">Daman and Diu</option>
+                                                    <option value="Delhi">Delhi</option>
+                                                    <option value="Goa">Goa</option>
+                                                    <option value="Gujarat">Gujarat</option>
+                                                    <option value="Haryana">Haryana</option>
+                                                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                                    <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                                    <option value="Jharkhand">Jharkhand</option>
+                                                    <option value="Karnataka">Karnataka</option>
+                                                    <option value="Kerala">Kerala</option>
+                                                    <option value="Ladakh">Ladakh</option>
+                                                    <option value="Lakshadweep">Lakshadweep</option>
+                                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                                    <option value="Maharashtra">Maharashtra</option>
+                                                    <option value="Manipur">Manipur</option>
+                                                    <option value="Meghalaya">Meghalaya</option>
+                                                    <option value="Mizoram">Mizoram</option>
+                                                    <option value="Nagaland">Nagaland</option>
+                                                    <option value="Odisha">Odisha</option>
+                                                    <option value="Pondicherry">Pondicherry</option>
+                                                    <option value="Punjab">Punjab</option>
+                                                    <option value="Rajasthan">Rajasthan</option>
+                                                    <option value="Sikkim">Sikkim</option>
+                                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                                    <option value="Telangana">Telangana</option>
+                                                    <option value="Tripura">Tripura</option>
+                                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                                    <option value="Uttarakhand">Uttarakhand</option>
+                                                    <option value="West Bengal">West Bengal</option>
+                                                    <option value="Other Territory">Other Territory</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="col-form-label mt-4" style="color: black;">BILLING ADDRESS</label>
+                                                <textarea class="form-control border-secondary" name="baddress" id="partyAddress" rows="6" type="text" style="color: black; background-color: white;" placeholder="Address Here"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="col-form-label mt-4" for="partyemail" style="color: black;">EMAIL</label>
+                                                <input type="email" class="form-control border-secondary" id="email" name="partyemail" style="color: black; background-color: white;" placeholder="Enter Email" >
+                                            </div>
+                                        </div>
+
+                                        <div class="text-start mt-5">
+                                            <button id="gstnxt" class="btn btn-primary bg-gradient" type="button">NEXT</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <div id="credittemp"style="background-color: rgba(144, 211, 117, 0.098);" hidden>
+                                <div class="row">
+                                    <div class="col-sm-12  col-md-1"></div>
+                                    <div class="col-sm-12 col-md-10 pb-4">
+                                        <div class="row mt-4">
+                                            <div class="col-md-6">
+                                                <label class="col-form-label" style="color: black;" for="openbalance">OPENING BALANCE  &nbsp; &nbsp;  </label>   &nbsp;&nbsp;&nbsp;
+                                                
+                                                <input type="number" class="form-control border-secondary" id="balance"  name="openbalance" style="color: black; background-color: white;" value="0">
+                                                <label class="col-form-label" style="color: black;">To Pay</label> &nbsp; &nbsp; 
+                                                <input type="radio" class="radio-input border-secondary" id="toPayRadio" name="paymentType" value="To Pay"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                                <label class="col-form-label" style="color: black;">To Receive</label> &nbsp; &nbsp;
+                                                <input type="radio" class="radio-input border-secondary" id="toReceiveRadio" name="paymentType" value="To Receive">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="col-form-label" style="color: black;" for="crd_lmt">CREDIT LIMIT &nbsp; &nbsp;</label>&nbsp;&nbsp;&nbsp;
+                                                <label class="switch">
+                                                    <input type="checkbox" id="toggle">
+                                                    <span class="slider round"></span>
+                                                </label>
+                                                <input type="number" class="form-control border-secondary" id="credit_limit"   name="crd_lmt" style="color: black; background-color: white; display: none;">
+                                                
+                                            </div>
+                                            
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="col-form-label mt-4" style="color: black;">DATE</label>
+                                                <input type="date" class="form-control border-secondary" id="current_date" name="current_date" style="color: black; background-color: white;"  value="{{tod | date:'Y-m-d'}}">
+                                            </div>
+                                        </div>
+
+                                        <div class="text-start mt-5">
+                                            <button id="creditnxt" class="btn btn-primary bg-gradient me-3" type="button">NEXT</button>
+                                            <button id="creditprev" class="btn btn-primary bg-gradient" type="button">PREVIOUS</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            
+                            </div>
+
+                            <div id="fieldtemp"style="background-color: rgba(144, 211, 117, 0.098);" hidden>
+                                <div class="row">
+                                    <div class="col-sm-12  col-md-1"></div>
+                                    <div class="col-sm-12 col-md-10 pb-4">
+                                        <div class="row mt-4">
+                                            <div class="col-md-4">
+                                                <label class="col-form-label" style="color: black;">ADDITIONAL FIELD 1</label>
+                                                <input type="text" class="form-control border-secondary" id="additionalfield1" name="additional1" style="color: black; background-color: white;">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="col-form-label" style="color: black;">ADDITIONAL FIELD 2</label>
+                                                <input type="text" class="form-control border-secondary" id="additionalfield2" name="additional2" style="color: black; background-color: white;">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="col-form-label" style="color: black;">ADDITIONAL FIELD 3</label>
+                                                <input type="text" class="form-control border-secondary" id="additionalfield3" name="additional3" style="color: black; background-color: white;">
+                                            </div>
+                                        </div>
+                                        <div class="text-start mt-5">
+                                            <button id="fieldprev" class="btn btn-primary bg-gradient  me-3" type="button">PREVIOUS</button>
+                                            <input type="button" id="saveParty" class="btn btn-primary bg-gradient me-3" data-bs-dismiss="modal" name="save" value="SAVE">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                    
                         </div>
-                    
-                        <div  class="col-sm-7 mt-4">
-                            <label class="radio-label">To Pay</label>
-                            <input type="radio" class="radio-input" id="toPayRadio" name="paymentType" value="To Pay" style="margin-right: 2vw; margin-left: 5px;">
-                            <label class="radio-label">To Receive</label>
-                            <input type="radio" class="radio-input" id="toReceiveRadio" name="paymentType" value="To Receive" style="margin-right: 2vw; margin-left: 5px;">
-                        </div>
-                    
-                        <label class="switchbox mt-4" style="margin-right: 1vw;">Credit Limit</label>
-                        <label class="switch">
-                            <input type="checkbox" id="toggle">
-                            <span class="slider round"></span>
-                        </label>
-                        <div class="col-md-5 mt-4" id="text-box" style="display: none;">
-                            <input style="background-color: white;" type="number" class="form-control" name="creditlimit" placeholder="Credit Limit" id="credit_limit">
-                        </div>
-                    
-                        <div class="col-md-5 mt-4">
-                            <input  type="date" class="form-control" id="current-date" name="currentdate" placeholder="Current Date" style="background-color: white;" >
-                        </div>
-                    
-            
-                    </fieldset>
-                    
-                    <fieldset id="additionalfield" class="additionalfield" style="display:none;">
-                        <div class="col-md-5 mt-4">
-                            <input type="text" class="form-control" name="additionalfield1" id="additionalfield1" placeholder="Additional Field" style="background-color: white;">
-                        </div>
-                
-                        <div class="col-md-5 mt-4">
-                            <input type="text" class="form-control" name="additionalfield2" id="additionalfield2" placeholder="Additional Field" style="background-color: white;">
-                        </div>
-                
-                        <div class="col-md-5 mt-4">
-                            <input type="text" class="form-control" name="additionalfield3" id="additionalfield3" placeholder="Additional Field" style="background-color: white;">
-                        </div>
-                    </fieldset>
-            
-                    
-                    <div class="col-md-5 mt-4">
-                        <input type="button"  class="btn btn-primary save-button" data-bs-dismiss="modal" name="save" value="Save">
-                    </div> -->
-                
                 </form>
             </div>
         </div>
     </div>
   </div>
-
-
-
-
-
-
 
 
 <script>
@@ -1105,7 +1268,7 @@
 
 
 
-    // --------------------------------end of party moadl tabs-----------------------
+    // --------------------------------end of party modal tabs-----------------------
 
 
 
@@ -1150,6 +1313,8 @@
                         }
                         $('#p_contact').val(json_data[key]['contact']);
                         $('#p_state').val(json_data[key]['state']);
+                        console.log("Selected party's state is" + json_data[key]['state']);
+
                         if (json_data[key]['payment'] == 'To Pay'){
                             $('#p_bal').css('color','red');
                             $('#p_bal').text(json_data[key]['balance']);
@@ -1185,6 +1350,7 @@
                     }
                     $('#p_contact').val(json_data[key]['contact']);
                     $('#p_state').val(json_data[key]['state']);
+                    console.log("Selected party's state is" + json_data[key]['state']);
                     if (json_data[key]['payment'] == 'To Pay'){
                         $('#p_bal').css('color','red');
                         $('#p_bal').text(json_data[key]['balance']);
@@ -1243,23 +1409,42 @@
     }
 
     $(document).on("click", "#saveParty", function(){
+
+
+        // console.log($('#partyname').val());
+        // console.log($('#gstno').val());
+        // console.log($('#contact').val());
+        // console.log($('#gst').val());
+        // console.log($('#state').val());
+        // console.log($('#partyAddress').val());
+        // console.log($('#email').val());
+        // console.log($('#balance').val());
+        // console.log($("input[name='paymentType']:checked").val());
+        // console.log($('#credit_limit').val());
+        // console.log($('#current_date').val());
+        // console.log($('#additionalfield1').val());
+        // console.log($('#additionalfield2').val());
+        // console.log($('#additionalfield3').val());
+
+        
+
         $.ajax({
             type : 'POST',
-            url:"{% url 'addNewParty' %}",
+            url:"{% url 'addEstParty' %}",
             data:{
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 partyname : $('#partyname').val(),
                 gstno : $('#gstno').val(),
                 contact : $('#contact').val(),
-                gst : $('#gst').text(),
+                gst : $('#gst').val(),
                 state : $('#state').val(),
                 address : $('#partyAddress').val(),
                 email : $('#email').val(),
                 balance : $('#balance').val(),
                 paymentType : $("input[name='paymentType']:checked").val(),
                 creditlimit : $('#credit_limit').val(),
-                currentdate : $('#current-date').val(),
-                enddate : $('#current-date').val(),
+                currentdate : $('#current_date').val(),
+                enddate : $('#current_date').val(),
                 additionalfield1 : $('#additionalfield1').val(),
                 additionalfield2 : $('#additionalfield2').val(),
                 additionalfield3 : $('#additionalfield3').val(),
@@ -1561,7 +1746,7 @@
     }
 
     // Get the current date
-    const currentDateInput = document.getElementById("current-date");
+    const currentDateInput = document.getElementById("current_date");
     const currentDate = new Date();
 
     // Format the date as "YYYY-MM-DD" and set it in the input field

@@ -176,6 +176,7 @@ urlpatterns = [
     path('create_estimate',views.create_estimate, name='create_estimate'),
     path('add_new_party',views.addNewParty, name='addNewParty'),
     path('add_new_item',views.addNewItem, name='addNewItem'),
+    path('add_est_party',views.addEstParty, name='addEstParty'),
     path('add_est_item',views.addEstItem, name='addEstItem'),
     path('get_party_details',views.getPartyDetails, name='getPartyDetails'),
     path('get_item_data',views.getItemData, name='getItemData'),

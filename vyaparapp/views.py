@@ -2993,6 +2993,97 @@ def delivery_challan(request):
       'staff':staff, 'company':com,'allmodules':allmodules, 'challan':challan,
     }
     return render(request, 'company/delivery_challan.html',context)
+
+
+
+def addEstParty(request):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    else:
+      return redirect('/')
+    staff =  staff_details.objects.get(id=staff_id)
+    allmodules= modules_list.objects.get(company=staff.company,status='New')
+
+    if request.method == 'POST':
+      Company = company.objects.get(id = staff.company.id)
+      user_id = request.user.id
+      
+      party_name = request.POST['partyname']
+      gst_no = request.POST['gstno']
+      contact = request.POST['contact']
+      gst_type = request.POST['gst']
+      state = request.POST['state']
+      address = request.POST['address']
+      email = request.POST['email']
+      openingbalance = request.POST.get('balance', '')
+      payment = request.POST.get('paymentType', '')
+      creditlimit = request.POST.get('creditlimit', '')
+      current_date = request.POST['currentdate']
+      End_date = request.POST.get('enddate', None)
+      additionalfield1 = request.POST['additionalfield1']
+      additionalfield2 = request.POST['additionalfield2']
+      additionalfield3 = request.POST['additionalfield3']
+      comp=Company
+
+
+      # print(party_name)
+      # print(gst_no)
+      # print(contact)
+      # print(gst_type)
+      # print(state)
+      # print(address)
+      # print(email)
+      # print(openingbalance)
+      # print(payment)
+      # print(creditlimit)
+      # print(current_date)
+      # print(End_date)
+      # print(additionalfield1)
+      # print(additionalfield2)
+      # print(additionalfield3)
+
+
+      context  = {'staff' : staff, 'tod' : date.today(),'allmodules' : allmodules}
+       
+
+      part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
+                      creditlimit=creditlimit,current_date=current_date, current_balance = openingbalance, End_date=End_date,additionalfield1=additionalfield1,
+                      additionalfield2=additionalfield2,additionalfield3=additionalfield3,user=staff.company.user,company=staff.company)
+        
+      if not party_name or not contact:
+          messages.error(request, 'Please Enter Party Name and Contact.')
+      else:
+        if 'save_and_new' in request.POST:
+            if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
+                messages.error(request, 'Party with the same party name and contact number already exists.')
+            else:
+                part.save()
+                party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created').save()
+            
+            return render(request, 'company/add_parties.html', context)
+        else:
+            if party.objects.filter(party_name=party_name, contact=contact).exists() or party.objects.filter(contact=contact).exists():
+                messages.error(request, 'Party with the same party name and contact number already exists.')
+            else:
+                part.save()
+                party_history.objects.create(party = part,company=staff.company,staff=staff,action='Created').save()
+
+            return JsonResponse({'status':True})
+
+    return render(request, 'company/create_estimate.html',context)  
+
+
+      # if (not party_name):
+      #   return render(request, 'add_parties.html')
+
+      # part = party(party_name=party_name, gst_no=gst_no,contact=contact,gst_type=gst_type, state=state,address=address, email=email, openingbalance=openingbalance,payment=payment,
+      #                 creditlimit=creditlimit,current_date=current_date,End_date=End_date,additionalfield1=additionalfield1,additionalfield2=additionalfield2,additionalfield3=additionalfield3,company=comp)
+      # part.save()
+
+      # return JsonResponse({'status':True})
+
   
 def addEstItem(request):
   if 'staff_id' in request.session:
