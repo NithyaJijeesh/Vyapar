@@ -219,14 +219,14 @@
                                                 <button type="button" class="btn bg-warning ms-1" data-bs-target="#newParty" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
                                             </div>
                                             <div class="party_balance mt-0 d-none" id="party_balance">
-                                                <label for="p_bal">Balance: </label>
+                                                <label for="p_bal" class="col-form-label" >BALANCE: </label>
                                                 <span id="p_bal" class="fs-3 fw-bold">0</span>
                                                 <input type="text" name="p_state" id="p_state" value="" hidden>
                                                 <input type="text" name="c_state" id="c_state" value="{{company.state}}" hidden>
                                             </div>
                                             <div id="phonediv">
                                                 <label class="col-form-label" >CONTACT </label>
-                                                <input class="form-control border-secondary" name="contact"  id="p_contact" autocomplete="off" style="color: black;background-color: white;" readonly>
+                                                <input class="form-control border-secondary fw-bolder" name="contact"  id="p_contact" autocomplete="off" style="color: black;background-color: white;" readonly>
                                             </div>
 
                                             
@@ -235,7 +235,7 @@
                                         <div class="col-md-4">
                                             <div id="daddressdiv" >
                                                 <label class="col-form-label">BILLING ADDRESS</label>
-                                                <textarea class="form-control border-secondary mb-3" name="address" id="bill_address" rows="6" type="text" style="color: black;background-color: white;" readonly></textarea>
+                                                <textarea class="form-control border-secondary mb-3 fw-bolder" name="address" id="bill_address" rows="5" type="text" style="color: black;background-color: white;" readonly></textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-4" >
@@ -249,7 +249,7 @@
 
 
                                             <label class="col-form-label ">STATE OF SUPPLY</label>
-                                            <select type="text" class="form-control border-secondary" id="state_of_supply" name="state_supply"  style="color: black;background-color: white;">
+                                            <select type="text" class="form-control border-secondary fw-bolder" id="state_of_supply" name="state_supply"  style="color: black;background-color: white;">
                                                 <option value="" selected hidden>Select</option>
                                                 <option value="State">State</option>
                                                 <option value="Other State">Other State</option>
@@ -268,15 +268,15 @@
                                             <table class="table table-bordered table-hover  mt-3" id="tab_logic" >
                                                 <thead>
                                                     <tr style="color: black;">
-                                                        <th class="text-center">#</th>
-                                                        <th class="text-center">PRODUCT</th>
-                                                        <th class="text-center">HSN</th>
-                                                        <th class="text-center">QTY</th>
-                                                        <th class="text-center">PRICE</th>
-                                                        <th class="text-center">TAX (%)</th>
-                                                        <th class="text-center">DISCOUNT</th>
-                                                        <th class="text-center">TOTAL</th>
-                                                        <th class="text-center">FIELD</th>
+                                                        <th scope="col" class="text-center">#</th>
+                                                        <th scope="col" class="text-center col-3">PRODUCT</th>
+                                                        <th scope="col" class="text-center">HSN</th>
+                                                        <th scope="col" class="text-center">QTY</th>
+                                                        <th scope="col" class="text-center">PRICE</th>
+                                                        <th scope="col" class="text-center">TAX (%)</th>
+                                                        <th scope="col" class="text-center">DISCOUNT</th>
+                                                        <th scope="col" class="text-center">TOTAL</th>
+                                                        <th scope="col" class="text-center"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="items-table-body">
@@ -284,7 +284,7 @@
                                                         <td class="nnum" style="text-align: center; color: black; width:2%">1</td>
     
                                                         <td style="width:21%">
-                                                            <div class="d-flex">
+                                                            <!-- <div class="d-flex">
                                                                 <select name='product[]' id="product1" class="form-control border-secondary product"  onchange="changeprd(this.id,this.value)" style="color: black; background-color: white;">
                                                                     <option value="" selected hidden>Select Product</option>
                                                                     {% for i in item %}
@@ -296,19 +296,32 @@
                                                             <button id="modal_closing" type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#newitem" data-bs-whatever="@mdo">
                                                                 <span class="fa fa-plus"></span>
                                                             </button>
+                                                        </div> -->
+
+                                                            <div class="w-100">
+                                                                <div class="p-0 border-0 bg-none d-flex position-relative" style="display: block;">
+                                                                    <input type="text" id="item1" value="" name="item[]" class="dropdown-toggle form-control item-display border-info bg-light" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
+                                                                    <ul class="dropdown-menu w-100 items-available position-absolute" id="menu1"  style="overflow-y: auto; height: 270px;"> 
+                                                                    {% for i in items %}
+                                                                    <li class="dropdown-item items-options" onclick="getItemDetails($(this).parent().prev().attr('id'),`{{i.item_name}}`)">{{i.item_name}}</li>
+                                                                    {% endfor %}
+                                                                    </ul>
+                                                                    <button type="button" class="btn bg-warning ms-1" data-bs-target="#newItem" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
+                                                                </div>
                                                             </div>
                                                         </td>
     
                                                         <td style="width:12%">
-                                                            <input type="text" name='hsn[]' id="hsn1" class="form-control border-secondary HSNCODE" style="color: black; background-color: white;" readonly />
+                                                            <input type="text" name='hsn[]' id="hsn1" class="form-control border-secondary HSNCODE" style="color: black; background-color: white;" readonly placeholder="HSN"/>
+                                                            <input type="text" name="estItems[]" id="estitem1" hidden>
                                                         </td>
     
                                                         <td style="width:13%">
-                                                            <input type="number" name='qty[]' id="qty1"  class="form-control border-secondary qty mb-1" step=0 min=0 style="color: black; background-color: white;" value=0 />
+                                                            <input type="number" name='qty[]' id="qty1"  class="form-control border-secondary qty mb-1" step=0 min=0 style="color: black; background-color: white;" value=0 placeholder="Quantity"/>
                                                         </td>
                                                     
                                                         <td style="width:12%">
-                                                            <input type="number" name='price[]' id="unit1" class="form-control border-secondary price" step="0.00" min="0" style="color: black; background-color: white;" value=0 readonly />
+                                                            <input type="number" name='price[]' id="unit1" class="form-control border-secondary price" step="0.00" min="0" style="color: black; background-color: white;" value=0 readonly placeholder="Sale Price"/>
                                                         </td>
                                                         
                                                         <td style="width:15%">
